@@ -24,6 +24,7 @@
                     animation: {
                         'scroll': 'scroll 45s linear infinite',
                         'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         scroll: {
@@ -55,6 +56,9 @@
         .ticker-item { display: inline-flex; align-items: center; gap: 8px; margin-right: 3rem; font-size: 0.9rem; font-weight: 600; }
         ul.custom-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: #cbd5e1; font-size: 0.9rem; }
         ul.custom-list li::before { content: "▹"; position: absolute; left: 0; color: #38bdf8; }
+
+        /* Stats Counter Style */
+        .stat-value { font-variant-numeric: tabular-nums; }
     </style>
 </head>
 <body class="antialiased">
@@ -211,12 +215,39 @@
 
     <section id="live-agent" class="py-24 bg-[#050914] border-t border-white/5">
         <div class="max-w-5xl mx-auto px-4">
-            <div class="text-center mb-10">
-                <div class="inline-block px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-400 text-xs font-bold mb-4">
+            <div class="text-center mb-8">
+                <div class="inline-block px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-400 text-xs font-bold mb-4 animate-pulse-slow">
                     LIVE SYSTEM
                 </div>
                 <h2 class="text-3xl font-bold text-white">Ask The Lawyer</h2>
                 <p class="text-slate-500 mt-2">Powered by Ekayan (Relevance AI)</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 animate-fade-in" id="stats-container">
+                <div class="glass-card p-4 rounded-xl text-center border-blue-500/20">
+                    <div class="text-2xl font-bold text-white flex justify-center items-center gap-1">
+                        <span class="counter" data-target="1420">0</span> TB
+                    </div>
+                    <div class="text-[10px] text-blue-400 uppercase tracking-widest font-semibold mt-1">Trade Data Processed</div>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center border-blue-500/20">
+                    <div class="text-2xl font-bold text-white flex justify-center items-center gap-1">
+                        <span class="counter" data-target="8500">0</span>+
+                    </div>
+                    <div class="text-[10px] text-blue-400 uppercase tracking-widest font-semibold mt-1">Queries Solved</div>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center border-blue-500/20">
+                    <div class="text-2xl font-bold text-white flex justify-center items-center gap-1">
+                        <span class="counter" data-target="12400">0</span> Hrs
+                    </div>
+                    <div class="text-[10px] text-blue-400 uppercase tracking-widest font-semibold mt-1">Manual Labor Saved</div>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center border-blue-500/20 bg-blue-600/5">
+                    <div class="text-2xl font-bold text-green-400 flex justify-center items-center gap-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span> Active
+                    </div>
+                    <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mt-1">Ekayan Status</div>
+                </div>
             </div>
 
             <div class="bg-white rounded-2xl overflow-hidden h-[700px] relative shadow-2xl border border-gray-200">
@@ -288,7 +319,39 @@
             } catch (err) { document.getElementById('statusMsg').innerText = "❌ Error connecting to server."; } 
             finally { btn.innerText = "Submit Request"; }
         }
+
+        // --- NEW: ANIMATED COUNTER LOGIC FOR METRICS ---
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.counter');
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-target');
+                        const speed = 200; // The lower the slower
+                        
+                        const updateCount = () => {
+                            const count = +counter.innerText;
+                            const inc = target / speed;
+                            
+                            if (count < target) {
+                                counter.innerText = Math.ceil(count + inc);
+                                setTimeout(updateCount, 20);
+                            } else {
+                                counter.innerText = target;
+                            }
+                        };
+                        updateCount();
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const statsContainer = document.getElementById('stats-container');
+        if(statsContainer) observer.observe(statsContainer);
+
     </script>
 </body>
 </html>
-
