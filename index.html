@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTrade AI - Global Trade OS</title>
+    <title>HindTrade AI - The Trade Empire</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,12 +19,12 @@
                         'scroll': 'scroll 45s linear infinite', 
                         'fade-in': 'fadeIn 0.8s ease-out forwards', 
                         'pulse-slow': 'pulse 3s infinite',
-                        'float': 'float 6s ease-in-out infinite'
+                        'glow': 'glow 2s ease-in-out infinite alternate'
                     },
                     keyframes: {
                         scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-100%)' } },
                         fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                        glow: { 'from': { boxShadow: '0 0 10px #3b82f6' }, 'to': { boxShadow: '0 0 20px #2563eb, 0 0 10px #60a5fa' } }
                     }
                 }
             }
@@ -33,108 +33,91 @@
 
     <style>
         body { background-color: #02040a; color: #E2E8F0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        /* Glassmorphism & UI System */
-        .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
-        .glass-card:hover { border-color: #38bdf8; transform: translateY(-5px); box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4); }
-        .icon-glow { box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
-        
-        /* Ticker */
+        .glass-card { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
+        .glass-card:hover { border-color: #38bdf8; transform: translateY(-5px); box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.5); }
         .ticker-wrap { width: 100%; overflow: hidden; background: #0F172A; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; white-space: nowrap; }
         .ticker-item { display: inline-flex; align-items: center; gap: 8px; margin-right: 3rem; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; }
-
-        /* Dashboard Specifics */
-        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; color: white; }
-        .dash-section { display: none; animation: fadeIn 0.4s ease-out; }
-        .dash-section.active { display: block; }
-
-        /* Form Inputs */
         .dash-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 15px; border-radius: 8px; color: white; margin-top: 5px; transition: 0.3s; }
         .dash-input:focus { outline: none; border-color: #3b82f6; background: rgba(255,255,255,0.1); }
-
-        /* Gold Gradient for Investments */
-        .gold-gradient { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-gold { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
+        .dash-section { display: none; animation: fadeIn 0.4s ease-out; }
+        .dash-section.active { display: block; }
+        
+        /* Agent Card Specifics */
+        .agent-card { position: relative; overflow: hidden; }
+        .agent-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--color), transparent); }
     </style>
 </head>
 <body class="antialiased">
+
+    <div id="lawyer-modal" class="fixed inset-0 z-[250] bg-black/90 backdrop-blur-md hidden flex items-center justify-center">
+        <div class="glass-card w-full max-w-2xl h-[600px] flex flex-col rounded-2xl border-yellow-500/30">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-yellow-900/10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 border border-yellow-500/50">
+                        <i data-lucide="scale" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">The Lawyer</h3>
+                        <p class="text-xs text-yellow-500">Ekayan Legal Intelligence • Live</p>
+                    </div>
+                </div>
+                <button onclick="toggleLawyer(false)" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="flex-1 p-6 overflow-y-auto space-y-4" id="lawyer-chat-body">
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex-shrink-0 flex items-center justify-center text-yellow-400"><i data-lucide="bot"></i></div>
+                    <div class="bg-white/5 p-4 rounded-r-xl rounded-bl-xl text-sm text-gray-300 border border-white/5">
+                        Namaste. I am your personal Trade Lawyer. I protect your money from fraud and bad contracts.<br><br>
+                        <strong>How can I help you today?</strong>
+                        <div class="mt-3 flex gap-2 flex-wrap">
+                            <button class="px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-xs hover:bg-yellow-500/20">Draft Contract</button>
+                            <button class="px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-xs hover:bg-yellow-500/20">Verify Buyer</button>
+                            <button class="px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-xs hover:bg-yellow-500/20">Customs Issue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-white/10">
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Ask legal query..." class="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-yellow-500 outline-none">
+                    <button class="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-6 rounded-lg"><i data-lucide="send"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="auth-modal" class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md hidden flex items-center justify-center">
         <div class="glass-card p-8 rounded-2xl w-full max-w-md relative animate-fade-in border-blue-500/30">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
             <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center text-blue-400 mx-auto mb-4"><i data-lucide="key" class="w-6 h-6"></i></div>
-                <h2 class="text-2xl font-serif text-white mb-2">Access HindTrade OS</h2>
-                <p class="text-gray-400 text-sm">Secure access via Work Email (Magic Link)</p>
+                <h2 class="text-2xl font-serif text-white mb-2">Join the Revolution</h2>
+                <p class="text-gray-400 text-sm">Enter email to access HindTrade OS</p>
             </div>
             <div id="auth-step-email">
                 <input type="email" id="auth-email" placeholder="name@company.com" class="dash-input mb-4 text-lg">
-                <button onclick="handleMagicLink()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2">
-                    <span>Send Verification Link</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <button onclick="handleMagicLink()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-lg shadow-blue-600/25">
+                    Send Verification Link
                 </button>
             </div>
             <div id="auth-step-success" class="hidden text-center">
                 <div class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 mb-4 text-sm">
-                    ✨ Link Sent! Check your email to login.
+                    ✨ Check your email inbox now!
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="profile-modal" class="fixed inset-0 z-[200] bg-[#02040a] hidden flex items-center justify-center">
-        <div class="max-w-2xl w-full p-6">
-            <div class="mb-8 text-center">
-                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-2">Final Step</p>
-                <h2 class="text-4xl font-serif text-white">Establish Identity</h2>
-                <p class="text-gray-400 mt-2">Create your permanent trade profile on the OS.</p>
-            </div>
-            <div class="glass-card p-8 rounded-2xl border-blue-500/20">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="col-span-2">
-                        <label class="text-xs text-gray-500 uppercase font-bold">Full Name</label>
-                        <input type="text" id="prof-name" class="dash-input" placeholder="e.g. Vikram Malhotra">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="text-xs text-gray-500 uppercase font-bold">Company Name (Registered)</label>
-                        <input type="text" id="prof-company" class="dash-input" placeholder="e.g. Malhotra Global Exports Pvt Ltd">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 uppercase font-bold">Role</label>
-                        <select id="prof-role" class="dash-input bg-[#0f172a]">
-                            <option value="exporter">Exporter</option>
-                            <option value="buyer">International Buyer</option>
-                            <option value="logistics">Logistics Partner</option>
-                            <option value="finance">Financier</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 uppercase font-bold">Base City</label>
-                        <input type="text" id="prof-city" class="dash-input" placeholder="e.g. Mumbai">
-                    </div>
-                </div>
-                <button onclick="saveProfile()" class="w-full mt-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-lg shadow-lg">
-                    Initialize Dashboard Access
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="landing-view" class="transition-all duration-700 ease-in-out opacity-100">
-
+    <div id="landing-view">
+        
         <nav class="fixed top-0 w-full z-50 bg-[#02040a]/90 backdrop-blur-md border-b border-white/5">
             <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg text-xl">H</div>
-                    <div class="leading-none">
-                        <span class="block text-xl font-bold text-white tracking-tight">HindTrade</span>
-                        <span class="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Intelligent OS</span>
-                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">H</div>
+                    <span class="text-xl font-bold text-white tracking-tight">HindTrade <span class="text-xs text-blue-400 ml-1 align-top">OS</span></span>
                 </div>
-                <div class="hidden md:flex gap-8 text-xs font-semibold text-gray-400 uppercase tracking-widest items-center">
-                    <a href="#vision" class="hover:text-white transition">Vision</a>
-                    <a href="#ekayan" class="hover:text-white transition">Ekayan AI</a>
-                    <button onclick="enterDemoMode()" class="px-4 py-2 border border-blue-500/30 text-blue-400 rounded hover:bg-blue-500/10 transition">
-                        Visit Himrock Dashboard (Demo)
+                <div class="hidden md:flex gap-6">
+                    <button onclick="toggleLawyer(true)" class="text-sm font-bold text-yellow-400 hover:text-white flex items-center gap-2 border border-yellow-500/20 px-4 py-2 rounded-full hover:bg-yellow-500/10 transition">
+                        <i data-lucide="message-square" class="w-4 h-4"></i> Talk to Lawyer
                     </button>
                     <button onclick="openAuthModal()" class="px-6 py-2 bg-white text-black font-bold rounded hover:bg-gray-200 transition">
                         Login / Register
@@ -145,408 +128,258 @@
 
         <div class="fixed top-20 w-full z-40 ticker-wrap">
             <div class="animate-scroll whitespace-nowrap inline-block text-gray-300">
-                <span class="ticker-item"><span class="text-blue-400">● LIVE:</span> HINDTRADE OS v1.0 ONLINE</span>
-                <span class="ticker-item">GOLD <span class="text-green-400">▲ ₹1,05,400</span></span>
-                <span class="ticker-item">USD/INR <span class="text-red-400">▲ 87.50</span></span>
-                <span class="ticker-item">WHEAT (MP) <span class="text-green-400">▲ ₹2,400/Q</span></span>
-                <span class="ticker-item">CONTAINERS BOOKED: <span class="text-blue-400">1,240 TODAY</span></span>
-                <span class="ticker-item">MATCHES MADE: <span class="text-yellow-400">85 TODAY</span></span>
+                <span class="ticker-item text-green-400">● SYSTEM ONLINE</span>
+                <span class="ticker-item">GOLD <span class="text-yellow-400">▲ ₹72,400</span></span>
+                <span class="ticker-item">USD <span class="text-green-400">▲ 83.50</span></span>
+                <span class="ticker-item">WHEAT <span class="text-green-400">▲ ₹2,400</span></span>
+                <span class="ticker-item">RICE (BASMATI) <span class="text-green-400">▲ ₹9,500/Q</span></span>
             </div>
         </div>
 
-        <section id="vision" class="pt-48 pb-20 px-6 min-h-screen flex flex-col justify-center relative">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] -z-10 animate-pulse-slow"></div>
-            
-            <div class="max-w-5xl mx-auto text-center z-10">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> World's First AI Trade OS
+        <section class="pt-48 pb-20 px-6 min-h-screen flex flex-col justify-center text-center relative overflow-hidden">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[120px] -z-10 animate-pulse-slow"></div>
+
+            <h1 class="text-5xl md:text-8xl font-serif text-white mb-6 leading-tight animate-fade-in">
+                India's First <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">Autonomous Trade Empire.</span>
+            </h1>
+
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 text-sm animate-fade-in">
+                <div class="p-3 bg-white/5 border border-red-500/20 rounded text-gray-300">
+                    <span class="text-red-400 font-bold block">❌ Tired of Fraud?</span>
+                    "The Gatekeeper" verifies every buyer instantly.
+                </div>
+                <div class="p-3 bg-white/5 border border-yellow-500/20 rounded text-gray-300">
+                    <span class="text-yellow-400 font-bold block">❌ Stuck in Customs?</span>
+                    "The Lawyer" handles all paperwork automatically.
+                </div>
+                <div class="p-3 bg-white/5 border border-green-500/20 rounded text-gray-300">
+                    <span class="text-green-400 font-bold block">❌ Middlemen Eating Profits?</span>
+                    Connect directly. Keep 100% of your margin.
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-4 animate-fade-in">
+                <div class="flex flex-col sm:flex-row gap-5">
+                    <button onclick="openAuthModal()" class="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg rounded-xl shadow-xl shadow-blue-600/30 transition hover:-translate-y-1 animate-glow">
+                        Register With Us
+                    </button>
+                    <button onclick="toggleLawyer(true)" class="px-10 py-4 border border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10 font-bold text-lg rounded-xl transition flex items-center gap-2">
+                        <i data-lucide="gavel" class="w-5 h-5"></i> Talk with Lawyer
+                    </button>
                 </div>
                 
-                <h1 class="text-5xl md:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in">
-                    Trade Without <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500 italic">Boundaries.</span>
-                </h1>
-                
-                <p class="text-xl text-slate-300 mb-10 max-w-3xl mx-auto leading-relaxed font-light animate-fade-in">
-                    Your one registration today may earn you <span class="text-white font-bold border-b border-yellow-500">Future Equity</span> in this upcoming Unicorn.
-                    <br><span class="text-sm text-gray-500">Be an early adopter of the infrastructure that powers tomorrow.</span>
+                <p class="text-sm text-gray-400 mt-2 max-w-lg">
+                    <i data-lucide="trending-up" class="w-4 h-4 inline text-green-400 mr-1"></i>
+                    <span class="text-white border-b border-gray-600 pb-0.5">Your one registration today</span> may earn you <span class="text-yellow-400 font-bold">Future Equity</span> in this platform. Don't just trade, own the infrastructure.
                 </p>
-                
-                <div class="flex flex-col sm:flex-row gap-5 justify-center animate-fade-in mb-20">
-                    <button onclick="openAuthModal()" class="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-xl shadow-blue-600/20 transition-all transform hover:-translate-y-1">
-                        Register Now (Secure Spot)
-                    </button>
-                    <button onclick="enterDemoMode()" class="px-10 py-4 glass-card hover:bg-white/10 text-white font-bold rounded-lg transition-all">
-                        View Live Demo
-                    </button>
-                </div>
-            </div>
-
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in">
-                <div class="glass-card p-4 rounded-xl flex items-center gap-4">
-                    <div class="p-3 bg-blue-500/20 rounded-lg text-blue-400"><i data-lucide="zap" class="w-5 h-5"></i></div>
-                    <div><h4 class="text-white font-bold text-sm">AI Matchmaking</h4><p class="text-xs text-gray-400">Find buyers in 30s.</p></div>
-                </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-4 border-green-500/30">
-                    <div class="p-3 bg-green-500/20 rounded-lg text-green-400"><i data-lucide="sprout" class="w-5 h-5"></i></div>
-                    <div><h4 class="text-white font-bold text-sm">Farmer Direct</h4><p class="text-xs text-gray-400">Zero Middlemen.</p></div>
-                </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-4">
-                    <div class="p-3 bg-purple-500/20 rounded-lg text-purple-400"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                    <div><h4 class="text-white font-bold text-sm">Trust Verified</h4><p class="text-xs text-gray-400">GST/IEC Validated.</p></div>
-                </div>
-                <div class="glass-card p-4 rounded-xl flex items-center gap-4">
-                    <div class="p-3 bg-yellow-500/20 rounded-lg text-yellow-400"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
-                    <div><h4 class="text-white font-bold text-sm">Save Freight</h4><p class="text-xs text-gray-400">AI negotiates rates.</p></div>
-                </div>
             </div>
         </section>
 
-        <section id="ekayan" class="py-24 bg-[#050914] relative border-t border-white/5">
+        <section class="py-24 bg-[#050914] relative border-t border-white/10">
             <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-20">
-                    <h2 class="text-blue-400 text-sm font-bold tracking-[0.3em] uppercase mb-4">The Philosophy</h2>
-                    <h3 class="font-serif text-5xl text-white mb-6">Meet <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Ekayan AI</span></h3>
-                    <p class="text-gray-400 max-w-2xl mx-auto">"Ekayan" (Sanskrit: <span class="text-white">एकायन</span>) — Unity of Purpose. A single intelligence connecting Legal, Logistics, and Finance.</p>
+                <div class="text-center mb-16">
+                    <span class="text-blue-500 font-bold tracking-[0.5em] text-sm uppercase">The Intelligence</span>
+                    <h2 class="text-5xl font-serif text-white mt-2 mb-4">EKAYAN <span class="text-2xl text-gray-500 font-sans font-light">( Sanskrit: The One Who Is All )</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        Ekayan is not just software. It is a unified AI workforce that replaces an entire export department.
+                        <br><span class="text-white font-bold">Meet your new employees:</span>
+                    </p>
                 </div>
-                
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div class="glass-card p-8 rounded-2xl relative">
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:border-green-500/50 transition">
-                                <div class="w-10 h-10 rounded bg-green-500/20 flex items-center justify-center text-green-400"><i data-lucide="shield-check"></i></div>
-                                <div><h4 class="text-white font-bold">The Gatekeeper</h4><p class="text-xs text-gray-400">Verifies Identity & Credentials</p></div>
-                            </div>
-                            <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:border-blue-500/50 transition">
-                                <div class="w-10 h-10 rounded bg-blue-500/20 flex items-center justify-center text-blue-400"><i data-lucide="scale"></i></div>
-                                <div><h4 class="text-white font-bold">The Lawyer</h4><p class="text-xs text-gray-400">Contracts & Compliance AI</p></div>
-                            </div>
-                            <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:border-yellow-500/50 transition">
-                                <div class="w-10 h-10 rounded bg-yellow-500/20 flex items-center justify-center text-yellow-400"><i data-lucide="ship"></i></div>
-                                <div><h4 class="text-white font-bold">Logistics Core</h4><p class="text-xs text-gray-400">Route & Freight Optimization</p></div>
-                            </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <div class="glass-card p-8 rounded-2xl agent-card" style="--color: #22c55e;">
+                        <div class="w-14 h-14 bg-green-500/10 rounded-xl flex items-center justify-center text-green-400 mb-6 border border-green-500/20">
+                            <i data-lucide="shield-check" class="w-7 h-7"></i>
                         </div>
-                    </div>
-                    <div>
-                        <h4 class="text-2xl font-bold text-white mb-4">Why Manual Trade Fails?</h4>
-                        <ul class="space-y-4 text-gray-400">
-                            <li class="flex gap-3"><i data-lucide="x-circle" class="text-red-500"></i> Trust Deficit between new partners.</li>
-                            <li class="flex gap-3"><i data-lucide="x-circle" class="text-red-500"></i> Complex Documentation (LCs, BLs).</li>
-                            <li class="flex gap-3"><i data-lucide="x-circle" class="text-red-500"></i> Opaque Logistics Pricing.</li>
+                        <h3 class="text-xl font-bold text-white mb-2">The Gatekeeper</h3>
+                        <p class="text-sm text-gray-400 mb-4">"I trust no one until verified."</p>
+                        <ul class="text-xs text-gray-500 space-y-2">
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-green-500"></i> Verifies GST/IEC Instantly</li>
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-green-500"></i> Blocks Fraudulent Buyers</li>
                         </ul>
-                        <div class="mt-8 p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl">
-                            <p class="text-blue-300 text-sm font-bold">Ekayan Solves This.</p>
-                            <p class="text-xs text-gray-400 mt-1">One dashboard to rule them all.</p>
-                        </div>
                     </div>
+
+                    <div class="glass-card p-8 rounded-2xl agent-card" style="--color: #eab308;">
+                        <div class="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-400 mb-6 border border-yellow-500/20">
+                            <i data-lucide="scale" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">The Lawyer</h3>
+                        <p class="text-sm text-gray-400 mb-4">"I ensure you never lose a dispute."</p>
+                        <ul class="text-xs text-gray-500 space-y-2">
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-yellow-500"></i> Auto-Drafts Contracts</li>
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-yellow-500"></i> International Compliance</li>
+                        </ul>
+                        <button onclick="toggleLawyer(true)" class="mt-4 w-full py-2 border border-yellow-500/30 text-yellow-400 text-xs rounded hover:bg-yellow-500/10">Test Live Now</button>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-2xl agent-card" style="--color: #3b82f6;">
+                        <div class="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 mb-6 border border-blue-500/20">
+                            <i data-lucide="container" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Logistics Core</h3>
+                        <p class="text-sm text-gray-400 mb-4">"I find the cheapest route."</p>
+                        <ul class="text-xs text-gray-500 space-y-2">
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-blue-500"></i> Compares 50+ Shipping Lines</li>
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-blue-500"></i> Real-time Container Tracking</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-2xl agent-card" style="--color: #a855f7;">
+                        <div class="w-14 h-14 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400 mb-6 border border-purple-500/20">
+                            <i data-lucide="brain-circuit" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">The Analyst</h3>
+                        <p class="text-sm text-gray-400 mb-4">"I predict what sells next."</p>
+                        <ul class="text-xs text-gray-500 space-y-2">
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-500"></i> Market Price Prediction</li>
+                            <li class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-purple-500"></i> Buyer Behavior Analysis</li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
         </section>
 
-        <footer class="bg-[#02040a] py-12 border-t border-white/5 text-center">
-            <h2 class="font-serif text-2xl text-white tracking-widest mb-2">HINDTRADE</h2>
-            <p class="text-gray-500 text-xs uppercase tracking-widest">© 2025 • Building the Backbone of India</p>
+        <footer class="py-8 bg-black border-t border-white/10 text-center text-gray-600 text-xs">
+            <p>HINDTRADE INTELLIGENT OS • BUILT FOR BHARAT 🇮🇳</p>
         </footer>
     </div>
 
-
     <div id="dashboard-view" class="hidden fixed inset-0 w-full h-full bg-[#02040a] flex overflow-hidden z-[100]">
-        
-        <aside class="w-64 bg-[#050914] border-r border-white/5 flex flex-col justify-between p-6">
-            <div>
-                <div class="flex items-center gap-3 mb-10">
-                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">H</div>
-                    <span class="font-bold text-white tracking-widest text-sm">HINDTRADE OS</span>
-                </div>
-                
-                <div id="user-badge" class="mb-8 p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
-                    </div>
-
-                <nav class="space-y-2">
-                    <button onclick="switchView('home')" id="nav-home" class="nav-item active w-full flex items-center gap-3 px-4 py-3 text-white rounded-lg transition">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Mission Control
-                    </button>
-                    <button onclick="switchView('network')" id="nav-network" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="globe" class="w-5 h-5"></i> Global Network
-                    </button>
-                    <button onclick="switchView('docs')" id="nav-docs" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="file-check" class="w-5 h-5"></i> Vault (Docs)
-                    </button>
-                    <button onclick="switchView('shipments')" id="nav-shipments" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="container" class="w-5 h-5"></i> Shipments
-                    </button>
-                </nav>
-            </div>
-            
-            <button onclick="logout()" class="flex items-center gap-2 text-red-400 text-sm hover:text-red-300">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
-            </button>
+        <aside class="w-64 bg-[#050914] border-r border-white/5 flex flex-col p-6">
+            <div class="mb-10 text-xl font-bold text-white tracking-widest">HINDTRADE</div>
+            <div id="user-badge" class="mb-8 p-3 bg-white/5 rounded-xl border border-white/10 flex items-center gap-3"></div>
+            <nav class="space-y-2">
+                <button class="w-full text-left p-3 text-white bg-blue-600/20 border-l-2 border-blue-500 rounded">Dashboard</button>
+                <button class="w-full text-left p-3 text-gray-400 hover:text-white">Live Market</button>
+                <button class="w-full text-left p-3 text-gray-400 hover:text-white">Documents</button>
+            </nav>
+            <button onclick="logout()" class="mt-auto text-red-400 text-sm">Sign Out</button>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-8 relative bg-[#02040a]">
-            
+        <main class="flex-1 p-8 overflow-y-auto">
             <header class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-2xl font-serif text-white" id="header-title">Command Center</h1>
-                    <p class="text-slate-500 text-sm flex gap-4 mt-1">
-                        Status: <span class="text-green-400 font-bold">● System Optimal</span>
-                    </p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="px-4 py-2 bg-blue-900/20 border border-blue-500/20 rounded-lg text-blue-400 text-xs font-bold">
-                        AI CREDITS: <span id="credit-display" class="text-white text-sm ml-1">Loading...</span>
-                    </div>
-                    <button class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 relative">
-                        <i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
-                </div>
+                <h1 class="text-2xl text-white font-serif">Command Center</h1>
+                <div class="px-4 py-2 bg-blue-900/30 border border-blue-500/30 rounded text-blue-400 text-xs font-bold">CREDITS: <span id="credit-display">0</span></div>
             </header>
-
-            <div id="view-home" class="dash-section active">
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="glass-card p-6 rounded-xl">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Revenue</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">₹ 0.00</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl border-green-500/20">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Trust Score</p>
-                        <h3 class="text-2xl font-bold text-green-400 mt-1">98/100</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Active Leads</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">12</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Shipments</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">0</h3>
-                    </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dashboard-cards">
                 </div>
-
-                <h3 class="text-white font-bold text-lg mb-4">Recommended Matches (AI)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dashboard-content-area">
-                    </div>
-            </div>
-
-            <div id="view-network" class="dash-section">
-                <h2 class="text-white font-bold text-xl mb-4">Global Trade Network</h2>
-                <div class="glass-card rounded-xl p-1">
-                    <table class="w-full text-left text-sm text-gray-400">
-                        <thead class="bg-white/5 text-white uppercase text-xs">
-                            <tr><th class="p-4">Entity</th><th class="p-4">Type</th><th class="p-4">Location</th><th class="p-4">Verification</th><th class="p-4">Action</th></tr>
-                        </thead>
-                        <tbody id="network-table-body">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="view-docs" class="dash-section">
-                <h2 class="text-white font-bold text-xl mb-4">Digital Vault</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 rounded-xl flex flex-col items-center justify-center text-center border-dashed border-2 border-gray-700 hover:border-blue-500 cursor-pointer transition">
-                        <i data-lucide="upload" class="w-10 h-10 text-gray-500 mb-3"></i>
-                        <h4 class="text-white font-bold">Upload IEC</h4>
-                        <p class="text-xs text-gray-500">Import Export Code</p>
-                    </div>
-                     <div class="glass-card p-6 rounded-xl flex flex-col items-center justify-center text-center border-dashed border-2 border-gray-700 hover:border-blue-500 cursor-pointer transition">
-                        <i data-lucide="file-text" class="w-10 h-10 text-gray-500 mb-3"></i>
-                        <h4 class="text-white font-bold">Upload GST</h4>
-                        <p class="text-xs text-gray-500">Tax Registration</p>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 
     <script>
-        // --- 1. SETUP SUPABASE (Keys provided by user) ---
+        // CONFIG
         const SUPABASE_URL = 'https://rlezzjpgisjycxrmtbmi.supabase.co';
         const SUPABASE_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZXp6anBnaXNqeWN4cm10Ym1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzU2MjUsImV4cCI6MjA4MTAxMTYyNX0.fYeTbYnCEDP8wNkqBerGT8buMWk0wK3PdTjI57dVYSY';
-        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentUser = null;
-        let isDemo = false;
 
-        // --- 2. INITIALIZATION ---
-        window.addEventListener('load', async () => {
-            lucide.createIcons();
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session) {
-                currentUser = session.user;
-                checkProfileExists();
+        // ICONS
+        lucide.createIcons();
+
+        // UI FUNCTIONS
+        function toggleLawyer(show) {
+            const modal = document.getElementById('lawyer-modal');
+            if(show) {
+                modal.classList.remove('hidden');
+                // Simulate typing
+                setTimeout(() => {
+                    const chat = document.getElementById('lawyer-chat-body');
+                    chat.innerHTML += `
+                        <div class="flex gap-4 mt-4 animate-fade-in">
+                            <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex-shrink-0 flex items-center justify-center text-yellow-400"><i data-lucide="bot"></i></div>
+                            <div class="bg-white/5 p-4 rounded-r-xl rounded-bl-xl text-sm text-gray-300 border border-white/5">
+                                I see you are visiting from India. Do you need an <strong>export license (IEC)</strong> check?
+                            </div>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }, 1000);
+            } else {
+                modal.classList.add('hidden');
             }
-        });
+        }
 
-        // --- 3. AUTH & FLOW ---
         function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
+        // AUTH LOGIC
         async function handleMagicLink() {
             const email = document.getElementById('auth-email').value;
-            if(!email) return alert("Please enter email");
-
+            if(!email) return alert("Email is required");
             const btn = document.querySelector('#auth-step-email button');
             btn.innerHTML = "Sending...";
             
             const { error } = await supabase.auth.signInWithOtp({ email });
-            
-            if(error) {
-                alert("Error: " + error.message);
-                btn.innerHTML = "Try Again";
-            } else {
+            if(error) { alert(error.message); btn.innerHTML = "Try Again"; }
+            else {
                 document.getElementById('auth-step-email').classList.add('hidden');
                 document.getElementById('auth-step-success').classList.remove('hidden');
             }
         }
 
-        async function checkProfileExists() {
-            // Check if profile exists in database
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-            
-            if(!data) {
-                // User logged in but no profile -> Show Setup
-                document.getElementById('landing-view').style.display = 'none';
-                document.getElementById('auth-modal').classList.add('hidden');
-                document.getElementById('profile-modal').classList.remove('hidden');
-            } else {
-                // Profile exists -> Show Dashboard
-                launchDashboard(data);
+        // LOAD LOGIC
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                checkProfile();
+            }
+        });
+
+        async function checkProfile() {
+            const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+            if(data) launchDashboard(data);
+            else {
+                // If no profile, auto-create a temp one for demo flow
+                launchDashboard({ company_name: "New User", role: "Trader", credits: 50 });
             }
         }
 
-        async function saveProfile() {
-            const name = document.getElementById('prof-name').value;
-            const company = document.getElementById('prof-company').value;
-            const role = document.getElementById('prof-role').value;
-            const city = document.getElementById('prof-city').value;
-
-            if(!name || !company) return alert("Fill all fields");
-
-            const { error } = await supabase.from('profiles').insert({
-                id: currentUser.id,
-                email: currentUser.email,
-                full_name: name,
-                company_name: company,
-                role: role,
-                city: city,
-                credits: 50
-            });
-
-            if(error) alert(error.message);
-            else checkProfileExists();
-        }
-
-        // --- 4. DEMO MODE LOGIC ---
-        function enterDemoMode() {
-            isDemo = true;
-            const dummyProfile = {
-                company_name: "Visitor Guest",
-                role: "Viewer",
-                credits: "DEMO ACCESS"
-            };
-            launchDashboard(dummyProfile);
-        }
-
-        // --- 5. DASHBOARD RENDERER ---
         function launchDashboard(profile) {
             document.getElementById('landing-view').style.display = 'none';
-            document.getElementById('profile-modal').classList.add('hidden');
             document.getElementById('dashboard-view').classList.remove('hidden');
-
-            // 1. Sidebar Badge
+            document.getElementById('auth-modal').classList.add('hidden');
+            
             document.getElementById('user-badge').innerHTML = `
-                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">${profile.company_name.charAt(0)}</div>
-                <div class="overflow-hidden">
-                    <p class="text-white text-sm font-bold truncate">${profile.company_name}</p>
-                    <p class="text-xs text-gray-400 capitalize">${profile.role}</p>
-                </div>
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">${profile.company_name[0]}</div>
+                <div><p class="text-white text-sm font-bold">${profile.company_name}</p><p class="text-xs text-gray-400">${profile.role}</p></div>
             `;
-
-            // 2. Credits
             document.getElementById('credit-display').innerText = profile.credits;
-            if(isDemo) document.getElementById('header-title').innerText = "Himrock Dashboard (Demo View)";
 
-            // 3. INJECT DEMO PROFILES (Farmer vs MNC)
-            const cardsHTML = `
-                <div class="glass-card p-6 rounded-xl group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-3 py-1 rounded-bl-lg">TOP SELLER</div>
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-green-900/40 rounded-full flex items-center justify-center text-green-400 border border-green-500/30">
-                            <i data-lucide="wheat" class="w-6 h-6"></i>
+            // Inject Cards
+            document.getElementById('dashboard-cards').innerHTML = `
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-3">
+                            <div class="p-2 bg-green-500/20 rounded text-green-400"><i data-lucide="wheat"></i></div>
+                            <div><h4 class="text-white font-bold">Kisan Union</h4><p class="text-xs text-gray-400">Seller • Punjab</p></div>
                         </div>
-                        <div>
-                            <h4 class="text-white font-bold text-lg">Kisan Organic Union</h4>
-                            <p class="text-gray-400 text-xs">Punjab, India • Verified FPO</p>
-                        </div>
+                        <span class="px-2 py-1 bg-green-500 text-black text-[10px] font-bold rounded">VERIFIED</span>
                     </div>
-                    <div class="space-y-2 text-sm text-gray-300 mb-4">
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Product:</span> <span class="text-white">Basmati Rice (1121 Steam)</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Quantity:</span> <span class="text-white">100 MT Available</span></div>
-                        <div class="flex justify-between"><span>Ask Price:</span> <span class="text-green-400 font-bold">₹95/kg</span></div>
-                    </div>
-                    <button class="w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded text-xs font-bold transition">View Lab Report</button>
+                    <p class="text-sm text-gray-300 mb-4">Offering: 500 Tons Wheat (Grade A). Price: ₹2400/Q.</p>
+                    <button class="w-full py-2 bg-white/10 rounded text-white text-xs hover:bg-white/20">View Details</button>
                 </div>
-
-                <div class="glass-card p-6 rounded-xl group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">VERIFIED BUYER</div>
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-blue-900/40 rounded-full flex items-center justify-center text-blue-400 border border-blue-500/30">
-                            <i data-lucide="building-2" class="w-6 h-6"></i>
+                 <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-3">
+                            <div class="p-2 bg-blue-500/20 rounded text-blue-400"><i data-lucide="building-2"></i></div>
+                            <div><h4 class="text-white font-bold">Dubai Imports LLC</h4><p class="text-xs text-gray-400">Buyer • UAE</p></div>
                         </div>
-                        <div>
-                            <h4 class="text-white font-bold text-lg">Wallmart Global Sourcing</h4>
-                            <p class="text-gray-400 text-xs">USA / Dubai • Retail Giant</p>
-                        </div>
+                        <span class="px-2 py-1 bg-blue-500 text-white text-[10px] font-bold rounded">HIGH DEMAND</span>
                     </div>
-                    <div class="space-y-2 text-sm text-gray-300 mb-4">
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Requirement:</span> <span class="text-white">Organic Spices & Rice</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Volume:</span> <span class="text-white">50 Containers / Mo</span></div>
-                        <div class="flex justify-between"><span>Payment:</span> <span class="text-white">LC at Sight (100%)</span></div>
-                    </div>
-                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold shadow-lg shadow-blue-600/20 transition">Connect Agent</button>
+                    <p class="text-sm text-gray-300 mb-4">Needs: 20 Containers Basmati Rice. Payment: LC.</p>
+                    <button class="w-full py-2 bg-blue-600 rounded text-white text-xs hover:bg-blue-500">Connect Agent</button>
                 </div>
             `;
-            
-            document.getElementById('dashboard-content-area').innerHTML = cardsHTML;
-            
-            // Populate Network Table
-            const tableHTML = `
-                <tr class="hover:bg-white/5 transition border-b border-white/5">
-                    <td class="p-4 flex items-center gap-2"><div class="w-6 h-6 rounded bg-green-500/20 text-green-400 flex items-center justify-center text-xs">K</div> Kisan Organic</td>
-                    <td class="p-4 text-xs uppercase bg-green-500/10 text-green-400 w-min rounded">Seller</td>
-                    <td class="p-4">Punjab</td>
-                    <td class="p-4 text-green-400"><i data-lucide="check-circle" class="w-4 h-4"></i></td>
-                    <td class="p-4"><button class="text-blue-400 hover:text-white text-xs underline">Connect</button></td>
-                </tr>
-                <tr class="hover:bg-white/5 transition">
-                    <td class="p-4 flex items-center gap-2"><div class="w-6 h-6 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">W</div> Wallmart Global</td>
-                    <td class="p-4 text-xs uppercase bg-blue-500/10 text-blue-400 w-min rounded">Buyer</td>
-                    <td class="p-4">USA</td>
-                    <td class="p-4 text-green-400"><i data-lucide="check-circle" class="w-4 h-4"></i></td>
-                    <td class="p-4"><button class="text-blue-400 hover:text-white text-xs underline">Connect</button></td>
-                </tr>
-            `;
-            document.getElementById('network-table-body').innerHTML = tableHTML;
-
             lucide.createIcons();
         }
 
-        // --- 6. UTILITIES ---
-        function switchView(viewId) {
-            document.querySelectorAll('.dash-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'text-white'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-gray-400'));
-            
-            document.getElementById('nav-' + viewId).classList.add('active', 'text-white');
-            document.getElementById('nav-' + viewId).classList.remove('text-gray-400');
-        }
-
         async function logout() {
-            if(!isDemo) await supabase.auth.signOut();
+            await supabase.auth.signOut();
             window.location.reload();
         }
     </script>
