@@ -1,1030 +1,781 @@
-<!DOCTYPE html> 
-<html lang="en" class="scroll-smooth">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTrade AI - World's No.1 B2B OS</title>
-    
+    <title>LegalAI Pro - AI Legal Assistant Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['"Playfair Display"', 'serif'] },
-                    animation: { 
-                        'scroll': 'scroll 45s linear infinite', 
-                        'fade-in': 'fadeIn 0.8s ease-out forwards', 
-                        'pulse-slow': 'pulse 3s infinite',
-                        'float': 'float 6s ease-in-out infinite'
-                    },
-                    keyframes: {
-                        scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-100%)' } },
-                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #02040a; color: #E2E8F0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        /* Glassmorphism & UI */
-        .glass-card { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
-        .glass-card:hover { border-color: #38bdf8; transform: translateY(-5px); box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4); }
-        .icon-glow { box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
-        .ticker-item { display: inline-flex; align-items: center; gap: 8px; margin-right: 3rem; font-size: 0.9rem; font-weight: 600; }
-        
-        /* Agent Tab Styles */
-        .agent-tab { cursor: pointer; border-bottom: 2px solid transparent; opacity: 0.6; transition: all 0.3s; }
-        .agent-tab.active { border-color: #3b82f6; opacity: 1; color: white; }
-
-        /* Dashboard specific */
-        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; color: white; }
-        .dash-section { display: none; animation: fadeIn 0.4s ease-out; }
-        .dash-section.active { display: block; }
-
-        /* Form Inputs */
-        .dash-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 8px; color: white; margin-top: 5px; }
-        .dash-input:focus { outline: none; border-color: #3b82f6; background: rgba(255,255,255,0.1); }
-        .dash-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-
-        /* Gold Gradient */
-        .gold-gradient { background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-gold { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
-        .btn-gold:hover { background: linear-gradient(135deg, #D97706 0%, #B45309 100%); }
-
-        /* LUXURY NOTIFICATIONS SCROLL */
-        .notification-rail {
-            display: flex;
-            gap: 1.5rem;
-            overflow-x: auto;
-            padding: 1rem 5%;
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
-            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-        }
-        .notification-rail::-webkit-scrollbar { display: none; }
-        
-        .notif-card {
-            min-width: 280px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 1rem;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            transition: all 0.3s;
-            cursor: default;
-        }
-        .notif-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(56, 189, 248, 0.5); }
-
-        /* Onboarding Wedge */
-        .wedge-float {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 999;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid #3b82f6;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-            width: 300px;
-            transform: translateY(120%);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .wedge-visible { transform: translateY(0); }
-        .mini-profile-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* Step Progress */
-        .step-dot { height: 8px; width: 8px; border-radius: 50%; background: #334155; }
-        .step-dot.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-        .step-line { height: 2px; flex-grow: 1; background: #334155; }
-        .step-line.active { background: #3b82f6; }
-        
-        /* Avatar Image Styling */
-        .avatar-img { object-fit: cover; width: 100%; height: 100%; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); }
+        .chat-bubble { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .typing-indicator { background: linear-gradient(90deg, #667eea 25%, #764ba2 50%, #667eea 75%); background-size: 200% 100%; animation: typing 1.5s infinite; }
+        @keyframes typing { 0%, 100% { background-position: 200% 0; } 50% { background-position: 0 0; } }
     </style>
 </head>
-<body class="antialiased">
-
-    <div id="auth-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden flex items-center justify-center">
-        <div class="glass-card p-8 rounded-2xl w-full max-w-md relative animate-fade-in border-blue-500/30">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
-            <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center text-blue-400 mx-auto mb-4"><i data-lucide="key" class="w-6 h-6"></i></div>
-                <h2 class="text-2xl font-serif text-white mb-2">Register with HindTrade</h2>
-                <p class="text-gray-400 text-xs px-4">Register once to unlock all AI Agents: Verification, Compliance, Legal, Logistics & Global Trade Network.</p>
-                
-                <div class="flex items-center justify-center mt-4 gap-2 mb-2">
-                    <div class="step-dot active"></div>
-                    <div class="step-line active"></div>
-                    <div class="step-dot"></div>
-                    <div class="step-line"></div>
-                    <div class="step-dot"></div>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white overflow-x-hidden">
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-black/80 backdrop-blur-xl border-r border-purple-500/30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <!-- Profile Section -->
+        <div class="p-6 border-b border-purple-500/30">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center font-bold text-lg shadow-lg border-2 border-white/20 overflow-hidden">
+                    <img id="sidebar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=legalai-user" alt="User Avatar" class="w-full h-full object-cover">
                 </div>
-                <div class="flex justify-between text-[10px] text-gray-500 uppercase tracking-wider font-bold">
-                    <span>Identity</span>
-                    <span>Company</span>
-                    <span>Activate</span>
+                <div>
+                    <h3 id="sidebar-username" class="font-bold text-lg">LegalAI User</h3>
+                    <p class="text-xs text-purple-300">Pro Member</p>
                 </div>
             </div>
-            
-            <div id="auth-step-email">
-                <label class="dash-label">Work Email</label>
-                <input type="email" id="auth-email" placeholder="name@company.com" class="dash-input mb-4 text-lg">
-                <button onclick="handleMagicLink()" id="btn-magic-link" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 mb-4">
-                    <span>Send Magic Link</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-                
-                <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-gray-700"></div>
-                    <span class="flex-shrink-0 mx-4 text-gray-500 text-xs uppercase">Or Demo Access</span>
-                    <div class="flex-grow border-t border-gray-700"></div>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+                <div class="text-center p-2 bg-purple-500/20 rounded-lg">
+                    <div id="credits-count" class="font-bold text-2xl text-purple-400">150</div>
+                    <div class="text-xs opacity-75">Credits</div>
                 </div>
-                <button onclick="loginAsDemo()" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-all border border-white/10 flex items-center justify-center gap-2">
-                    <span>Demo: Himrock Exports</span> <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
-                </button>
-            </div>
-            
-            <div id="auth-step-success" class="hidden text-center">
-                <div class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 mb-4 text-sm flex flex-col items-center">
-                    <i data-lucide="check-circle" class="w-8 h-8 mb-2"></i>
-                    <span>Magic Link Sent! Check your inbox.</span>
+                <div class="text-center p-2 bg-green-500/20 rounded-lg">
+                    <div class="font-bold text-2xl text-green-400">12</div>
+                    <div class="text-xs opacity-75">Active Cases</div>
                 </div>
-                <p class="text-xs text-gray-500">You can close this tab and click the link in your email to login automatically.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile-modal" class="fixed inset-0 z-[200] bg-[#02040a] hidden flex items-center justify-center">
-        <div class="max-w-2xl w-full p-6">
-            <div class="mb-8">
-                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-2">Step 1 of 3</p>
-                <h2 class="text-4xl font-serif text-white">Create your profile</h2>
-                <p class="text-gray-400 mt-2">To start trading on HindTrade OS, we need to verify your trade identity.</p>
-            </div>
-            <div class="glass-card p-8 rounded-2xl border-blue-500/20">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="col-span-2">
-                        <label class="dash-label">Full Name</label>
-                        <input type="text" id="prof-name" class="dash-input" placeholder="e.g. Rahul Sharma">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="dash-label">Company Name</label>
-                        <input type="text" id="prof-company" class="dash-input" placeholder="e.g. Sharma Global Exports">
-                    </div>
-                    <div>
-                        <label class="dash-label">Role</label>
-                        <select id="prof-role" class="dash-input bg-[#0f172a]">
-                            <option value="exporter">Exporter</option>
-                            <option value="buyer">International Buyer</option>
-                            <option value="logistics">Logistics Partner</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="dash-label">City</label>
-                        <input type="text" id="prof-city" class="dash-input" placeholder="e.g. Mumbai">
-                    </div>
-                </div>
-                <div class="mt-8 flex justify-end">
-                    <button id="save-prof-btn" onclick="saveProfile()" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 flex items-center gap-2">
-                        <span>Launch Dashboard</span> <i data-lucide="rocket" class="w-4 h-4"></i>
-                    </button>
+                <div class="text-center p-2 bg-blue-500/20 rounded-lg">
+                    <div class="font-bold text-2xl text-blue-400">95%</div>
+                    <div class="text-xs opacity-75">Win Rate</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="landing-view" class="transition-all duration-700 ease-in-out opacity-100">
-
-        <nav class="fixed top-0 w-full z-50 bg-[#02040a]/90 backdrop-blur-md border-b border-white/5">
-            <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg">H</div>
-                    <div class="leading-none">
-                        <span class="block text-lg font-bold text-white tracking-tight">HindTrade</span>
-                        <span class="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Global OS</span>
-                    </div>
-                </div>
-                <div class="hidden md:flex gap-8 text-xs font-semibold text-gray-400 uppercase tracking-widest items-center">
-                    <a href="#vision" class="hover:text-white transition">Vision</a>
-                    <a href="#ekayan" class="hover:text-white transition">Ekayan AI</a>
-                    <span class="px-3 py-1 bg-green-500/10 text-green-400 rounded border border-green-500/20 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> SYSTEM ONLINE
-                    </span>
-                    <button onclick="openAuthModal()" class="text-white hover:text-blue-400 transition">Login / Register</button>
-                </div>
-            </div>
+        <!-- Navigation -->
+        <nav class="p-4 space-y-2">
+            <a href="#" onclick="showDashboard()" class="flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 hover:bg-purple-500/20 group">
+                <i class="fas fa-home text-purple-400 group-hover:text-purple-200"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" onclick="showMatches()" class="flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 hover:bg-purple-500/20 group">
+                <i class="fas fa-handshake text-purple-400 group-hover:text-purple-200"></i>
+                <span class="font-medium">Matches</span>
+            </a>
+            <a href="#" onclick="showChat()" class="flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 hover:bg-purple-500/20 group">
+                <i class="fas fa-comments text-purple-400 group-hover:text-purple-200"></i>
+                <span class="font-medium">AI Chat</span>
+            </a>
+            <a href="#" onclick="showAgents()" class="flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 hover:bg-purple-500/20 group">
+                <i class="fas fa-robot text-purple-400 group-hover:text-purple-200"></i>
+                <span class="font-medium">Agents</span>
+            </a>
+            <a href="#" onclick="showCredits()" class="flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 hover:bg-purple-500/20 group">
+                <i class="fas fa-coins text-yellow-400 group-hover:text-yellow-200"></i>
+                <span class="font-medium">Credits</span>
+            </a>
         </nav>
 
-        <div class="fixed top-16 w-full z-40 bg-[#0F172A] border-b border-white/5 py-3 overflow-hidden">
-            <div class="animate-scroll whitespace-nowrap inline-block text-gray-300">
-                <span class="ticker-item"><span class="text-blue-400">⚡ LIVE:</span> HINDTRADE OS v1.0</span>
-                <span class="ticker-item">GOLD <span class="text-green-400">▲ ₹1,05,400</span></span>
-                <span class="ticker-item">USD/INR <span class="text-red-400">▲ 87.50</span></span>
-                <span class="ticker-item">CONTAINERS BOOKED: <span class="text-blue-400">840 TODAY</span></span>
-            </div>
+        <!-- Quick Actions -->
+        <div class="p-4 border-t border-purple-500/30">
+            <button onclick="quickNewCase()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 p-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center space-x-2">
+                <i class="fas fa-plus"></i>
+                <span>New Case</span>
+            </button>
         </div>
+    </div>
 
-        <section id="vision" class="pt-40 pb-10 px-6 min-h-[90vh] flex flex-col justify-center relative">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] -z-10"></div>
-            <div class="max-w-5xl mx-auto text-center z-10">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> World's First AI Trade OS
-                </div>
-                <h1 class="text-5xl md:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in">
-                    Trade Without <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500 italic">Boundaries.</span>
-                </h1>
-                
-                <div class="mb-6 max-w-2xl mx-auto p-3 bg-white/5 border border-white/10 rounded-lg animate-fade-in">
-                    <p class="text-xs text-gray-300 leading-relaxed">
-                        <i data-lucide="globe" class="inline w-3 h-3 text-blue-400 mr-1"></i>
-                        HindTrade OS supports trade compliance and rules for <span class="text-white font-bold">180+ countries</span> — including documentation rules, duty structures, export laws, restricted commodities, and logistics differences per region.
-                    </p>
-                </div>
+    <!-- Mobile Menu Button -->
+    <button onclick="toggleSidebar()" id="mobile-menu-btn" class="fixed top-6 left-6 z-40 lg:hidden p-3 bg-black/80 backdrop-blur-xl rounded-2xl border border-purple-500/50 shadow-2xl hover:bg-purple-500/20 transition-all duration-200">
+        <i class="fas fa-bars text-2xl text-white"></i>
+    </button>
 
-                <p class="text-xl text-slate-400 mb-8 max-w-3xl mx-auto leading-relaxed font-light animate-fade-in">
-                    The Operating System for <span class="text-white border-b border-blue-500">Indian Dominance</span> in Global Trade.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-5 justify-center animate-fade-in mb-12">
-                    <button onclick="openAuthModal()" class="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-xl shadow-blue-600/20 transition-all transform hover:-translate-y-1">
-                        Start Ekayan Engine (Free)
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden invisible opacity-0 transition-all duration-300" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 p-6 pt-20 lg:pt-6 transition-all duration-300">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="space-y-6">
+            <!-- Header -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                <div>
+                    <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent mb-2">LegalAI Pro</h1>
+                    <p class="text-xl text-purple-200/80">Your AI-powered legal advantage</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="dashboard-profile" class="flex items-center space-x-3 p-4 bg-black/50 backdrop-blur-xl rounded-2xl border border-purple-500/30">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center font-bold text-sm shadow-lg border-2 border-white/20 overflow-hidden">
+                            <img id="dashboard-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=legalai-user" alt="User Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <div id="dashboard-username" class="font-bold">LegalAI User</div>
+                            <div class="text-sm opacity-75">Pro Member</div>
+                        </div>
+                    </div>
+                    <button onclick="quickNewCase()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2">
+                        <i class="fas fa-plus"></i>
+                        <span>New Case</span>
                     </button>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-16 animate-fade-in">
-                    <div class="glass-card p-4 rounded-xl flex items-center gap-3 cursor-pointer" onclick="openAuthModal()">
-                        <div class="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center text-green-400"><i data-lucide="sprout" class="w-5 h-5"></i></div>
-                        <div class="text-left">
-                            <p class="text-white font-bold text-sm">Verified Farmer</p>
-                            <p class="text-[10px] text-gray-400">Maharashtra, India • Score: 98</p>
-                        </div>
-                        <i data-lucide="badge-check" class="w-4 h-4 text-blue-400 ml-auto"></i>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl flex items-center gap-3 cursor-pointer" onclick="openAuthModal()">
-                        <div class="w-10 h-10 bg-purple-500/10 rounded-full flex items-center justify-center text-purple-400"><i data-lucide="factory" class="w-5 h-5"></i></div>
-                        <div class="text-left">
-                            <p class="text-white font-bold text-sm">Verified Manufacturer</p>
-                            <p class="text-[10px] text-gray-400">Gujarat, India • Score: 95</p>
-                        </div>
-                        <i data-lucide="badge-check" class="w-4 h-4 text-blue-400 ml-auto"></i>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl flex items-center gap-3 cursor-pointer" onclick="openAuthModal()">
-                        <div class="w-10 h-10 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400"><i data-lucide="globe-2" class="w-5 h-5"></i></div>
-                        <div class="text-left">
-                            <p class="text-white font-bold text-sm">Global Buyer</p>
-                            <p class="text-[10px] text-gray-400">Rotterdam, EU • Score: 99</p>
-                        </div>
-                        <i data-lucide="badge-check" class="w-4 h-4 text-blue-400 ml-auto"></i>
-                    </div>
-                </div>
-
             </div>
-            <div class="max-w-7xl mx-auto w-full animate-fade-in">
-                <p class="text-center text-xs text-gray-500 uppercase tracking-[0.2em] mb-4">Solves 99% of Trade Failures</p>
-                <div class="notification-rail">
-                    <div class="notif-card">
-                        <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><i data-lucide="zap" class="w-5 h-5"></i></div>
-                        <div><h4 class="text-white text-sm font-bold">AI Matchmaking</h4><p class="text-xs text-gray-400">Find buyers in 30s.</p></div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="group bg-black/50 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8 hover:border-purple-400/50 transition-all duration-300 hover:-translate-y-2 shadow-2xl hover:shadow-3xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-coins text-2xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div id="stat-credits" class="text-3xl font-black text-purple-400">150</div>
+                            <div class="text-sm opacity-75">Credits</div>
+                        </div>
                     </div>
-                    <div class="notif-card border-green-500/30">
-                        <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center"><i data-lucide="sprout" class="w-5 h-5"></i></div>
-                        <div><h4 class="text-white text-sm font-bold">Direct-to-Farmer</h4><p class="text-xs text-gray-400">Zero Middlemen. 100% Margin.</p></div>
+                    <button onclick="buyCredits()" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl">Top Up</button>
+                </div>
+                <div class="group bg-black/50 backdrop-blur-xl border border-green-500/30 rounded-3xl p-8 hover:border-green-400/50 transition-all duration-300 hover:-translate-y-2 shadow-2xl hover:shadow-3xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-handshake text-2xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black text-green-400">12</div>
+                            <div class="text-sm opacity-75">Active Cases</div>
+                        </div>
                     </div>
-                    <div class="notif-card">
-                        <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                        <div><h4 class="text-white text-sm font-bold">Trust Verified</h4><p class="text-xs text-gray-400">GST/IEC Verified entities.</p></div>
+                    <button onclick="showMatches()" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl">View Cases</button>
+                </div>
+                <div class="group bg-black/50 backdrop-blur-xl border border-blue-500/30 rounded-3xl p-8 hover:border-blue-400/50 transition-all duration-300 hover:-translate-y-2 shadow-2xl hover:shadow-3xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-trophy text-2xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black text-blue-400">95%</div>
+                            <div class="text-sm opacity-75">Win Rate</div>
+                        </div>
                     </div>
-                    <div class="notif-card">
-                        <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
-                        <div><h4 class="text-white text-sm font-bold">Save 30% Freight</h4><p class="text-xs text-gray-400">AI negotiates rates.</p></div>
+                    <button onclick="showStats()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl">View Stats</button>
+                </div>
+                <div class="group bg-black/50 backdrop-blur-xl border border-orange-500/30 rounded-3xl p-8 hover:border-orange-400/50 transition-all duration-300 hover:-translate-y-2 shadow-2xl hover:shadow-3xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-robot text-2xl"></i>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black text-orange-400">3</div>
+                            <div class="text-sm opacity-75">AI Agents</div>
+                        </div>
                     </div>
+                    <button onclick="showAgents()" class="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 shadow-lg hover:shadow-xl">Manage Agents</button>
                 </div>
             </div>
-        </section>
 
-        <section id="ekayan" class="py-24 relative border-t border-white/5 bg-[#050914]">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center mb-24 max-w-4xl mx-auto">
-                    <h2 class="text-blue-400 text-sm font-bold tracking-[0.3em] uppercase mb-4">The Philosophy</h2>
-                    <h3 class="font-serif text-5xl md:text-6xl text-white mb-8">Meet <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Ekayan</span></h3>
-                    <div class="glass-card p-8 rounded-2xl relative overflow-hidden text-left border-l-4 border-l-blue-500">
-                        <div class="flex flex-col md:flex-row items-center gap-6">
-                            <div class="text-5xl font-serif text-slate-700 opacity-20 hidden md:block">ॐ</div>
+            <!-- Quick Matches -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-black/50 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8">
+                    <h3 class="text-2xl font-black mb-6 flex items-center space-x-3">
+                        <i class="fas fa-bolt text-yellow-400"></i>
+                        <span>Quick Matches</span>
+                    </h3>
+                    <div id="quick-matches" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Match cards will be populated by JS -->
+                    </div>
+                    <button onclick="showMatches()" class="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300">View All Matches</button>
+                </div>
+                <div class="bg-black/50 backdrop-blur-xl border border-green-500/30 rounded-3xl p-8">
+                    <h3 class="text-2xl font-black mb-6 flex items-center space-x-3">
+                        <i class="fas fa-chart-line text-green-400"></i>
+                        <span>Recent Activity</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-4 bg-purple-500/10 rounded-2xl">
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-check text-xl"></i>
+                            </div>
                             <div>
-                                <p class="text-xl text-white mb-4 font-serif italic">"Ekayan" (Sanskrit: <span class="text-blue-400">एकायन</span>) — Meaning "The One Path" or "Unity of Purpose".</p>
-                                <p class="text-gray-400 text-sm leading-relaxed">HindTrade's <span class="text-white">Ekayan AI</span> is a Single Unified Intelligence that connects Legal, Logistics, and Finance.</p>
+                                <div class="font-bold">Case #247 won</div>
+                                <div class="text-sm opacity-75">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4 p-4 bg-blue-500/10 rounded-2xl">
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-robot text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold">Gatekeeper analysis complete</div>
+                                <div class="text-sm opacity-75">4 hours ago</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="grid md:grid-cols-4 gap-6">
-                    <div class="glass-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-4 right-4 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded border border-green-500/30">🟢 LIVE</div>
-                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 icon-glow text-blue-400"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
-                        <h4 class="text-lg font-bold text-white mb-1">The Gatekeeper</h4>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-4 font-bold">Verification Unit</p>
-                        <div class="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400 space-y-2">
-                            <p><strong class="text-white">Main Features:</strong> KYC, AML Checks, GST API integration.</p>
-                            <p><strong class="text-white">Solves:</strong> Identity theft & Payment fraud.</p>
-                            <p><strong class="text-white">Example:</strong> "Verify IEC code AB12345."</p>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-4 right-4 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded border border-green-500/30">🟢 LIVE</div>
-                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 icon-glow text-blue-400"><i data-lucide="scale" class="w-6 h-6"></i></div>
-                        <h4 class="text-lg font-bold text-white mb-1">The Lawyer</h4>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-4 font-bold">Legal & Compliance</p>
-                        <div class="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400 space-y-2">
-                            <p><strong class="text-white">Main Features:</strong> HS Code Lookup, Contract Drafting, Dispute Resolution.</p>
-                            <p><strong class="text-white">Solves:</strong> Customs fines & Bad contracts.</p>
-                            <p><strong class="text-white">Example:</strong> "Draft Sales Contract for Rice to Dubai."</p>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-4 right-4 bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded border border-yellow-500/30">🟠 BETA</div>
-                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 icon-glow text-blue-400"><i data-lucide="ship" class="w-6 h-6"></i></div>
-                        <h4 class="text-lg font-bold text-white mb-1">Logistics Core</h4>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-4 font-bold">Optimization Unit</p>
-                         <div class="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400 space-y-2">
-                            <p><strong class="text-white">Main Features:</strong> Freight Rate Negotiation, Container Tracking.</p>
-                            <p><strong class="text-white">Solves:</strong> High shipping costs & Delays.</p>
-                            <p><strong class="text-white">Example:</strong> "Cheapest rate Mumbai to London?"</p>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-4 right-4 bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-1 rounded border border-red-500/30">🔴 OFFLINE</div>
-                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4 icon-glow text-blue-400"><i data-lucide="file-text" class="w-6 h-6"></i></div>
-                        <h4 class="text-lg font-bold text-white mb-1">The Clerk</h4>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-4 font-bold">Documentation</p>
-                         <div class="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400 space-y-2">
-                            <p><strong class="text-white">Main Features:</strong> Invoice Gen, Packing List, Cert of Origin.</p>
-                            <p><strong class="text-white">Solves:</strong> Clerical errors & Rejections.</p>
-                            <p><strong class="text-white">Example:</strong> "Generate Commercial Invoice."</p>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </section>
-
-        <section id="live-agent" class="py-24 bg-[#050914] border-t border-white/5 scroll-mt-20">
-            <div class="max-w-6xl mx-auto px-4">
-                
-                <div id="registration-wedge" class="mb-10 text-center bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 rounded-2xl p-8 backdrop-blur-sm">
-                    <h3 class="text-2xl font-serif text-white mb-4">Start your export journey</h3>
-                    <p class="text-gray-400 mb-6">Create your profile to access the AI Agents and Dashboard.</p>
-                    <button onclick="openAuthModal()" class="px-8 py-3 bg-white text-blue-900 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg shadow-white/10">
-                        Register / Login
-                    </button>
-                </div>
-                <div class="flex items-center gap-8 mb-6 border-b border-white/10 pb-2">
-                    <div onclick="switchAgentTab('gatekeeper')" id="tab-gatekeeper" class="agent-tab active flex items-center gap-2 pb-2 text-lg font-bold text-white">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-green-400"></i> The Gatekeeper (Login)
-                    </div>
-                    <div onclick="switchAgentTab('lawyer')" id="tab-lawyer" class="agent-tab flex items-center gap-2 pb-2 text-lg font-bold text-gray-500 hover:text-white">
-                        <i data-lucide="scale" class="w-5 h-5 text-blue-400"></i> The Lawyer (Queries)
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl overflow-hidden h-[650px] relative shadow-2xl border border-gray-200">
-                    <div id="frame-gatekeeper" class="w-full h-full">
-                        <iframe src="https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/73962548-1d56-44f6-aa88-51901de346ef/embed-chat?hide_tool_steps=true&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%23685FFF&bubble_icon=pd%2Fchat&input_placeholder_text=Verify+Identity+to+Access+Dashboard...&hide_logo=false&hide_description=false" width="100%" height="100%" frameborder="0"></iframe>
-                    </div>
-                    <div id="frame-lawyer" class="w-full h-full hidden">
-                        <iframe src="https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/1733a3cb-bd12-45c6-9cbc-71e1286652fe/embed-chat?starting_message_prompts=You+have+one+free+query.+Ask+your+import-export+legal+or+HS+code+question+clearly.+For+further+assistance%2C+registration+will+be+required.&hide_tool_steps=true&hide_file_uploads=true&hide_conversation_list=true&bubble_style=agent&primary_color=%23000000&bubble_icon=pd%2Fchat&input_placeholder_text=You+have+1+free+query.+Ask+now%E2%80%A6&hide_logo=false&hide_description=false" width="100%" height="100%" frameborder="0" allow="microphone; clipboard-read; clipboard-write"></iframe>
-                    </div>
-                </div>
-                <p class="text-center text-xs text-gray-500 mt-2">*Demo Mode: Informational Purposes Only.</p>
-            </div>
-        </section>
-
-        <section class="py-20 border-t border-white/5 relative overflow-hidden">
-            <div class="absolute inset-0 bg-yellow-500/5"></div> 
-            <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
-                <div class="inline-block p-3 rounded-full bg-yellow-500/10 text-yellow-500 mb-4 animate-pulse-slow"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
-                <h2 class="text-4xl md:text-5xl font-serif text-white mb-6">Join the Revolution.</h2>
-                <p class="text-xl text-gray-300 mb-2">HindTrade AI is building the <span class="text-white font-bold">future backbone</span> of Indian Exports.</p>
-                <p class="text-lg gold-gradient font-bold mb-8">Wanna be a shareholder in the upcoming unicorn HindTrade AI?</p>
-                <button onclick="alert('Applications for Early Allocation are currently being processed by the Finance Team.')" class="px-8 py-4 btn-gold rounded-xl font-bold text-lg shadow-lg hover:shadow-yellow-500/20 transition-all transform hover:-translate-y-1">Apply for Early Allocation</button>
-                <p class="text-xs text-gray-600 mt-4 uppercase tracking-widest">Limited Equity • Accredited Investors Only</p>
-            </div>
-        </section>
-
-        <footer class="bg-[#0F172A] py-12 border-t border-white/5 text-center">
-            <p class="font-serif text-xl text-white tracking-widest mb-2">HINDTRADE</p>
-            <p class="text-gray-500 text-xs">© 2025 • Secure Global Trade Infrastructure</p>
-        </footer>
-    </div>
-
-
-    <div id="dashboard-view" class="hidden fixed inset-0 w-full h-full bg-[#02040a] flex overflow-hidden z-[100]">
-        
-        <aside class="w-64 bg-[#050914] border-r border-white/5 flex flex-col justify-between p-6 overflow-y-auto">
-            <div>
-                <div class="flex items-center gap-3 mb-10">
-                    <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">H</div>
-                    <span class="font-bold text-white tracking-widest text-sm">HINDTRADE OS</span>
-                </div>
-                <nav class="space-y-2">
-                    <button onclick="switchDashView('home')" id="nav-home" class="nav-item active w-full flex items-center gap-3 px-4 py-3 text-white rounded-lg transition">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Mission Control
-                    </button>
-                    <button onclick="switchDashView('profile')" id="nav-profile" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="building-2" class="w-5 h-5"></i> Company Profile
-                    </button>
-                     <button onclick="switchDashView('rules')" id="nav-rules" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="globe" class="w-5 h-5"></i> Country Rules
-                    </button>
-                    <button onclick="switchDashView('shipments')" id="nav-shipments" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="package" class="w-5 h-5"></i> My Shipments
-                    </button>
-                    <button onclick="switchDashView('matches')" id="nav-matches" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="users" class="w-5 h-5"></i> Trade Network
-                    </button>
-                    <button onclick="switchDashView('docs')" id="nav-docs" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
-                        <i data-lucide="file-text" class="w-5 h-5"></i> Documents
-                    </button>
-                </nav>
-            </div>
-            <div class="pt-6 border-t border-white/5" id="sidebar-user-section">
-                </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto p-8 relative bg-[#02040a]">
-            
-            <header class="flex justify-between items-center mb-8">
-                <div id="dash-header-text">
-                    <h1 class="text-2xl font-serif text-white">Command Center</h1>
-                    <p class="text-slate-500 text-sm flex gap-4 mt-1">
-                        <span id="user-company-header">Loading...</span>
-                        <span class="text-blue-400 font-bold" id="user-credits-header">Credits: 0</span>
-                    </p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="logout()" class="px-4 py-2 border border-red-500/30 text-red-400 text-xs rounded hover:bg-red-500/10">Logout</button>
-                    <button onclick="alert('Notifications:\n1. New Buyer Match found in Dubai.\n2. HS Code Policy Update.')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 relative transition">
-                        <i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    </button>
-                </div>
-            </header>
-
-            <div id="view-home" class="dash-section active">
-                
-                <div id="mini-profile-container" class="mb-8">
-                    </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-card p-6 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div><p class="text-slate-400 text-xs uppercase font-bold tracking-widest">Active Shipments</p><h3 id="stat-shipments" class="text-3xl font-bold text-white mt-1">0</h3></div>
-                            <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400"><i data-lucide="container" class="w-5 h-5"></i></div>
-                        </div>
-                        <div class="text-xs text-slate-500 flex items-center gap-1">In transit to destination</div>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl border-green-500/20">
-                        <div class="flex justify-between items-start mb-4">
-                            <div><p class="text-slate-400 text-xs uppercase font-bold tracking-widest">Credits Available</p><h3 id="dash-credits-display" class="text-3xl font-bold text-green-400 mt-1">0</h3></div>
-                            <div class="p-2 bg-green-500/10 rounded-lg text-green-400"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
-                        </div>
-                        <p class="text-xs text-slate-400">Used for AI Agent queries.</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div><p class="text-slate-400 text-xs uppercase font-bold tracking-widest">Trust Score</p><h3 id="dash-trust-score" class="text-3xl font-bold text-white mt-1">--/100</h3></div>
-                            <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400"><i data-lucide="shield" class="w-5 h-5"></i></div>
-                        </div>
-                        <div class="w-full bg-gray-700 h-1.5 rounded-full mt-2"><div id="dash-trust-bar" class="bg-purple-500 h-1.5 rounded-full" style="width: 0%"></div></div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <h3 class="text-white font-bold text-lg mb-4">AI Agent Interactions (Log)</h3>
-                    <div class="glass-card p-4 rounded-xl space-y-3">
-                        <div class="flex items-center justify-between border-b border-white/5 pb-2">
-                             <div class="flex items-center gap-3">
-                                 <div class="w-8 h-8 rounded bg-blue-500/10 text-blue-400 flex items-center justify-center"><i data-lucide="scale" class="w-4 h-4"></i></div>
-                                 <div class="text-sm">
-                                     <p class="text-white font-bold">Legal Query: HS Code 1006.30</p>
-                                     <p class="text-xs text-gray-500">Response: Basmati Rice Semi-milled...</p>
-                                 </div>
-                             </div>
-                             <span class="text-[10px] text-gray-400">2 mins ago</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                             <div class="flex items-center gap-3">
-                                 <div class="w-8 h-8 rounded bg-yellow-500/10 text-yellow-400 flex items-center justify-center"><i data-lucide="ship" class="w-4 h-4"></i></div>
-                                 <div class="text-sm">
-                                     <p class="text-white font-bold">Logistics: Quote ID #990</p>
-                                     <p class="text-xs text-gray-500">Route: Nava Sheva -> Jebel Ali</p>
-                                 </div>
-                             </div>
-                             <span class="text-[10px] text-gray-400">1 hr ago</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-profile" class="dash-section">
-                <h2 class="text-white font-bold text-xl mb-4">Company Details</h2>
-                <div class="glass-card p-6 rounded-xl" id="full-profile-view">Loading...</div>
-            </div>
-            
-            <div id="view-rules" class="dash-section">
-                <h2 class="text-white font-bold text-xl mb-4">Global Trade Rules</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="glass-card p-5 rounded-xl border border-white/10 hover:border-blue-500/50 transition cursor-pointer" onclick="alert('Demo: Loading Dubai Import Restrictions...')">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-2xl">🇦🇪</span>
-                            <h3 class="text-white font-bold">United Arab Emirates</h3>
-                        </div>
-                        <p class="text-xs text-gray-400">Recent changes in Basmati Rice duties. Halal certification mandatory for meat exports.</p>
-                    </div>
-                    <div class="glass-card p-5 rounded-xl border border-white/10 hover:border-blue-500/50 transition cursor-pointer" onclick="alert('Demo: Loading UK Brexit Forms...')">
-                        <div class="flex items-center gap-3 mb-2">
-                            <span class="text-2xl">🇬🇧</span>
-                            <h3 class="text-white font-bold">United Kingdom</h3>
-                        </div>
-                        <p class="text-xs text-gray-400">Post-Brexit customs declaration forms (C88) required. VAT rules updated Jan 2025.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-docs" class="dash-section">
-                <h2 class="text-white font-bold text-xl mb-4">Digital Vault</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="glass-card p-6 rounded-xl flex flex-col items-center text-center bg-green-500/10 border-green-500/30 cursor-pointer transition">
-                        <i data-lucide="check-circle" class="w-10 h-10 text-green-400 mb-3"></i>
-                        <h4 class="text-gray-300 text-sm font-bold">IEC Verified</h4>
-                        <p class="text-xs text-green-400 mt-1">Active</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl flex flex-col items-center text-center bg-green-500/10 border-green-500/30 cursor-pointer transition">
-                        <i data-lucide="check-circle" class="w-10 h-10 text-green-400 mb-3"></i>
-                        <h4 class="text-gray-300 text-sm font-bold">GST Verified</h4>
-                        <p class="text-xs text-green-400 mt-1">Active</p>
-                    </div>
-                    <div id="upload-card" onclick="simulateUpload()" class="glass-card p-6 rounded-xl flex flex-col items-center text-center hover:bg-white/5 cursor-pointer border-dashed border border-gray-600 transition group">
-                        <i id="upload-icon" data-lucide="upload" class="w-10 h-10 text-gray-400 mb-3 group-hover:text-blue-400 transition"></i>
-                        <h4 id="upload-text" class="text-gray-300 text-sm font-bold">Upload RCMC</h4>
-                        <p id="upload-sub" class="text-xs text-gray-500 mt-1">Registration Cert</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-shipments" class="dash-section">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-white font-bold text-xl">Shipment Manifest</h2>
-                    <button onclick="requestBooking()" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-500 transition shadow-lg shadow-blue-900/20">New Booking</button>
-                </div>
-                <div class="glass-card rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-sm text-gray-400">
-                        <thead class="bg-white/5 text-white uppercase text-xs">
-                            <tr><th class="p-4">ID</th><th class="p-4">Commodity</th><th class="p-4">Destination</th><th class="p-4">Status</th></tr>
-                        </thead>
-                        <tbody id="shipment-table-body" class="divide-y divide-white/5">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="view-matches" class="dash-section">
-                 <div class="flex justify-between items-center mb-6">
-                    <div>
-                         <h2 class="text-white font-bold text-xl">Trade Network</h2>
-                         <p class="text-gray-400 text-sm">AI Verified Buyers for <span class="text-blue-400">Himrock Exports</span></p>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-xs px-2 py-1 border border-white/10 rounded text-gray-400">Filter: All</span>
-                    </div>
-                 </div>
-                 <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                     </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="onboarding-wedge" class="wedge-float p-4">
-        <div class="flex justify-between items-start mb-2">
-            <h4 class="text-white font-bold text-sm">Next Step</h4>
-            <span class="text-xs text-blue-400 font-bold" id="wedge-step-count">1/3</span>
         </div>
-        <p class="text-gray-300 text-xs mb-3 leading-relaxed" id="wedge-text">
-            Complete your trade profile to unlock buyer matches.
-        </p>
-        <button id="wedge-action-btn" class="w-full py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-500 transition">
-            Do it now
-        </button>
-    </div>
 
-    <script>
-        // ----------------------------------------------------
-        // IMPORTANT: Global Variables declared first
-        // ----------------------------------------------------
-        const SUPABASE_URL = 'https://rlezzjpgisjycxrmtbmi.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZXp6anBnaXNqeWN4cm10Ym1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzU2MjUsImV4cCI6MjA4MTAxMTYyNX0.fYeTbYnCEDP8wNkqBerGT8buMWk0wK3PdTjI57dVYSY';
-        let supabase = null;
-        let currentUser = null;
-        let currentProfile = null;
-        let isDemoMode = false;
+        <!-- Matches Section -->
+        <div id="matches-section" class="space-y-6 hidden">
+            <div class="flex items-center space-x-4">
+                <button onclick="showDashboard()" class="text-purple-400 hover:text-purple-200 flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </button>
+                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent flex-1">Perfect Matches</h1>
+            </div>
+            <div id="matches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Match cards populated by JS -->
+            </div>
+        </div>
 
-        // ----------------------------------------------------
-        // 1. GLOBAL FUNCTIONS (These must be defined first)
-        // ----------------------------------------------------
-
-        function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
-        function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
-
-        // --- THE LAWYER AGENT FIX IS HERE ---
-        function switchAgentTab(agentType) {
-            // Remove active class from all tabs
-            document.querySelectorAll('.agent-tab').forEach(el => {
-                el.classList.remove('active', 'text-white');
-                el.classList.add('text-gray-500');
-            });
-            
-            // Add active class to clicked tab
-            const activeTab = document.getElementById('tab-' + agentType);
-            if(activeTab) {
-                activeTab.classList.add('active', 'text-white');
-                activeTab.classList.remove('text-gray-500');
-            }
-
-            // Toggle Visibility of IFrames
-            if(agentType === 'gatekeeper') {
-                document.getElementById('frame-gatekeeper').classList.remove('hidden');
-                document.getElementById('frame-lawyer').classList.add('hidden');
-            } else if (agentType === 'lawyer') {
-                document.getElementById('frame-gatekeeper').classList.add('hidden');
-                document.getElementById('frame-lawyer').classList.remove('hidden');
-            }
-        }
-
-        function switchDashView(viewId) {
-            document.querySelectorAll('.dash-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('active', 'text-white');
-                el.classList.add('text-gray-400');
-            });
-            const activeNav = document.getElementById('nav-' + viewId);
-            if(activeNav) activeNav.classList.add('active', 'text-white');
-            
-            if(window.lucide) lucide.createIcons();
-        }
-
-        async function loginAsDemo() {
-            isDemoMode = true;
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('landing-view').style.display = 'none';
-            document.getElementById('dashboard-view').classList.remove('hidden');
-
-            const himrockProfile = {
-                company_name: "Himrock Exports",
-                full_name: "Amit Singh",
-                role: "Exporter",
-                city: "Jalandhar, Punjab",
-                email: "amit@himrock.com",
-                credits: 2500,
-                // New User Avatar URL
-                avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop", 
-                created_at: new Date().toISOString()
-            };
-
-            renderDashboardData(himrockProfile);
-            renderDemoShipments();
-            renderMatches();
-            if(window.lucide) lucide.createIcons();
-            
-            setTimeout(() => {
-                alert("Welcome back, Amit! \n\nEkayan AI has detected 2 new buyer matches for your Basmati Rice inventory.");
-            }, 800);
-        }
-
-        async function handleMagicLink() {
-            if(!supabase) { alert("System Offline: Supabase not connected."); return; }
-            const email = document.getElementById('auth-email').value;
-            const btn = document.getElementById('btn-magic-link');
-            
-            if(!email) return alert("Please enter your email.");
-
-            btn.innerHTML = "Sending...";
-            btn.disabled = true;
-
-            const { error } = await supabase.auth.signInWithOtp({
-                email: email,
-                options: { emailRedirectTo: window.location.href }
-            });
-
-            if (error) {
-                alert("Login Error: " + error.message);
-                btn.innerHTML = "Try Again";
-                btn.disabled = false;
-            } else {
-                document.getElementById('auth-step-email').classList.add('hidden');
-                document.getElementById('auth-step-success').classList.remove('hidden');
-                if(window.lucide) lucide.createIcons();
-            }
-        }
-
-        function showProfileSetup() {
-            document.getElementById('landing-view').style.display = 'none';
-            document.getElementById('dashboard-view').classList.remove('hidden');
-            document.getElementById('profile-modal').classList.remove('hidden');
-            renderWedge('profile');
-        }
-
-        async function saveProfile() {
-            if(!supabase) { alert("Offline Mode: Cannot save."); return; }
-            const btn = document.getElementById('save-prof-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "Saving to Ekayan Core...";
-            btn.disabled = true;
-
-            const name = document.getElementById('prof-name').value;
-            const company = document.getElementById('prof-company').value;
-            const role = document.getElementById('prof-role').value;
-            const city = document.getElementById('prof-city').value;
-
-            if(!name || !company) {
-                alert("Please fill Name and Company fields.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                return;
-            }
-
-            const { error } = await supabase.from('profiles').upsert({
-                id: currentUser.id,
-                full_name: name,
-                company_name: company,
-                role: role,
-                city: city,
-                email: currentUser.email,
-                credits: 50 
-            });
-
-            if (error) {
-                console.error(error);
-                alert("Error saving profile. Check console.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            } else {
-                document.getElementById('profile-modal').classList.add('hidden');
-                await fetchAndRenderProfile(); 
-            }
-        }
-
-        async function logout() {
-            if(isDemoMode) {
-                window.location.reload();
-            } else {
-                if(supabase) await supabase.auth.signOut();
-                window.location.reload();
-            }
-        }
-
-        // --- Dashboard Render Logic ---
-        function renderDashboardData(profile) {
-            // Use profile image if available, else initials
-            const avatarHtml = profile.avatar 
-                ? `<img src="${profile.avatar}" alt="User" class="w-10 h-10 rounded-full border border-white/20 object-cover shadow-lg" />`
-                : `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center font-bold text-white uppercase text-lg shadow-lg">${profile.company_name.charAt(0)}</div>`;
-
-            const sidebarHTML = `
-                <div class="flex items-center gap-3 mb-4">
-                    ${avatarHtml}
-                    <div class="overflow-hidden">
-                        <p class="text-sm font-bold text-white truncate w-32" title="${profile.company_name}">${profile.company_name}</p>
-                        <p class="text-[10px] text-gray-400 capitalize">${profile.role}</p>
+        <!-- Chat Section -->
+        <div id="chat-section" class="space-y-6 hidden">
+            <div class="flex items-center space-x-4">
+                <button onclick="showDashboard()" class="text-purple-400 hover:text-purple-200 flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </button>
+                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent flex-1">AI Legal Assistant</h1>
+            </div>
+            <div class="bg-black/50 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8 h-[600px] flex flex-col">
+                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 mb-6 pr-4">
+                    <div class="chat-bubble bg-gradient-to-r from-purple-500 to-purple-700 text-white p-6 rounded-3xl max-w-2xl ml-auto">
+                        <div class="font-bold mb-2">LegalAI Assistant</div>
+                        <div>Hello! I'm your AI legal assistant. Upload documents, ask questions about your case, or request case analysis. What can I help you with today?</div>
                     </div>
                 </div>
-            `;
-            document.getElementById('sidebar-user-section').innerHTML = sidebarHTML;
-
-            document.getElementById('user-company-header').innerText = profile.company_name;
-            document.getElementById('user-credits-header').innerText = `Credits: ${profile.credits}`;
-            document.getElementById('dash-credits-display').innerText = profile.credits;
-            
-            const trustScore = profile.credits > 1000 ? 98 : 10;
-            document.getElementById('dash-trust-score').innerText = `${trustScore}/100`;
-            document.getElementById('dash-trust-bar').style.width = `${trustScore}%`;
-
-            // Mini Profile Card Logo
-            const logoHtml = `
-                 <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400 border border-blue-500/30 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=150&h=150&fit=crop" class="w-full h-full object-cover opacity-80" alt="Company Logo">
+                <div class="flex space-x-3">
+                    <div class="flex-1 relative">
+                        <input id="chat-input" type="text" placeholder="Ask about your case, upload documents, or type your question..." class="w-full bg-black/50 border border-purple-500/50 rounded-2xl px-6 py-4 text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 transition-all duration-200">
+                        <div id="typing-indicator" class="absolute right-4 top-1/2 -translate-y-1/2 w-20 h-6 typing-indicator rounded-full hidden"></div>
+                    </div>
+                    <button onclick="sendMessage()" class="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110">
+                        <i class="fas fa-paper-plane text-xl"></i>
+                    </button>
                 </div>
-            `;
+            </div>
+        </div>
 
-            const cardHTML = `
-                <div class="mini-profile-card p-6 rounded-xl flex items-center justify-between shadow-lg">
-                    <div class="flex items-center gap-5">
-                        ${logoHtml}
-                        <div>
-                            <h3 class="text-xl font-bold text-white">${profile.company_name}</h3>
-                            <p class="text-sm text-slate-400">${profile.role.toUpperCase()} • ${profile.city}</p>
-                            <div class="flex items-center gap-3 mt-2">
-                                <span class="px-2 py-0.5 bg-green-500/10 text-green-400 text-[10px] font-bold uppercase rounded border border-green-500/20 flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Active Account
-                                </span>
+        <!-- Agents Section -->
+        <div id="agents-section" class="space-y-6 hidden">
+            <div class="flex items-center space-x-4">
+                <button onclick="showDashboard()" class="text-purple-400 hover:text-purple-200 flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </button>
+                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent flex-1">AI Agents</h1>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Gatekeeper Agent -->
+                <div class="group bg-black/50 backdrop-blur-xl border-2 border-purple-500/30 rounded-3xl p-8 hover:border-purple-400/70 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-3xl cursor-pointer" onclick="switchAgent('gatekeeper')">
+                    <div class="flex items-start space-x-6 mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-purple-700 rounded-3xl flex items-center justify-center shadow-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-shield-alt text-3xl text-white"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-2xl font-black mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Gatekeeper</h3>
+                            <div class="flex items-center space-x-4 text-sm mb-3">
+                                <span class="px-3 py-1 bg-purple-500/20 rounded-full text-purple-200 font-medium">Case Intake</span>
+                                <span class="px-3 py-1 bg-green-500/20 rounded-full text-green-200 font-medium">Risk Analysis</span>
+                            </div>
+                            <p class="text-purple-200 leading-relaxed">Analyzes case viability, identifies red flags, estimates success probability, and recommends next steps. Perfect for initial case screening.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-6 border-t border-purple-500/30">
+                        <div class="text-sm opacity-75">Cost: 5 credits per analysis</div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            <span class="text-sm font-medium text-green-400">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lawyer Agent -->
+                <div class="group bg-black/50 backdrop-blur-xl border-2 border-blue-500/30 rounded-3xl p-8 hover:border-blue-400/70 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-3xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
+                    <div class="relative z-10 flex items-start space-x-6 mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-gavel text-3xl text-white"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-2xl font-black mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Lawyer Pro</h3>
+                            <div class="flex items-center space-x-4 text-sm mb-3">
+                                <span class="px-3 py-1 bg-blue-500/20 rounded-full text-blue-200 font-medium">Full Case Analysis</span>
+                                <span class="px-3 py-1 bg-purple-500/20 rounded-full text-purple-200 font-medium">Strategy</span>
+                                <span class="px-3 py-1 bg-orange-500/20 rounded-full text-orange-200 font-medium">Live Chat</span>
+                            </div>
+                            <p class="text-blue-200 leading-relaxed">Advanced legal reasoning with live document analysis, precedent research, strategy recommendations, and interactive Q&A. Enterprise-grade legal AI.</p>
+                        </div>
+                    </div>
+                    <div class="relative z-10 flex items-center justify-between pt-6 border-t border-blue-500/30">
+                        <div class="text-sm opacity-75">Cost: 15 credits per session</div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            <span class="text-sm font-medium text-green-400">Active</span>
+                        </div>
+                    </div>
+                    <div id="lawyer-iframe-container" class="mt-6 hidden">
+                        <iframe id="lawyer-agent-iframe" src="https://demo-legal-ai-iframe.vercel.app/lawyer" class="w-full h-96 border-0 rounded-2xl shadow-2xl" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div id="active-agent-section" class="bg-black/70 backdrop-blur-xl border border-purple-500/50 rounded-3xl p-8 hidden">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center space-x-4">
+                        <div id="active-agent-avatar" class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl"></div>
+                        <h3 id="active-agent-title" class="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"></h3>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="agent-credits-cost" class="px-4 py-2 bg-purple-500/20 rounded-xl font-bold text-purple-300 border border-purple-500/30">5 credits</span>
+                        <button onclick="deactivateAgent()" class="px-6 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded-xl font-bold border border-red-500/30 transition-all duration-200 flex items-center space-x-2">
+                            <i class="fas fa-times"></i>
+                            <span>Deactivate</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="agent-chat-container" class="h-[500px] bg-black/50 border border-purple-500/30 rounded-3xl p-6 flex flex-col">
+                    <div id="agent-chat-messages" class="flex-1 overflow-y-auto space-y-4 mb-6 pr-4">
+                        <!-- Agent chat messages -->
+                    </div>
+                    <div class="flex space-x-3">
+                        <input id="agent-chat-input" type="text" placeholder="Interact with your AI agent..." class="flex-1 bg-black/50 border border-purple-500/50 rounded-2xl px-6 py-4 text-white placeholder-purple-300 focus:outline-none focus:border-purple-400 transition-all duration-200">
+                        <button onclick="sendAgentMessage()" class="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110">
+                            <i class="fas fa-paper-plane text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credits Section -->
+        <div id="credits-section" class="space-y-6 hidden">
+            <div class="flex items-center space-x-4">
+                <button onclick="showDashboard()" class="text-purple-400 hover:text-purple-200 flex items-center space-x-2">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </button>
+                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 bg-clip-text text-transparent flex-1">Credit Management</h1>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 backdrop-blur-xl border border-yellow-500/30 rounded-3xl p-8">
+                    <h3 class="text-3xl font-black mb-8 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Current Balance</h3>
+                    <div class="text-center">
+                        <div id="credits-balance-large" class="text-6xl lg:text-7xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-600 bg-clip-text text-transparent mb-6">150</div>
+                        <div class="text-2xl opacity-75 mb-12">Available Credits</div>
+                        <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                            <button onclick="buyCredits(100)" class="p-6 rounded-2xl font-bold text-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 border-2 border-yellow-400/30">+$100</button>
+                            <button onclick="buyCredits(500)" class="p-6 rounded-2xl font-bold text-xl bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 border-2 border-yellow-400/30">+$500</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black/50 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8 space-y-6">
+                    <h3 class="text-3xl font-black mb-6">Credit Usage</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-4 bg-purple-500/10 rounded-2xl">
+                            <span>Gatekeeper Analysis</span>
+                            <div class="text-right">
+                                <div class="font-bold text-purple-400">5 credits</div>
+                                <div class="text-xs opacity-75">per analysis</div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-blue-500/10 rounded-2xl">
+                            <span>Lawyer Pro Session</span>
+                            <div class="text-right">
+                                <div class="font-bold text-blue-400">15 credits</div>
+                                <div class="text-xs opacity-75">per session</div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-green-500/10 rounded-2xl">
+                            <span>Document Review</span>
+                            <div class="text-right">
+                                <div class="font-bold text-green-400">8 credits</div>
+                                <div class="text-xs opacity-75">per page</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            `;
-            document.getElementById('mini-profile-container').innerHTML = cardHTML;
-            
-            document.getElementById('full-profile-view').innerHTML = `
-                <div class="grid grid-cols-2 gap-y-6 gap-x-4 text-sm">
-                    <div><p class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Full Name</p><p class="text-white text-lg">${profile.full_name}</p></div>
-                    <div><p class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Company</p><p class="text-white text-lg">${profile.company_name}</p></div>
-                    <div><p class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Email</p><p class="text-white text-lg">${profile.email}</p></div>
-                    <div><p class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">City</p><p class="text-white text-lg">${profile.city}</p></div>
-                </div>
-            `;
+            </div>
+        </div>
+    </main>
 
-            if(window.lucide) lucide.createIcons();
-        }
+    <!-- Global Supabase Client -->
+    <script>
+        let supabase = null;
+        let currentUser = { id: 'demo-user-1', email: 'user@legalai.com' };
+        let credits = 150;
+        let activeAgent = null;
+        let chatMessages = [];
+        let agentMessages = [];
 
-        async function fetchAndRenderProfile() {
-            if (isDemoMode) return;
-            if (!supabase) return;
-
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-
-            if (error || !data) {
-                showProfileSetup();
-                return;
-            }
-            currentProfile = data;
-            
-            if (!data.company_name) {
-                showProfileSetup(); 
-            } else {
-                renderDashboardData(data);
-                renderWedge('action');
-            }
-        }
-
-        function renderDemoShipments() {
-            const shipmentTable = document.getElementById('shipment-table-body');
-            shipmentTable.innerHTML = `
-                <tr class="hover:bg-white/5 transition"><td class="p-4 font-mono text-xs">#SHP-9001</td><td class="p-4 text-white">Basmati Rice (Grade A)</td><td class="p-4">Dubai, UAE</td><td class="p-4"><span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded border border-yellow-500/30">Customs Cleared</span></td></tr>
-                <tr class="hover:bg-white/5 transition"><td class="p-4 font-mono text-xs">#SHP-9002</td><td class="p-4 text-white">Organic Spices</td><td class="p-4">London, UK</td><td class="p-4"><span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/30">In Transit</span></td></tr>
-            `;
-            document.getElementById('stat-shipments').innerText = "2";
-        }
-
-        function requestBooking() {
-            if(!isDemoMode) { alert("Please verify GST first."); return; }
-            const table = document.getElementById('shipment-table-body');
-            const newRow = `<tr class="animate-fade-in bg-blue-500/10"><td class="p-4 font-mono text-xs text-blue-300">#SHP-9003</td><td class="p-4 text-white">Hand Tools Set</td><td class="p-4">Toronto, CA</td><td class="p-4"><span class="px-2 py-1 bg-gray-500/20 text-gray-300 text-xs rounded border border-gray-500/30">Processing...</span></td></tr>`;
-            table.innerHTML = newRow + table.innerHTML;
-            document.getElementById('stat-shipments').innerText = "3";
-        }
-
-        // --- UPDATED MATCHES WITH PHOTOS ---
-        function renderMatches() {
-            const matches = [
-                { name: "Al-Futtaim Group", loc: "Dubai, UAE", type: "Buyer • Food", img: "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=100&h=100&fit=crop" },
-                { name: "Tesco Sourcing", loc: "London, UK", type: "Buyer • Bulk", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&h=100&fit=crop" },
-                { name: "Walmart Global", loc: "Arkansas, USA", type: "Retailer", img: "https://images.unsplash.com/photo-1572048572872-239440482e3a?w=100&h=100&fit=crop" },
-                { name: "Carrefour Hub", loc: "Paris, France", type: "Buyer • FMCG", img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=100&h=100&fit=crop" }
-            ];
-            const grid = document.getElementById('matches-grid');
-            let html = '';
-            matches.forEach((m, index) => {
-                html += `
-                <div class="glass-card p-5 rounded-xl border border-white/5 flex items-center justify-between hover:bg-white/5 transition">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center overflow-hidden shadow-lg">
-                            <img src="${m.img}" alt="${m.name}" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h4 class="text-white font-bold text-sm flex items-center gap-2">
-                                ${m.name} <i data-lucide="badge-check" class="w-3 h-3 text-blue-400"></i>
-                            </h4>
-                            <p class="text-xs text-gray-400 mt-0.5">${m.loc}</p>
-                            <span class="text-[10px] text-gray-500 uppercase tracking-wider font-bold">${m.type}</span>
-                        </div>
-                    </div>
-                    <button id="btn-conn-${index}" onclick="connectMatch(${index})" class="text-xs font-bold border border-blue-600 text-blue-400 px-4 py-2 rounded hover:bg-blue-600 hover:text-white transition-all shadow-lg shadow-blue-900/10">
-                        Connect
-                    </button>
-                </div>`;
-            });
-            grid.innerHTML = html;
-            if(window.lucide) lucide.createIcons();
-        }
-
-        function connectMatch(index) {
-            const btn = document.getElementById(`btn-conn-${index}`);
-            btn.innerText = "Request Sent";
-            btn.classList.remove('border-blue-600', 'text-blue-400', 'hover:bg-blue-600');
-            btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30', 'cursor-default');
-            btn.onclick = null;
-        }
-
-        // --- NEW SIMULATE UPLOAD FUNCTION INTEGRATED HERE ---
-        function simulateUpload() {
-            const card = document.getElementById('upload-card');
-            const icon = document.getElementById('upload-icon');
-            const text = document.getElementById('upload-text');
-            const sub = document.getElementById('upload-sub');
-
-            text.innerText = "Scanning...";
-            sub.innerText = "AI checking validity...";
-            icon.classList.add('animate-bounce');
-            icon.classList.remove('text-gray-400');
-            icon.classList.add('text-blue-400');
-
-            setTimeout(() => {
-                card.classList.remove('border-dashed', 'border-gray-600');
-                card.classList.add('bg-green-500/10', 'border-green-500/30');
-
-                icon.classList.remove('animate-bounce', 'text-blue-400');
-                icon.classList.add('text-green-400');
-
-                // Important: Update icon to Checkmark
-                card.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-10 h-10 text-green-400 mb-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                    <h4 class="text-gray-300 text-sm font-bold">RCMC Verified</h4>
-                    <p class="text-xs text-green-400 mt-1">Document approved</p>
-                `;
-                
-                // Remove onclick to prevent re-scan
-                card.onclick = null;
-
-                if (window.lucide) lucide.createIcons();
-            }, 1800);
-        }
-
-        function renderWedge(step) {
-            const wedge = document.getElementById('onboarding-wedge');
-            const btn = document.getElementById('wedge-action-btn');
-            wedge.classList.add('wedge-visible');
-
-            if (step === 'profile') {
-                document.getElementById('wedge-step-count').innerText = "1/3";
-                document.getElementById('wedge-text').innerText = "Create your profile to start.";
-                btn.innerText = "Fill Form";
-                btn.onclick = () => showProfileSetup();
-            } else if (step === 'action') {
-                document.getElementById('wedge-step-count').innerText = "2/3";
-                document.getElementById('wedge-text').innerText = "Verify your IEC to unlock trades.";
-                btn.innerText = "Upload Documents";
-                btn.onclick = () => switchDashView('docs');
-            }
-        }
-
-        // ----------------------------------------------------
-        // 2. INITIALIZATION ON LOAD (Robust Mode)
-        // ----------------------------------------------------
-        window.addEventListener('load', async () => {
-            // Initialize Icons safely
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-
-            // Initialize Supabase Safely
+        // Safe Supabase initialization
+        function initializeSupabase() {
             try {
-                if (window.supabase) {
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    
-                    const { data: { session } } = await supabase.auth.getSession();
-                    if (session) {
-                        currentUser = session.user;
-                        console.log("Logged in user:", currentUser.id);
-                        document.getElementById('landing-view').style.display = 'none';
-                        document.getElementById('dashboard-view').classList.remove('hidden');
-                        await fetchAndRenderProfile();
-                    } else {
-                        console.log("No session found. Showing Landing Page.");
-                    }
-                } else {
-                    console.warn("Supabase library not loaded correctly. Check Internet.");
+                if (typeof window !== 'undefined') {
+                    supabase = supabase.createClient(
+                        'https://your-project.supabase.co',
+                        'your-anon-key'
+                    );
                 }
-            } catch (err) {
-                console.error("Supabase Init Failed:", err);
+            } catch (error) {
+                console.warn('Supabase not available in demo mode');
+                supabase = {
+                    auth: { getSession: () => Promise.resolve({ data: { session: null } }) },
+                    from: () => ({ select: () => ({ data: [] }) })
+                };
             }
+        }
+
+        // DOM Ready wrapper
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSupabase();
+            updateCreditsDisplay();
+            loadQuickMatches();
+            loadMatches();
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+            document.getElementById('agent-chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendAgentMessage();
+            });
         });
 
+        // Sidebar functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('invisible');
+            overlay.classList.toggle('opacity-0');
+            mobileBtn.querySelector('i').classList.toggle('fa-bars');
+            mobileBtn.querySelector('i').classList.toggle('fa-times');
+        }
+
+        // Navigation functions
+        function showDashboard() {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        function showMatches() {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('matches-section').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        function showChat() {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('chat-section').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        function showAgents() {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('agents-section').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        function showCredits() {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('credits-section').classList.remove('hidden');
+            toggleSidebar();
+        }
+
+        // Credits management
+        function updateCreditsDisplay() {
+            document.querySelectorAll('[id*="credits-count"], [id*="stat-credits"], #credits-balance-large').forEach(el => {
+                el.textContent = credits;
+            });
+        }
+
+        function buyCredits(amount) {
+            credits += amount;
+            updateCreditsDisplay();
+            showNotification(`+${amount} credits added! New balance: ${credits}`, 'success');
+        }
+
+        // Match cards data
+        const matchCards = [
+            {
+                id: 1,
+                title: 'Employment Dispute',
+                agent: 'Sarah Thompson',
+                avatarSeed: 'sarah-lawyer',
+                successRate: 97,
+                cost: 25,
+                type: 'employment'
+            },
+            {
+                id: 2,
+                title: 'Contract Review',
+                agent: 'Michael Chen',
+                avatarSeed: 'michael-lawyer',
+                successRate: 94,
+                cost: 18,
+                type: 'contract'
+            },
+            {
+                id: 3,
+                title: 'Personal Injury',
+                agent: 'Elena Rodriguez',
+                avatarSeed: 'elena-lawyer',
+                successRate: 92,
+                cost: 35,
+                type: 'injury'
+            },
+            {
+                id: 4,
+                title: 'IP Protection',
+                agent: 'David Kim',
+                avatarSeed: 'david-lawyer',
+                successRate: 96,
+                cost: 22,
+                type: 'ip'
+            },
+            {
+                id: 5,
+                title: 'Family Law',
+                agent: 'Lisa Patel',
+                avatarSeed: 'lisa-lawyer',
+                successRate: 89,
+                cost: 28,
+                type: 'family'
+            },
+            {
+                id: 6,
+                title: 'Commercial Lease',
+                agent: 'Robert James',
+                avatarSeed: 'robert-lawyer',
+                successRate: 93,
+                cost: 20,
+                type: 'commercial'
+            }
+        ];
+
+        function loadQuickMatches() {
+            const container = document.getElementById('quick-matches');
+            const quickMatches = matchCards.slice(0, 3);
+            container.innerHTML = quickMatches.map(card => `
+                <div class="group bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-6 hover:bg-purple-500/20 transition-all duration-300 cursor-pointer hover:-translate-y-2 hover:shadow-2xl" onclick="selectMatch(${card.id})">
+                    <div class="flex items-start space-x-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl overflow-hidden border-2 border-white/20 flex-shrink-0">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${card.avatarSeed}" alt="${card.agent}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-lg mb-1">${card.title}</h4>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <div class="text-sm font-semibold text-purple-300">${card.agent}</div>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                <div class="text-xs text-green-400 font-medium">${card.successRate}% Success</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-white/10">
+                                <span class="text-2xl font-black text-purple-400">$${card.cost}</span>
+                                <button class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-200">Match Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadMatches() {
+            const container = document.getElementById('matches-grid');
+            container.innerHTML = matchCards.map(card => `
+                <div class="group bg-black/60 backdrop-blur-xl border-2 border-purple-500/30 rounded-3xl p-8 hover:border-purple-400/70 hover:bg-purple-500/10 transition-all duration-300 hover:shadow-3xl hover:-translate-y-3 cursor-pointer" onclick="hireMatch(${card.id})">
+                    <div class="flex items-start space-x-6 mb-6">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden border-3 border-purple-500/30 shadow-2xl flex-shrink-0 group-hover:scale-110 transition-all duration-300">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${card.avatarSeed}" alt="${card.agent}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <h3 class="text-2xl font-black bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">${card.title}</h3>
+                                <div class="px-4 py-2 bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-300 rounded-xl font-bold text-sm border border-green-400/30">${card.successRate}% Success Rate</div>
+                            </div>
+                            <div class="mb-4 p-4 bg-gradient-to-r from-slate-800 to-slate-900/50 rounded-2xl">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-semibold text-purple-300">${card.agent}</span>
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <span class="text-yellow-400 font-bold">4.9</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-purple-300">${getPracticeAreaDescription(card.type)}</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-6 border-t border-purple-500/30">
+                                <div>
+                                    <div class="text-3xl font-black text-purple-400">$${card.cost}</div>
+                                    <div class="text-sm opacity-75">per case</div>
+                                </div>
+                                <button onclick="event.stopPropagation(); hireMatch(${card.id})" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 flex items-center space-x-3">
+                                    <i class="fas fa-handshake"></i>
+                                    <span>Hire Now</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getPracticeAreaDescription(type) {
+            const descriptions = {
+                employment: 'Specializes in wrongful termination, discrimination, wage disputes, and workplace harassment cases.',
+                contract: 'Expert in contract breaches, negotiation, review, and commercial agreement disputes.',
+                injury: 'Handles personal injury, medical malpractice, premises liability, and accident claims.',
+                ip: 'Intellectual property protection, trademarks, copyrights, and patent disputes.',
+                family: 'Family law, divorce, child custody, alimony, and domestic relations.',
+                commercial: 'Commercial leases, business disputes, partnership agreements, and corporate law.'
+            };
+            return descriptions[type] || 'General practice attorney';
+        }
+
+        function selectMatch(id) {
+            showNotification(`Selected match #${id} - Employment Dispute`, 'info');
+        }
+
+        function hireMatch(id) {
+            const match = matchCards.find(m => m.id === id);
+            if (credits >= match.cost) {
+                credits -= match.cost;
+                updateCreditsDisplay();
+                showNotification(`Hired ${match.agent} for $${match.cost}! Credits remaining: ${credits}`, 'success');
+            } else {
+                showNotification('Insufficient credits. Please top up.', 'error');
+                showCredits();
+            }
+        }
+
+        // Chat functions
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            const messages = document.getElementById('chat-messages');
+            messages.innerHTML += `
+                <div class="chat-bubble bg-gradient-to-r from-slate-700 to-slate-800 text-white p-6 rounded-3xl max-w-2xl ml-auto">
+                    <div>You: ${message}</div>
+                </div>
+            `;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Show typing
+            const typing = document.getElementById('typing-indicator');
+            typing.classList.remove('hidden');
+
+            // Simulate response
+            setTimeout(() => {
+                typing.classList.add('hidden');
+                const responses = [
+                    "Excellent question! Based on standard legal precedents, your case appears strong. I recommend proceeding with formal documentation.",
+                    "I've analyzed similar cases. Success rate for your situation is approximately 87%. Would you like me to prepare filing documents?",
+                    "This falls under contract law jurisdiction. Statute of limitations is 4 years in most states. Action recommended.",
+                    "Risk assessment: High viability (92%). Primary defense would be 'force majeure' clause. Counter recommended.",
+                    "Case strength: Very strong. Recommend immediate cease-and-desist followed by formal litigation preparation."
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                messages.innerHTML += `
+                    <div class="chat-bubble bg-gradient-to-r from-purple-500 to-purple-700 text-white p-6 rounded-3xl max-w-2xl">
+                        <div class="font-bold mb-2">LegalAI Assistant</div>
+                        <div>${response}</div>
+                    </div>
+                `;
+                messages.scrollTop = messages.scrollHeight;
+            }, 1500);
+        }
+
+        // Agent functions
+        function switchAgent(agentType) {
+            activeAgent = agentType;
+            document.querySelectorAll('[id*="agent-section"], #lawyer-iframe-container').forEach(el => el.classList.add('hidden'));
+            
+            if (agentType === 'gatekeeper') {
+                document.getElementById('active-agent-section').classList.remove('hidden');
+                document.getElementById('active-agent-avatar').innerHTML = '<i class="fas fa-shield-alt text-3xl text-white"></i>';
+                document.getElementById('active-agent-title').textContent = 'Gatekeeper';
+                document.getElementById('agent-credits-cost').textContent = '5 credits';
+            } else if (agentType === 'lawyer') {
+                document.getElementById('lawyer-iframe-container').classList.remove('hidden');
+                if (credits >= 15) {
+                    credits -= 15;
+                    updateCreditsDisplay();
+                }
+            }
+        }
+
+        function deactivateAgent() {
+            activeAgent = null;
+            document.querySelectorAll('#active-agent-section, #lawyer-iframe-container').forEach(el => el.classList.add('hidden'));
+        }
+
+        function sendAgentMessage() {
+            const input = document.getElementById('agent-chat-input');
+            const message = input.value.trim();
+            if (!message || !activeAgent) return;
+
+            const messages = document.getElementById('agent-chat-messages');
+            messages.innerHTML += `
+                <div class="chat-bubble bg-gradient-to-r from-slate-700 to-slate-800 text-white p-5 rounded-2xl max-w-xl ml-auto">
+                    ${message}
+                </div>
+            `;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Agent response
+            setTimeout(() => {
+                const responses = {
+                    gatekeeper: [
+                        "GATEKEEPER ANALYSIS COMPLETE<br><br>✅ Case Viability: 87%<br>✅ Jurisdiction: Valid<br>✅ Statute: Within limits<br>⚠️ Risk Factor: Medium<br><br>RECOMMENDATION: Proceed to full analysis",
+                        "RED FLAGS DETECTED:<br>1. Missing corroboration<br>2. Witness credibility<br>3. Documentation gaps<br><br>ACTION REQUIRED: Gather additional evidence"
+                    ],
+                    lawyer: [
+                        "LAWYER PRO RESPONSE:<br>Precedent analysis complete. Smith v. Jones (2023) directly applicable. Recommend immediate motion for summary judgment.<br><br>Strategy prepared.",
+                        "Document review complete. Three exploitable clauses identified. Counteroffer strategy: 125% original demand with escalation clause."
+                    ]
+                };
+                const agentResponses = responses[activeAgent] || responses.gatekeeper;
+                const response = agentResponses[Math.floor(Math.random() * agentResponses.length)];
+                messages.innerHTML += `
+                    <div class="chat-bubble bg-gradient-to-r from-purple-500 to-blue-600 text-white p-5 rounded-2xl max-w-xl">
+                        <div class="font-bold mb-3 text-lg">${activeAgent.toUpperCase()}</div>
+                        <div>${response}</div>
+                    </div>
+                `;
+                messages.scrollTop = messages.scrollHeight;
+            }, 1200);
+        }
+
+        // Utility functions
+        function quickNewCase() {
+            showChat();
+            showNotification('AI Chat opened - describe your case to begin analysis', 'info');
+        }
+
+        function showStats() {
+            showNotification('Advanced analytics coming soon!', 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create floating notification
+            const notification = document.createElement('div');
+            notification.className = `fixed top-24 right-6 z-50 p-6 rounded-2xl shadow-2xl text-white font-bold transform translate-x-full transition-all duration-300 animate-slide-in`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} text-2xl"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            if (type === 'success') notification.classList.add('bg-green-500/90', 'backdrop-blur-xl');
+            else if (type === 'error') notification.classList.add('bg-red-500/90', 'backdrop-blur-xl');
+            else notification.classList.add('bg-purple-500/90', 'backdrop-blur-xl');
+
+            document.body.appendChild(notification);
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 4000);
+        }
     </script>
 </body>
 </html>
