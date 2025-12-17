@@ -634,23 +634,13 @@
 
     <script>
         // ----------------------------------------------------
-        // IMPORTANT: Global Variables declared first
-        // ----------------------------------------------------
-        const SUPABASE_URL = 'https://rlezzjpgisjycxrmtbmi.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZXp6anBnaXNqeWN4cm10Ym1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzU2MjUsImV4cCI6MjA4MTAxMTYyNX0.fYeTbYnCEDP8wNkqBerGT8buMWk0wK3PdTjI57dVYSY';
-        let supabase = null;
-        let currentUser = null;
-        let currentProfile = null;
-        let isDemoMode = false;
-
-        // ----------------------------------------------------
-        // 1. GLOBAL FUNCTIONS (These must be defined first)
+        // IMPORTANT: Global Functions defined BEFORE anything else
         // ----------------------------------------------------
 
         function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
         function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
-        // --- THE LAWYER AGENT FIX IS HERE ---
+        // --- THE LAWYER AGENT FIX (Global) ---
         function switchAgentTab(agentType) {
             // Remove active class from all tabs
             document.querySelectorAll('.agent-tab').forEach(el => {
@@ -689,6 +679,61 @@
             if(window.lucide) lucide.createIcons();
         }
 
+        function simulateUpload() {
+            const card = document.getElementById('upload-card');
+            const icon = document.getElementById('upload-icon');
+            const text = document.getElementById('upload-text');
+            const sub = document.getElementById('upload-sub');
+
+            text.innerText = "Scanning...";
+            sub.innerText = "AI checking validity...";
+            icon.classList.add('animate-bounce');
+            icon.classList.remove('text-gray-400');
+            icon.classList.add('text-blue-400');
+
+            setTimeout(() => {
+                card.classList.remove('border-dashed', 'border-gray-600');
+                card.classList.add('bg-green-500/10', 'border-green-500/30');
+
+                icon.classList.remove('animate-bounce', 'text-blue-400');
+                icon.classList.add('text-green-400');
+
+                // Important: Update icon to Checkmark
+                card.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-10 h-10 text-green-400 mb-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                    <h4 class="text-gray-300 text-sm font-bold">RCMC Verified</h4>
+                    <p class="text-xs text-green-400 mt-1">Document approved</p>
+                `;
+                
+                // Remove onclick to prevent re-scan
+                card.onclick = null;
+
+                if (window.lucide) lucide.createIcons();
+            }, 1800);
+        }
+
+        // ----------------------------------------------------
+        // INITIALIZATION (Safe Mode)
+        // ----------------------------------------------------
+        
+        const SUPABASE_URL = 'https://rlezzjpgisjycxrmtbmi.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsZXp6anBnaXNqeWN4cm10Ym1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzU2MjUsImV4cCI6MjA4MTAxMTYyNX0.fYeTbYnCEDP8wNkqBerGT8buMWk0wK3PdTjI57dVYSY';
+        let supabase = null;
+        let currentUser = null;
+        let isDemoMode = false;
+
+        // Initialize Supabase safely - Wrapped in try-catch so it doesn't break other buttons
+        try {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.warn("Supabase library not loaded correctly.");
+            }
+        } catch (err) {
+            console.error("Supabase Init Failed. Continuing in offline mode.", err);
+        }
+
+        // --- Demo & Auth Functions ---
         async function loginAsDemo() {
             isDemoMode = true;
             document.getElementById('auth-modal').classList.add('hidden');
@@ -799,7 +844,6 @@
             }
         }
 
-        // --- Dashboard Render Logic ---
         function renderDashboardData(profile) {
             // Use profile image if available, else initials
             const avatarHtml = profile.avatar 
@@ -899,7 +943,6 @@
             document.getElementById('stat-shipments').innerText = "3";
         }
 
-        // --- UPDATED MATCHES WITH PHOTOS ---
         function renderMatches() {
             const matches = [
                 { name: "Al-Futtaim Group", loc: "Dubai, UAE", type: "Buyer • Food", img: "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=100&h=100&fit=crop" },
@@ -941,40 +984,6 @@
             btn.onclick = null;
         }
 
-        // --- NEW SIMULATE UPLOAD FUNCTION INTEGRATED HERE ---
-        function simulateUpload() {
-            const card = document.getElementById('upload-card');
-            const icon = document.getElementById('upload-icon');
-            const text = document.getElementById('upload-text');
-            const sub = document.getElementById('upload-sub');
-
-            text.innerText = "Scanning...";
-            sub.innerText = "AI checking validity...";
-            icon.classList.add('animate-bounce');
-            icon.classList.remove('text-gray-400');
-            icon.classList.add('text-blue-400');
-
-            setTimeout(() => {
-                card.classList.remove('border-dashed', 'border-gray-600');
-                card.classList.add('bg-green-500/10', 'border-green-500/30');
-
-                icon.classList.remove('animate-bounce', 'text-blue-400');
-                icon.classList.add('text-green-400');
-
-                // Important: Update icon to Checkmark
-                card.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-circle w-10 h-10 text-green-400 mb-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                    <h4 class="text-gray-300 text-sm font-bold">RCMC Verified</h4>
-                    <p class="text-xs text-green-400 mt-1">Document approved</p>
-                `;
-                
-                // Remove onclick to prevent re-scan
-                card.onclick = null;
-
-                if (window.lucide) lucide.createIcons();
-            }, 1800);
-        }
-
         function renderWedge(step) {
             const wedge = document.getElementById('onboarding-wedge');
             const btn = document.getElementById('wedge-action-btn');
@@ -994,7 +1003,7 @@
         }
 
         // ----------------------------------------------------
-        // 2. INITIALIZATION ON LOAD (Robust Mode)
+        // INITIAL LOAD
         // ----------------------------------------------------
         window.addEventListener('load', async () => {
             // Initialize Icons safely
@@ -1002,11 +1011,9 @@
                 lucide.createIcons();
             }
 
-            // Initialize Supabase Safely
-            try {
-                if (window.supabase) {
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    
+            // Safe Authentication Check
+            if (supabase) {
+                try {
                     const { data: { session } } = await supabase.auth.getSession();
                     if (session) {
                         currentUser = session.user;
@@ -1017,11 +1024,9 @@
                     } else {
                         console.log("No session found. Showing Landing Page.");
                     }
-                } else {
-                    console.warn("Supabase library not loaded correctly. Check Internet.");
+                } catch(err) {
+                    console.log("Session check failed:", err);
                 }
-            } catch (err) {
-                console.error("Supabase Init Failed:", err);
             }
         });
 
