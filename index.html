@@ -3,217 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTrade AI - World's No.1 B2B OS</title>
+    <title>HindTrade AI - Fixed Version</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['"Playfair Display"', 'serif'] },
-                    animation: { 'scroll': 'scroll 45s linear infinite', 'fade-in': 'fadeIn 0.8s ease-out forwards', 'pulse-slow': 'pulse 3s infinite' },
-                    keyframes: {
-                        scroll: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-100%)' } },
-                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body { background-color: #02040a; color: #E2E8F0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass-card { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
-        .glass-card:hover { border-color: #38bdf8; transform: translateY(-5px); box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4); }
+        body { background-color: #02040a; color: #E2E8F0; font-family: 'Inter', sans-serif; }
+        .glass-card { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        
+        /* Tab Styles */
         .agent-tab { cursor: pointer; border-bottom: 2px solid transparent; opacity: 0.6; transition: all 0.3s; }
         .agent-tab.active { border-color: #3b82f6; opacity: 1; color: white; }
-        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; color: white; }
-        .dash-section { display: none; animation: fadeIn 0.4s ease-out; }
-        .dash-section.active { display: block; }
         
-        /* Loading Overlay */
-        #loader { position: fixed; inset: 0; background: #02040a; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        /* Debug Indicator */
+        #js-status { position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: #00ff00; z-index: 9999; }
     </style>
+
+    <script>
+        // --- 1. TAB SWITCHING FUNCTION ---
+        window.switchAgentTab = function(agentName) {
+            console.log("Switching to:", agentName);
+
+            // Hide all frames
+            document.getElementById('frame-gatekeeper').style.display = 'none';
+            document.getElementById('frame-lawyer').style.display = 'none';
+
+            // Reset Tab Styles
+            document.getElementById('tab-gatekeeper').classList.remove('active', 'text-white');
+            document.getElementById('tab-gatekeeper').classList.add('text-gray-500');
+            
+            document.getElementById('tab-lawyer').classList.remove('active', 'text-white');
+            document.getElementById('tab-lawyer').classList.add('text-gray-500');
+
+            // Show Selected
+            if (agentName === 'gatekeeper') {
+                document.getElementById('frame-gatekeeper').style.display = 'block';
+                document.getElementById('tab-gatekeeper').classList.add('active', 'text-white');
+                document.getElementById('tab-gatekeeper').classList.remove('text-gray-500');
+            } else {
+                document.getElementById('frame-lawyer').style.display = 'block';
+                document.getElementById('tab-lawyer').classList.add('active', 'text-white');
+                document.getElementById('tab-lawyer').classList.remove('text-gray-500');
+            }
+        }
+
+        // --- 2. MODAL FUNCTIONS ---
+        window.openAuthModal = function() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('auth-modal').classList.add('flex');
+        }
+        
+        window.closeAuthModal = function() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('flex');
+        }
+
+        // --- 3. LOGIN DEMO ---
+        window.loginAsDemo = function() {
+            alert("Logging in as Demo User...");
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('landing-view').style.display = 'none';
+            document.getElementById('dashboard-view').classList.remove('hidden');
+        }
+    </script>
 </head>
 <body class="antialiased">
 
-    <div id="loader">
-        <div class="text-center">
-            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-blue-400 font-mono text-xs animate-pulse">INITIALIZING HINDTRADE OS...</p>
-        </div>
-    </div>
+    <div id="js-status">JS Active ✅</div>
 
-    <div id="auth-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden flex items-center justify-center">
-        <div class="glass-card p-8 rounded-2xl w-full max-w-md relative animate-fade-in border-blue-500/30">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-serif text-white mb-2">Login Required</h2>
-                <p class="text-gray-400 text-xs">Access Global Trade Features</p>
-            </div>
-            <button onclick="loginAsDemo()" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg transition-all border border-white/10 flex items-center justify-center gap-2">
-                <span>Enter Demo Mode (Instant)</span> <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center">
+        <div class="glass-card p-8 rounded-2xl w-full max-w-md relative border border-blue-500/30">
+            <button onclick="window.closeAuthModal()" class="absolute top-4 right-4 text-white">X</button>
+            <h2 class="text-2xl font-serif text-white mb-4 text-center">Login to HindTrade</h2>
+            <button onclick="window.loginAsDemo()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg mb-4">
+                Demo Login (Instant)
             </button>
         </div>
     </div>
 
     <div id="landing-view">
-        <nav class="fixed top-0 w-full z-50 bg-[#02040a]/90 backdrop-blur-md border-b border-white/5">
-            <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">H</div>
-                    <span class="text-lg font-bold text-white">HindTrade</span>
-                </div>
-                <div class="flex gap-4">
-                     <button onclick="openAuthModal()" class="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded font-bold transition">Login</button>
-                </div>
-            </div>
+        <nav class="fixed top-0 w-full z-40 bg-[#02040a]/90 border-b border-white/5 h-16 flex items-center justify-between px-6">
+            <div class="text-white font-bold text-xl">HindTrade OS</div>
+            <button onclick="window.openAuthModal()" class="px-4 py-2 bg-white/10 text-white rounded hover:bg-white/20">Login</button>
         </nav>
 
-        <section class="pt-32 pb-10 px-6 text-center">
-            <h1 class="text-5xl md:text-7xl font-serif text-white mb-6">Trade Without <span class="text-blue-500">Boundaries.</span></h1>
-            <p class="text-gray-400 mb-8 max-w-2xl mx-auto">AI Agents for Legal, Logistics, and Verification.</p>
-            <button onclick="openAuthModal()" class="px-8 py-3 bg-white text-blue-900 font-bold rounded hover:bg-gray-200 transition">Launch App</button>
+        <section class="pt-32 pb-10 text-center px-4">
+            <h1 class="text-5xl md:text-6xl font-serif text-white mb-6">Trade Without Boundaries</h1>
+            <p class="text-gray-400 mb-8">Access the AI Agents below.</p>
         </section>
 
-        <section id="live-agent" class="py-12 bg-[#050914] border-t border-white/5">
+        <section class="py-10 bg-[#050914] border-t border-white/5">
             <div class="max-w-6xl mx-auto px-4">
                 <div class="flex items-center gap-8 mb-6 border-b border-white/10 pb-2">
-                    <div onclick="window.switchAgentTab('gatekeeper')" id="tab-gatekeeper" class="agent-tab active flex items-center gap-2 pb-2 text-lg font-bold text-white">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-green-400"></i> The Gatekeeper
+                    <div onclick="window.switchAgentTab('gatekeeper')" id="tab-gatekeeper" class="agent-tab active text-white text-lg font-bold flex items-center gap-2">
+                        <span>🛡️</span> The Gatekeeper
                     </div>
-                    <div onclick="window.switchAgentTab('lawyer')" id="tab-lawyer" class="agent-tab flex items-center gap-2 pb-2 text-lg font-bold text-gray-500 hover:text-white">
-                        <i data-lucide="scale" class="w-5 h-5 text-blue-400"></i> The Lawyer
+                    <div onclick="window.switchAgentTab('lawyer')" id="tab-lawyer" class="agent-tab text-gray-500 text-lg font-bold flex items-center gap-2">
+                        <span>⚖️</span> The Lawyer
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-2xl overflow-hidden h-[600px] relative shadow-2xl border border-gray-200">
+                <div class="bg-white rounded-xl overflow-hidden h-[600px] shadow-2xl relative">
+                    
                     <div id="frame-gatekeeper" class="w-full h-full">
                         <iframe src="https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/73962548-1d56-44f6-aa88-51901de346ef/embed-chat?hide_tool_steps=true&hide_file_uploads=false&bubble_style=agent&primary_color=%23685FFF" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
-                    <div id="frame-lawyer" class="w-full h-full hidden">
+
+                    <div id="frame-lawyer" class="w-full h-full" style="display: none;">
                         <iframe src="https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/1733a3cb-bd12-45c6-9cbc-71e1286652fe/embed-chat?hide_tool_steps=true&bubble_style=agent&primary_color=%23000000" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
+
                 </div>
             </div>
         </section>
     </div>
 
-    <div id="dashboard-view" class="hidden fixed inset-0 w-full h-full bg-[#02040a] z-[100] flex">
-        <aside class="w-64 bg-[#050914] border-r border-white/5 p-6">
-            <div class="flex items-center gap-3 mb-10">
-                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">H</div>
-                <span class="font-bold text-white">HINDTRADE</span>
-            </div>
-            <nav class="space-y-2">
-                <button onclick="switchDashView('home')" class="w-full text-left px-4 py-3 text-white bg-blue-600/10 border-l-2 border-blue-600 rounded">Mission Control</button>
-                <button onclick="logout()" class="w-full text-left px-4 py-3 text-red-400 hover:bg-red-900/10 rounded mt-10">Logout</button>
-            </nav>
-        </aside>
-        <main class="flex-1 p-8">
-            <h1 class="text-2xl font-bold text-white mb-4">Dashboard Active</h1>
-            <p class="text-gray-400">Welcome to Demo Mode. All systems nominal.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <div class="glass-card p-6 rounded-xl">
-                    <h3 class="text-gray-400 text-xs uppercase font-bold">Credits</h3>
-                    <p class="text-3xl text-green-400 font-bold mt-2">2,500</p>
-                </div>
-                <div class="glass-card p-6 rounded-xl">
-                    <h3 class="text-gray-400 text-xs uppercase font-bold">Shipments</h3>
-                    <p class="text-3xl text-white font-bold mt-2">2 Active</p>
-                </div>
-            </div>
-        </main>
+    <div id="dashboard-view" class="hidden fixed inset-0 bg-[#02040a] text-white p-10">
+        <h1 class="text-3xl font-bold mb-4">Welcome to Dashboard</h1>
+        <p class="text-green-400">Login Successful.</p>
+        <button onclick="location.reload()" class="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded">Logout</button>
     </div>
 
     <script>
-        // ==========================================
-        //  CRITICAL FUNCTIONS - DEFINED GLOBALLY
-        // ==========================================
-
-        // 1. Loader Removal (Runs even if code breaks)
-        setTimeout(() => {
-            const loader = document.getElementById('loader');
-            if(loader) loader.style.opacity = '0';
-            setTimeout(() => { if(loader) loader.remove(); }, 500);
-        }, 1500);
-
-        // 2. Tab Switcher (The Logic causing your issue)
-        window.switchAgentTab = function(agentType) {
-            console.log("Switching tab to:", agentType); // Debugging Log
-            
-            // Visual Update
-            document.querySelectorAll('.agent-tab').forEach(el => {
-                el.classList.remove('active', 'text-white');
-                el.classList.add('text-gray-500');
-            });
-            const activeTab = document.getElementById('tab-' + agentType);
-            if(activeTab) {
-                activeTab.classList.add('active', 'text-white');
-                activeTab.classList.remove('text-gray-500');
-            }
-
-            // Iframe Toggle
-            const gatekeeper = document.getElementById('frame-gatekeeper');
-            const lawyer = document.getElementById('frame-lawyer');
-            
-            if(gatekeeper && lawyer) {
-                if(agentType === 'gatekeeper') {
-                    gatekeeper.classList.remove('hidden');
-                    lawyer.classList.add('hidden');
-                } else {
-                    gatekeeper.classList.add('hidden');
-                    lawyer.classList.remove('hidden');
-                }
-            } else {
-                console.error("Frames not found in DOM");
-            }
-        }
-
-        // 3. UI Helper Functions
-        window.openAuthModal = function() { document.getElementById('auth-modal').classList.remove('hidden'); }
-        window.closeAuthModal = function() { document.getElementById('auth-modal').classList.add('hidden'); }
-        
-        window.loginAsDemo = function() {
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('landing-view').style.display = 'none';
-            document.getElementById('dashboard-view').classList.remove('hidden');
-        }
-
-        window.logout = function() {
-            window.location.reload();
-        }
-
-        // ==========================================
-        //  SUPABASE CONNECTION (FAIL-SAFE)
-        // ==========================================
-        
-        const SUPABASE_URL = 'https://rlezzjpgisjycxrmtbmi.supabase.co'; 
-        const SUPABASE_KEY = 'YOUR_SUPABASE_KEY_HERE'; // Keys removed intentionally for safety
-        
-        let supabase = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Icons
-            if(window.lucide) lucide.createIcons();
-
-            // Try Connecting Supabase (But don't stop if it fails)
-            try {
-                if (window.supabase) {
-                    // We only try to init if we have keys, otherwise we skip silent
-                    // supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    console.log("Supabase module loaded (Offline Mode Active)");
-                }
-            } catch (err) {
-                console.warn("Running in Offline Mode. Backend features disabled.");
-            }
-        });
-
+        if(window.lucide) { lucide.createIcons(); }
     </script>
 </body>
 </html>
