@@ -26,8 +26,8 @@
         .bot ul, .bot ol { margin: 8px 0; padding-left: 20px; }
         .bot li { margin-bottom: 4px; }
         .bot p { margin: 0 0 8px 0; }
-        .bot p:last-child { margin-bottom: 0; }
         
+        /* Cache Indicator */
         .cache-tag { display: inline-block; font-size: 11px; background: #166534; color: #bbf7d0; padding: 2px 6px; border-radius: 4px; margin-top: 8px; font-weight: 600; border: 1px solid #22c55e; }
 
         .input-area { display: flex; gap: 10px; }
@@ -53,7 +53,7 @@
         </div>
 
         <div id="chatBox">
-            <div class="msg bot">System Online. New API Configured. 🚀</div>
+            <div class="msg bot">System Online. Authorized & Ready. 🚀</div>
         </div>
 
         <div class="input-area">
@@ -63,10 +63,10 @@
     </div>
 
     <script>
-        // --- ⚙️ NEW CONFIGURATION (Updated from Screenshot) ---
+        // --- ⚙️ NEW CONFIGURATION (Updated Key) ---
         const CONFIG = {
             // Updated Authorization Token
-            AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-OGU1MjA5MTYtZGYyMi00YmYyLWlzY2QtZTNiMDViZGU0M2ZI",
+            AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NjExMzQwNmUtN2QyMy00Zjk3LTg4NGItOTA4NDBlYzYwNGQ2",
             
             // Agent ID & URLs
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
@@ -95,11 +95,10 @@
             if (cachedAnswer) {
                 console.log("⚡ Serving from Cache");
                 setTimeout(() => {
-                    // Show cached answer
                     const finalHtml = cachedAnswer + "<br><span class='cache-tag'>⚡ Saved from History (0 Credits)</span>";
                     addMsg(finalHtml, 'bot');
                     resetUI();
-                }, 600); // Small fake delay
+                }, 600);
                 return;
             }
 
@@ -170,7 +169,7 @@
                         // BEAUTIFY TEXT
                         const formattedText = formatText(rawText);
 
-                        // SAVE TO CACHE
+                        // SAVE TO CACHE (If answer is valid)
                         if (rawText.length > 10) {
                             const cacheKey = "nexus_" + originalQuery.toLowerCase().replace(/\s/g, '_');
                             try { localStorage.setItem(cacheKey, formattedText); } catch(e){}
