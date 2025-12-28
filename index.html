@@ -5,19 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HindTradeAI - Smart Trading Assistant</title>
     <style>
-        /* --- 1. BASIC STYLING (Platform Design) --- */
+        /* --- DESIGN SECTION --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #0f172a; /* Dark Blue Theme */
+            background-color: #0f172a; /* Dark Theme */
             color: white;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Hero Section (Content) */
         .hero {
             flex: 1;
             display: flex;
@@ -31,9 +30,7 @@
         h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
         p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; }
 
-        /* --- 2. CHAT WIDGET STYLING --- */
-        
-        /* Chat Button (Floating) */
+        /* --- CHAT WIDGET STYLING --- */
         .chat-widget-btn {
             position: fixed;
             bottom: 20px;
@@ -47,17 +44,11 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
             font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             z-index: 1000;
-            transition: transform 0.2s;
         }
-        .chat-widget-btn:hover { transform: scale(1.1); }
 
-        /* Chat Container (The Box) */
         .chat-container {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             bottom: 90px;
             right: 20px;
@@ -72,20 +63,17 @@
             overflow: hidden;
         }
 
-        /* Header */
         .chat-header {
             background: #0f172a;
             padding: 15px;
             border-bottom: 1px solid #334155;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             color: #38bdf8;
             font-weight: bold;
         }
         .close-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
 
-        /* Messages Area */
         .chat-body {
             flex: 1;
             padding: 15px;
@@ -95,7 +83,6 @@
             gap: 10px;
         }
 
-        /* Input Area */
         .chat-input-area {
             padding: 15px;
             background: #0f172a;
@@ -122,14 +109,9 @@
             cursor: pointer;
         }
 
-        /* Message Bubbles */
-        .message { padding: 10px 14px; border-radius: 10px; max-width: 80%; line-height: 1.4; font-size: 0.95rem; }
+        .message { padding: 10px 14px; border-radius: 10px; max-width: 80%; font-size: 0.95rem; word-wrap: break-word; }
         .bot-message { background: #334155; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 0; }
         .user-message { background: #38bdf8; color: #0f172a; align-self: flex-end; border-bottom-right-radius: 0; }
-        
-        /* Loading Animation */
-        .typing { font-style: italic; color: #94a3b8; font-size: 0.8rem; margin-left: 5px; }
-
     </style>
 </head>
 <body>
@@ -148,7 +130,7 @@
         </div>
         
         <div class="chat-body" id="chatBody">
-            <div class="message bot-message">Hello! I am your Trading AI. How can I help you?</div>
+            <div class="message bot-message">Hello! I am ready to help.</div>
         </div>
 
         <div class="chat-input-area">
@@ -158,47 +140,33 @@
     </div>
 
     <script>
-        // --- CONFIGURATION: NEW API KEY INTEGRATED ---
         const CONFIG = {
-            // Updated URL from your screenshot
+            // Updated URL from your screenshots
             API_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
             
-            // Your Agent ID
+            // Agent ID
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
             
-            // YOUR NEW API KEY (Integrated)
+            // YOUR NEW KEY
             AUTH_TOKEN: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh"
         };
 
-        // Toggle Chat Window
         function toggleChat() {
             const widget = document.getElementById('ekayan-widget');
-            if (widget.style.display === 'flex') {
-                widget.style.display = 'none';
-            } else {
-                widget.style.display = 'flex';
-                // Focus on input when opened
-                setTimeout(() => document.getElementById("userInput").focus(), 100);
-            }
+            widget.style.display = (widget.style.display === 'flex') ? 'none' : 'flex';
+            if (widget.style.display === 'flex') setTimeout(() => document.getElementById("userInput").focus(), 100);
         }
 
-        // Send Message Logic
         async function sendMessage() {
             const inputField = document.getElementById("userInput");
-            const chatBody = document.getElementById("chatBody");
             const message = inputField.value.trim();
-
             if (!message) return;
 
-            // 1. Show User Message
             addMessage(message, "user");
             inputField.value = "";
-
-            // 2. Show Loading Indicator
             const loadingId = addMessage("Thinking...", "bot", true);
 
             try {
-                // 3. Call Relevance AI API
                 const response = await fetch(CONFIG.API_URL, {
                     method: "POST",
                     headers: {
@@ -206,66 +174,61 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: { 
-                            role: "user", 
-                            content: message 
-                        },
+                        message: { role: "user", content: message },
                         agent_id: CONFIG.AGENT_ID
                     })
                 });
 
                 const data = await response.json();
-                console.log("API Response:", data);
+                console.log("Server Response:", data); // Check Console for errors
 
-                // 4. Extract Answer safely
-                let botReply = "Sorry, I couldn't understand that.";
-                
+                // --- SMART ANSWER FINDER ---
+                let botReply = "";
+
                 if (data.output && data.output.answer) {
-                    botReply = data.output.answer;
+                    botReply = data.output.answer; // Standard format
                 } else if (data.output && typeof data.output === 'string') {
-                    botReply = data.output;
+                    botReply = data.output; // Direct string format
                 } else if (data.message) {
-                    botReply = data.message;
+                    botReply = data.message; // Error or System msg
+                } else {
+                    // Fallback: Agar format alag hai to jo bhi hai dikha do
+                    botReply = JSON.stringify(data.output || data);
                 }
 
-                // 5. Update Loading Message with Real Answer
                 updateMessage(loadingId, botReply);
 
             } catch (error) {
-                console.error("Error:", error);
-                updateMessage(loadingId, "Connection error. Please check your internet or API key.");
+                console.error(error);
+                updateMessage(loadingId, "Connection Error. Check console.");
             }
         }
 
-        // Helper: Add Message to UI
         function addMessage(text, sender, isLoading = false) {
             const chatBody = document.getElementById("chatBody");
             const div = document.createElement("div");
             div.className = `message ${sender === "user" ? "user-message" : "bot-message"}`;
             
             if (isLoading) {
-                div.innerHTML = `Thinking<span class="typing">...</span>`;
-                div.id = "loading-" + Date.now();
+                div.innerHTML = "Thinking...";
+                div.id = "loading-msg";
             } else {
                 div.innerText = text;
             }
 
             chatBody.appendChild(div);
             chatBody.scrollTop = chatBody.scrollHeight;
-            
-            return isLoading ? div.id : null;
+            return div.id;
         }
 
-        // Helper: Update Loading Message
         function updateMessage(elementId, newText) {
             const el = document.getElementById(elementId);
             if (el) {
                 el.innerText = newText;
-                el.removeAttribute("id"); // Remove ID after update
+                el.removeAttribute("id");
             }
         }
 
-        // Handle Enter Key
         function handleKeyPress(e) {
             if (e.key === "Enter") sendMessage();
         }
