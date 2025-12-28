@@ -3,219 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Trade - Live Endpoint</title>
+    <title>Nexus Trade - Pro UI</title>
     <style>
         /* --- DARK THEME UI --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
         
-        h2 { margin-bottom: 10px; font-weight: 600; text-align: center; color: #38bdf8; letter-spacing: 0.5px; }
-
-        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; border-radius: 12px; padding: 20px; background: #1e293b; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; border-radius: 12px; padding: 20px; background: #1e293b; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         
-        .msg { padding: 12px 18px; border-radius: 8px; max-width: 85%; line-height: 1.6; font-size: 15px; word-wrap: break-word; }
-        .user { background: #38bdf8; color: #0f172a; align-self: flex-end; font-weight: 500; border-bottom-right-radius: 2px; }
+        /* Message Styling */
+        .msg { padding: 15px; border-radius: 8px; max-width: 85%; line-height: 1.6; font-size: 15px; margin-bottom: 15px; }
+        .user { background: #38bdf8; color: #0f172a; align-self: flex-end; font-weight: 600; border-bottom-right-radius: 2px; }
+        
+        /* Bot Message Formatting */
         .bot { background: #334155; color: #e2e8f0; align-self: flex-start; border-left: 4px solid #38bdf8; border-bottom-left-radius: 2px; }
-        
-        /* Debug Output Style */
-        pre { background: #111; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 12px; border: 1px solid #475569; }
+        .bot strong { color: #38bdf8; font-weight: 700; } /* Bold text color */
+        .bot ul { margin: 5px 0; padding-left: 20px; }
+        .bot li { margin-bottom: 5px; }
 
         .input-area { display: flex; gap: 10px; }
-        input { flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; outline: none; font-size: 16px; transition: border-color 0.2s; }
-        input:focus { border-color: #38bdf8; }
-        
-        button { padding: 0 30px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.2s; }
+        input { flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; outline: none; font-size: 16px; }
+        button { padding: 0 30px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; }
         button:hover { background: #7dd3fc; }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        button:disabled { background: #94a3b8; }
     </style>
 </head>
 <body>
 
-    <h2>Nexus Trade Agent</h2>
+    <h2 style="text-align: center; color: #38bdf8;">Nexus Trade Agent</h2>
 
     <div class="chat-container">
         <div id="chatBox">
-            <div class="msg bot">System Online. Ready to trade. 🚀</div>
+            <div class="msg bot">System Online. Ready. 🚀</div>
         </div>
 
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Ask about market analysis..." onkeypress="handleEnter(event)">
+            <input type="text" id="userInput" placeholder="Type here..." onkeypress="handleEnter(event)">
             <button onclick="startChat()" id="sendBtn">Send</button>
         </div>
     </div>
 
     <script>
-        // --- ⚙️ CONFIGURATION ---
+        // --- ⚙️ SETTINGS ---
         const CONFIG = {
-            // Tumhari Key (Jo tumne di thi)
             AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh",
-            
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
             TRIGGER_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
             POLL_BASE: "https://api-d7b62b.stack.tryrelevance.com/latest/jobs"
         };
 
-        // --- MAIN LOGIC ---
         async function startChat() {
             const input = document.getElementById("userInput");
             const btn = document.getElementById("sendBtn");
             const text = input.value.trim();
-            
             if(!text) return;
 
-            // UI Setup
             addMsg(text, 'user');
             input.value = '';
-            input.disabled = true; 
-            btn.disabled = true;
+            input.disabled = true; btn.disabled = true;
             
-            const loadingId = addMsg("Sending request to Agent...", 'bot');
+            const loadingId = addMsg("Thinking...", 'bot');
 
             try {
-                // 1. TRIGGER
-                const response = await fetch(CONFIG.TRIGGER_URL, {
+                // 1. Trigger
+                const resp = await fetch(CONFIG.TRIGGER_URL, {
                     method: "POST",
-                    headers: { 
-                        "Authorization": CONFIG.AUTH, 
-                        "Content-Type": "application/json" 
-                    },
-                    body: JSON.stringify({ 
-                        message: { role: "user", content: text }, 
-                        agent_id: CONFIG.AGENT_ID 
-                    })
+                    headers: { "Authorization": CONFIG.AUTH, "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: { role: "user", content: text }, agent_id: CONFIG.AGENT_ID })
                 });
+                const data = await resp.json();
 
-                const data = await response.json();
-                console.log("Trigger Init:", data); 
+                if (data.job_info) pollResult(data.job_info.job_id, loadingId);
+                else { updateMsg(loadingId, "❌ Error: No Job ID"); resetUI(); }
 
-                if (data.job_info && data.job_info.job_id) {
-                    updateMsg(loadingId, "Agent is thinking...");
-                    pollResult(data.job_info.job_id, loadingId);
-                } else {
-                    updateMsg(loadingId, "❌ Connection Failed. Check Console.");
-                    resetUI();
-                }
-
-            } catch (e) {
-                console.error(e);
-                updateMsg(loadingId, "❌ Network Error: " + e.message);
-                resetUI();
-            }
+            } catch (e) { updateMsg(loadingId, "❌ Network Error"); resetUI(); }
         }
 
-        // 2. POLLING (UNIVERSAL FIX)
         async function pollResult(jobId, msgId) {
-            const pollUrl = `${CONFIG.POLL_BASE}/${jobId}`;
-            let attempts = 0;
-            const maxAttempts = 60; 
-
             const interval = setInterval(async () => {
-                attempts++;
-                
-                // Animated Status
-                if(attempts % 3 === 0) {
-                    const dots = ".".repeat((attempts % 3) + 1);
-                    updateMsg(msgId, `Analyzing Market Data${dots}`);
-                }
-
                 try {
-                    const res = await fetch(pollUrl, {
-                        headers: { "Authorization": CONFIG.AUTH }
-                    });
+                    const res = await fetch(`${CONFIG.POLL_BASE}/${jobId}`, { headers: { "Authorization": CONFIG.AUTH } });
                     const job = await res.json();
                     
-                    console.log(`Poll ${attempts}:`, job);
-
-                    // --- CHECK COMPLETION ---
-                    if (job.status === 'done' || job.state === 'completed' || job.status === 'complete') {
+                    if (job.status === 'done' || job.status === 'complete') {
                         clearInterval(interval);
                         
-                        let finalAnswer = "";
-                        let rawData = job.output || {};
-
-                        // --- SMART EXTRACTION LOGIC ---
-                        // Step 1: Check Standard Keys
-                        if (typeof rawData === 'string') {
-                            finalAnswer = rawData;
-                        } 
-                        else if (rawData.answer) { finalAnswer = rawData.answer; }
-                        else if (rawData.output) { finalAnswer = rawData.output; }
-                        else if (rawData.text) { finalAnswer = rawData.text; }
-                        else if (rawData.message) { finalAnswer = rawData.message; }
+                        // Extract Text
+                        let output = job.output?.answer || job.output?.output || job.output?.text || JSON.stringify(job.output);
                         
-                        // Step 2: Fallback (Agar standard keys nahi mili)
-                        if (!finalAnswer) {
-                            // Raw output dikha do taaki user blank na dekhe
-                            finalAnswer = "⚠️ <b>Output format unmatched. Raw Data:</b><br><pre>" + 
-                                          JSON.stringify(rawData, null, 2) + 
-                                          "</pre>";
-                        } else {
-                            // Agar text mil gaya toh formatting karo
-                            finalAnswer = formatText(finalAnswer);
-                        }
-
-                        updateMsg(msgId, finalAnswer);
+                        // Beautify Text (Convert Markdown to HTML)
+                        updateMsg(msgId, formatText(output));
                         resetUI();
                     }
-                    
-                    // --- FAIL CHECK ---
-                    if (job.status === 'failed' || job.status === 'cancelled') {
-                        clearInterval(interval);
-                        updateMsg(msgId, "❌ Agent process failed.");
-                        resetUI();
-                    }
-
-                } catch (err) {
-                    console.error("Poll Error:", err);
-                    updateMsg(msgId, "❌ Code Error: " + err.message);
-                }
-
-                // --- TIMEOUT ---
-                if (attempts >= maxAttempts) {
-                    clearInterval(interval);
-                    updateMsg(msgId, "❌ Timeout: Server took too long.");
-                    resetUI();
-                }
-
-            }, 2000); 
+                    if (job.status === 'failed') { clearInterval(interval); updateMsg(msgId, "❌ Failed"); resetUI(); }
+                } catch (e) { }
+            }, 2000);
         }
 
-        // --- HELPERS ---
+        // --- 🎨 BEAUTIFIER FUNCTION (Ye Text ko Sundar Banayega) ---
+        function formatText(text) {
+            if (!text) return "";
+            if (typeof text !== 'string') return JSON.stringify(text);
+
+            return text
+                // 1. Replace Bold (**text**) with <strong>text</strong>
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                
+                // 2. Replace Bullet Points (- text) with List
+                .replace(/^- (.*$)/gim, "<li>$1</li>")
+                
+                // 3. Replace New Lines with <br>
+                .replace(/\n/g, "<br>");
+        }
+
         function addMsg(text, type) {
             const box = document.getElementById("chatBox");
             const div = document.createElement("div");
             div.className = `msg ${type}`;
-            div.innerHTML = text;
+            div.innerHTML = text; // InnerHTML zaroori hai formatting ke liye
             div.id = "msg_" + Date.now();
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
             return div.id;
         }
 
-        function updateMsg(id, text) {
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = text;
-        }
-
-        function resetUI() {
-            document.getElementById("userInput").disabled = false;
-            document.getElementById("sendBtn").disabled = false;
-            document.getElementById("userInput").focus();
-        }
-
-        function formatText(text) {
-            if(!text) return "";
-            return text
-                .replace(/\n/g, "<br>")
-                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-                .replace(/\*(.*?)\*/g, "<i>$1</i>");
-        }
-
+        function updateMsg(id, text) { const el = document.getElementById(id); if(el) el.innerHTML = text; }
+        function resetUI() { document.getElementById("userInput").disabled = false; document.getElementById("sendBtn").disabled = false; document.getElementById("userInput").focus(); }
         function handleEnter(e) { if(e.key === 'Enter') startChat(); }
     </script>
 
