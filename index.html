@@ -2,23 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus Trade - Live Endpoint</title>
     <style>
         /* --- DARK THEME UI --- */
-        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         
-        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; border-radius: 12px; padding: 15px; background: #1e293b; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; }
-        
-        .msg { padding: 12px 16px; border-radius: 8px; max-width: 85%; line-height: 1.5; font-size: 15px; }
-        .user { background: #38bdf8; color: #0f172a; align-self: flex-end; font-weight: 500; }
-        .bot { background: #334155; color: #e2e8f0; align-self: flex-start; border-left: 4px solid #38bdf8; }
-        .status-log { font-size: 12px; color: #94a3b8; align-self: center; margin-top: -10px; font-family: monospace; }
+        h2 { margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; }
 
+        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; border-radius: 12px; padding: 20px; background: #1e293b; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        .msg { padding: 12px 18px; border-radius: 8px; max-width: 85%; line-height: 1.6; font-size: 15px; word-wrap: break-word; }
+        .user { background: #38bdf8; color: #0f172a; align-self: flex-end; font-weight: 500; border-bottom-right-radius: 2px; }
+        .bot { background: #334155; color: #e2e8f0; align-self: flex-start; border-left: 4px solid #38bdf8; border-bottom-left-radius: 2px; }
+        
         .input-area { display: flex; gap: 10px; }
-        input { flex: 1; padding: 15px; border-radius: 8px; border: none; background: #334155; color: white; outline: none; }
-        button { padding: 15px 25px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; }
+        input { flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; outline: none; font-size: 16px; transition: border-color 0.2s; }
+        input:focus { border-color: #38bdf8; }
+        
+        button { padding: 0 30px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; font-size: 16px; transition: background 0.2s; }
         button:hover { background: #7dd3fc; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 <body>
@@ -27,42 +38,50 @@
 
     <div class="chat-container">
         <div id="chatBox">
-            <div class="msg bot">System Online. Connected to API Trigger.</div>
+            <div class="msg bot">System Online. Ready to trade. 🚀</div>
         </div>
 
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type query here..." onkeypress="handleEnter(event)">
-            <button onclick="startChat()">Send</button>
+            <input type="text" id="userInput" placeholder="Ask about market analysis..." onkeypress="handleEnter(event)">
+            <button onclick="startChat()" id="sendBtn">Send</button>
         </div>
     </div>
 
     <script>
-        // --- SETTINGS ---
+        // --- ⚙️ CONFIGURATION ---
         const CONFIG = {
-            // Tumhara Specific Endpoint
-            TRIGGER_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
-            // Polling ke liye General Endpoint
-            POLL_BASE: "https://api-d7b62b.stack.tryrelevance.com/latest/jobs",
+            // Tumhari purani key (Provided by you)
+            AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh",
             
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
-            AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh"
+            TRIGGER_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
+            POLL_BASE: "https://api-d7b62b.stack.tryrelevance.com/latest/jobs"
         };
 
+        // --- MAIN LOGIC ---
         async function startChat() {
             const input = document.getElementById("userInput");
+            const btn = document.getElementById("sendBtn");
             const text = input.value.trim();
+            
             if(!text) return;
 
+            // UI Update
             addMsg(text, 'user');
             input.value = '';
+            input.disabled = true; 
+            btn.disabled = true;
             
-            // 1. TRIGGER REQUEST
-            const loadingId = addMsg("Sending to Backend...", 'bot');
+            const loadingId = addMsg("Sending request to Agent...", 'bot');
 
             try {
+                // 1. TRIGGER THE AGENT
                 const response = await fetch(CONFIG.TRIGGER_URL, {
                     method: "POST",
-                    headers: { "Authorization": CONFIG.AUTH, "Content-Type": "application/json" },
+                    headers: { 
+                        "Authorization": CONFIG.AUTH, 
+                        "Content-Type": "application/json" 
+                    },
                     body: JSON.stringify({ 
                         message: { role: "user", content: text }, 
                         agent_id: CONFIG.AGENT_ID 
@@ -70,32 +89,37 @@
                 });
 
                 const data = await response.json();
-                console.log("Trigger Response:", data);
+                console.log("Trigger Init:", data); 
 
                 if (data.job_info && data.job_info.job_id) {
-                    updateMsg(loadingId, "Processing... (Job ID: " + data.job_info.job_id.substring(0,6) + ")");
-                    // Polling shuru karo
+                    updateMsg(loadingId, "Agent is thinking...");
                     pollResult(data.job_info.job_id, loadingId);
                 } else {
-                    updateMsg(loadingId, "Trigger Failed: No Job ID returned.");
+                    updateMsg(loadingId, "❌ Connection Failed. Check Console.");
+                    resetUI();
                 }
 
             } catch (e) {
                 console.error(e);
-                updateMsg(loadingId, "Connection Error: " + e.message);
+                updateMsg(loadingId, "❌ Network Error: " + e.message);
+                resetUI();
             }
         }
 
-        // 2. POLLING FUNCTION (Ye hai main Logic)
+        // 2. POLLING (FIXED FOR OUTPUT EXTRACTION)
         async function pollResult(jobId, msgId) {
             const pollUrl = `${CONFIG.POLL_BASE}/${jobId}`;
             let attempts = 0;
+            const maxAttempts = 60; // Timeout approx 2 mins
 
             const interval = setInterval(async () => {
                 attempts++;
                 
-                // Update Status Text (Taaki pata chale code zinda hai)
-                if(attempts % 2 === 0) updateMsg(msgId, `Thinking... (Check ${attempts})`);
+                // Visual heartbeat
+                if(attempts % 3 === 0) {
+                    const dots = ".".repeat((attempts % 3) + 1);
+                    updateMsg(msgId, `Analyzing Market Data${dots}`);
+                }
 
                 try {
                     const res = await fetch(pollUrl, {
@@ -103,60 +127,55 @@
                     });
                     const job = await res.json();
                     
-                    console.log(`Poll ${attempts}:`, job.status);
+                    // Console mein check karo kya aa raha hai
+                    console.log(`Poll ${attempts}:`, job);
 
-                    // AGAR KAAM HO GAYA (DONE)
-                    if (job.status === 'done' || job.state === 'completed') {
-                        clearInterval(interval); // Loop roko
+                    // DONE CHECK
+                    if (job.status === 'done' || job.state === 'completed' || job.status === 'complete') {
+                        clearInterval(interval);
                         
-                        // --- ANSWER DHOONDHO AB ---
-                        let finalAnswer = "Analysis Complete (No text found).";
+                        // --- EXTRACT ANSWER LOGIC ---
+                        let finalAnswer = "⚠️ Analysis Done but text format unrecognized.";
 
-                        // Priority 1: Seedha Answer
-                        if (job.output && job.output.answer) {
-                            finalAnswer = job.output.answer;
-                        } 
-                        // Priority 2: Generic Output string
-                        else if (job.output && typeof job.output === 'string') {
-                            finalAnswer = job.output;
-                        }
-                        // Priority 3: Nested Output (Common in Agents)
-                        else if (job.output && job.output.output) {
-                             finalAnswer = job.output.output;
-                        }
-                        // Priority 4: JSON Dump (Agar kuch samajh na aaye)
-                        else if (job.output) {
-                            finalAnswer = JSON.stringify(job.output);
+                        if (job.output) {
+                            // Priority checks
+                            if (job.output.answer) finalAnswer = job.output.answer;
+                            else if (job.output.output) finalAnswer = job.output.output;
+                            else if (job.output.text) finalAnswer = job.output.text;
+                            else if (job.output.message) finalAnswer = job.output.message;
+                            else if (typeof job.output === 'string') finalAnswer = job.output;
+                            // Fallback: Show raw JSON
+                            else finalAnswer = "Raw Output: " + JSON.stringify(job.output, null, 2);
                         }
 
-                        // Text ko sundar banao
-                        finalAnswer = finalAnswer
-                            .replace(/\n/g, "<br>")
-                            .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-
+                        // Format HTML
+                        finalAnswer = formatText(finalAnswer);
                         updateMsg(msgId, finalAnswer);
+                        resetUI();
                     }
                     
-                    // AGAR FAIL HO GAYA
-                    if (job.status === 'failed') {
+                    // FAIL CHECK
+                    if (job.status === 'failed' || job.status === 'cancelled') {
                         clearInterval(interval);
-                        updateMsg(msgId, "Agent Failed to process request.");
+                        updateMsg(msgId, "❌ Agent process failed.");
+                        resetUI();
                     }
 
                 } catch (err) {
                     console.error("Poll Error:", err);
                 }
 
-                // 40 Seconds Timeout
-                if (attempts > 20) {
+                // TIMEOUT CHECK
+                if (attempts >= maxAttempts) {
                     clearInterval(interval);
-                    updateMsg(msgId, "Server took too long. Check Dashboard History.");
+                    updateMsg(msgId, "❌ Timeout: Server took too long.");
+                    resetUI();
                 }
 
-            }, 2000); // Har 2 second mein check karega
+            }, 2000); 
         }
 
-        // --- UI HELPERS ---
+        // --- HELPERS ---
         function addMsg(text, type) {
             const box = document.getElementById("chatBox");
             const div = document.createElement("div");
@@ -171,6 +190,21 @@
         function updateMsg(id, text) {
             const el = document.getElementById(id);
             if (el) el.innerHTML = text;
+        }
+
+        function resetUI() {
+            document.getElementById("userInput").disabled = false;
+            document.getElementById("sendBtn").disabled = false;
+            document.getElementById("userInput").focus();
+        }
+
+        function formatText(text) {
+            if(!text) return "";
+            // Replace newlines and bold markers
+            return text
+                .replace(/\n/g, "<br>")
+                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+                .replace(/\*(.*?)\*/g, "<i>$1</i>");
         }
 
         function handleEnter(e) { if(e.key === 'Enter') startChat(); }
