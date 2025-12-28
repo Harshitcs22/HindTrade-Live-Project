@@ -3,151 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTradeAI - Smart Trading Assistant</title>
+    <title>HindTradeAI - Nexus Officer</title>
     <style>
         /* --- DESIGN SECTION --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #0f172a; /* Dark Theme */
-            color: white;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #0f172a; color: white; display: flex; flex-direction: column; min-height: 100vh; }
+        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
         h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
         p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; }
 
-        /* --- CHAT WIDGET STYLING --- */
-        .chat-widget-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #38bdf8, #2563eb);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-            font-size: 24px;
-            z-index: 1000;
-        }
-
-        .chat-container {
-            display: none;
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 350px;
-            height: 500px;
-            background-color: #1e293b;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-direction: column;
-            z-index: 1000;
-            border: 1px solid #334155;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background: #0f172a;
-            padding: 15px;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-            color: #38bdf8;
-            font-weight: bold;
-        }
+        /* Chat Widget */
+        .chat-widget-btn { position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #38bdf8, #2563eb); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4); font-size: 24px; z-index: 1000; }
+        .chat-container { display: none; position: fixed; bottom: 90px; right: 20px; width: 380px; height: 550px; background-color: #1e293b; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-direction: column; z-index: 1000; border: 1px solid #334155; overflow: hidden; }
+        .chat-header { background: #0f172a; padding: 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; color: #38bdf8; font-weight: bold; }
         .close-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        /* Input Area */
+        .chat-input-area { padding: 15px; background: #0f172a; border-top: 1px solid #334155; display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; background: #334155; border: none; padding: 10px; border-radius: 8px; color: white; outline: none; }
+        .chat-input-area button { background: #38bdf8; border: none; padding: 10px 15px; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; }
 
-        .chat-body {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-input-area {
-            padding: 15px;
-            background: #0f172a;
-            border-top: 1px solid #334155;
-            display: flex;
-            gap: 10px;
-        }
-        .chat-input-area input {
-            flex: 1;
-            background: #334155;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            color: white;
-            outline: none;
-        }
-        .chat-input-area button {
-            background: #38bdf8;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .message { padding: 10px 14px; border-radius: 10px; max-width: 80%; font-size: 0.95rem; word-wrap: break-word; }
-        .bot-message { background: #334155; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 0; }
+        /* Messages */
+        .message { padding: 10px 14px; border-radius: 10px; max-width: 85%; font-size: 0.95rem; white-space: pre-wrap; line-height: 1.5; }
+        .bot-message { background: #334155; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 0; border-left: 3px solid #38bdf8; }
         .user-message { background: #38bdf8; color: #0f172a; align-self: flex-end; border-bottom-right-radius: 0; }
+        .code-block { background: #0f172a; padding: 8px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; color: #a5f3fc; margin-top: 5px; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
     <div class="hero">
         <h1>HindTrade AI</h1>
-        <p>Your intelligent trading companion. Ask me anything about the markets.</p>
+        <p>Nexus Trade Officer: Your intelligent trading companion.</p>
     </div>
 
     <button class="chat-widget-btn" onclick="toggleChat()">💬</button>
 
     <div class="chat-container" id="ekayan-widget">
         <div class="chat-header">
-            <span>AI Assistant</span>
+            <span>Nexus Trade Officer</span>
             <button class="close-btn" onclick="toggleChat()">×</button>
         </div>
         
         <div class="chat-body" id="chatBody">
-            <div class="message bot-message">Hello! I am ready to help.</div>
+            <div class="message bot-message">Hello! I am connected to DGFT & Trade Policies. How can I assist?</div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="Ask about stocks..." onkeypress="handleKeyPress(event)">
+            <input type="text" id="userInput" placeholder="Ask about imports/exports..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
         const CONFIG = {
-            // Updated URL from your screenshots
-            API_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
-            
-            // Agent ID
+            REGION: "https://api-d7b62b.stack.tryrelevance.com/latest",
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
-            
-            // YOUR NEW KEY
             AUTH_TOKEN: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh"
         };
 
@@ -164,58 +75,81 @@
 
             addMessage(message, "user");
             inputField.value = "";
-            const loadingId = addMessage("Thinking...", "bot", true);
+            const loadingId = addMessage("Analyzing Trade Data...", "bot", true);
 
             try {
-                const response = await fetch(CONFIG.API_URL, {
+                // Step 1: Trigger the Agent
+                const response = await fetch(`${CONFIG.REGION}/agents/trigger`, {
                     method: "POST",
-                    headers: {
-                        "Authorization": CONFIG.AUTH_TOKEN,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: { role: "user", content: message },
-                        agent_id: CONFIG.AGENT_ID
-                    })
+                    headers: { "Authorization": CONFIG.AUTH_TOKEN, "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: { role: "user", content: message }, agent_id: CONFIG.AGENT_ID })
                 });
 
                 const data = await response.json();
-                console.log("Server Response:", data); // Check Console for errors
+                console.log("Trigger Response:", data);
 
-                // --- SMART ANSWER FINDER ---
-                let botReply = "";
-
+                // CASE A: Direct Answer (Agar turant jawaab aaya)
                 if (data.output && data.output.answer) {
-                    botReply = data.output.answer; // Standard format
-                } else if (data.output && typeof data.output === 'string') {
-                    botReply = data.output; // Direct string format
-                } else if (data.message) {
-                    botReply = data.message; // Error or System msg
-                } else {
-                    // Fallback: Agar format alag hai to jo bhi hai dikha do
-                    botReply = JSON.stringify(data.output || data);
+                    updateMessage(loadingId, data.output.answer);
                 }
-
-                updateMessage(loadingId, botReply);
+                // CASE B: Job Queued (Agar 'Waiting' ticket mila)
+                else if (data.job_info && data.job_info.job_id) {
+                    console.log("Job Queued. ID:", data.job_info.job_id);
+                    await pollJobStatus(data.job_info.job_id, loadingId);
+                }
+                // CASE C: Fallback
+                else {
+                    updateMessage(loadingId, "Processing completed. Check Dashboard for details.");
+                }
 
             } catch (error) {
                 console.error(error);
-                updateMessage(loadingId, "Connection Error. Check console.");
+                updateMessage(loadingId, "Connection Failed.");
             }
+        }
+
+        // --- POLLING FUNCTION (Jawaab ka intezaar karne wala) ---
+        async function pollJobStatus(jobId, elementId) {
+            const pollUrl = `${CONFIG.REGION}/jobs/${jobId}`;
+            let attempts = 0;
+
+            const interval = setInterval(async () => {
+                attempts++;
+                if (attempts > 30) { // 60 seconds timeout
+                    clearInterval(interval);
+                    updateMessage(elementId, "Response timed out. Please try again.");
+                    return;
+                }
+
+                try {
+                    const res = await fetch(pollUrl, {
+                        headers: { "Authorization": CONFIG.AUTH_TOKEN }
+                    });
+                    const jobData = await res.json();
+                    console.log("Polling...", jobData.status);
+
+                    if (jobData.status === "done" || jobData.state === "completed") {
+                        clearInterval(interval);
+                        
+                        // Answer dhoondho
+                        let finalReply = "Analysis Complete.";
+                        if (jobData.output && jobData.output.answer) finalReply = jobData.output.answer;
+                        else if (jobData.output && typeof jobData.output === 'string') finalReply = jobData.output;
+                        
+                        updateMessage(elementId, finalReply);
+                    }
+                } catch (e) {
+                    console.error("Polling Error", e);
+                }
+            }, 2000); // Check every 2 seconds
         }
 
         function addMessage(text, sender, isLoading = false) {
             const chatBody = document.getElementById("chatBody");
             const div = document.createElement("div");
             div.className = `message ${sender === "user" ? "user-message" : "bot-message"}`;
-            
-            if (isLoading) {
-                div.innerHTML = "Thinking...";
-                div.id = "loading-msg";
-            } else {
-                div.innerText = text;
-            }
-
+            if (isLoading) { div.innerText = "Connecting to Nexus Core..."; div.id = "loading-msg"; }
+            else { div.innerHTML = text.replace(/\n/g, "<br>"); } // Line breaks fix
             chatBody.appendChild(div);
             chatBody.scrollTop = chatBody.scrollHeight;
             return div.id;
@@ -224,15 +158,16 @@
         function updateMessage(elementId, newText) {
             const el = document.getElementById(elementId);
             if (el) {
-                el.innerText = newText;
+                // Formatting for the Nexus style logs
+                if (newText.includes("[NEXUS_CORE]") || newText.includes(">")) {
+                    newText = newText.replace(/(\[.*?\])/g, "<b>$1</b>"); // Bold tags
+                }
+                el.innerHTML = newText.replace(/\n/g, "<br>");
                 el.removeAttribute("id");
             }
         }
 
-        function handleKeyPress(e) {
-            if (e.key === "Enter") sendMessage();
-        }
+        function handleKeyPress(e) { if (e.key === "Enter") sendMessage(); }
     </script>
-
 </body>
 </html>
