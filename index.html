@@ -3,134 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Trade - Pro UI</title>
+    <title>Nexus Trade - Debugger</title>
     <style>
-        /* --- DARK THEME UI --- */
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        .chat-container { flex: 1; display: flex; flex-direction: column; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
-        
-        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; border-radius: 12px; padding: 20px; background: #1e293b; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        
-        /* Message Styling */
-        .msg { padding: 15px; border-radius: 8px; max-width: 85%; line-height: 1.6; font-size: 15px; margin-bottom: 15px; }
-        .user { background: #38bdf8; color: #0f172a; align-self: flex-end; font-weight: 600; border-bottom-right-radius: 2px; }
-        
-        /* Bot Message Formatting */
-        .bot { background: #334155; color: #e2e8f0; align-self: flex-start; border-left: 4px solid #38bdf8; border-bottom-left-radius: 2px; }
-        .bot strong { color: #38bdf8; font-weight: 700; } /* Bold text color */
-        .bot ul { margin: 5px 0; padding-left: 20px; }
-        .bot li { margin-bottom: 5px; }
-
-        .input-area { display: flex; gap: 10px; }
-        input { flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; outline: none; font-size: 16px; }
-        button { padding: 0 30px; background: #38bdf8; border: none; border-radius: 8px; color: #0f172a; font-weight: bold; cursor: pointer; }
-        button:hover { background: #7dd3fc; }
-        button:disabled { background: #94a3b8; }
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        .chat-container { flex: 1; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
+        #chatBox { flex: 1; overflow-y: auto; border: 1px solid #334155; padding: 20px; background: #1e293b; margin-bottom: 20px; }
+        .msg { padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .bot { background: #334155; border-left: 4px solid #38bdf8; }
+        .error { background: #450a0a; border-left: 4px solid #ef4444; color: #fca5a5; }
+        input { padding: 15px; width: 70%; background: #334155; color: white; border: none; }
+        button { padding: 15px; width: 25%; background: #38bdf8; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h2 style="text-align: center; color: #38bdf8;">Nexus Trade Agent</h2>
+    <h2 style="text-align: center; color: #ef4444;">DEBUG MODE (Error Finder)</h2>
 
     <div class="chat-container">
         <div id="chatBox">
-            <div class="msg bot">System Online. Ready. 🚀</div>
+            <div class="msg bot">System Ready. Send message to check API status.</div>
         </div>
-
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type here..." onkeypress="handleEnter(event)">
-            <button onclick="startChat()" id="sendBtn">Send</button>
+        <div>
+            <input type="text" id="userInput" placeholder="Type generic test..." value="Hi">
+            <button onclick="startChat()">Test Connection</button>
         </div>
     </div>
 
     <script>
-        // --- ⚙️ SETTINGS ---
+        // --- ⚠️ CHECK YOUR CREDENTIALS HERE ---
         const CONFIG = {
+            // Yahan check karo ki key sahi format mein hai (ProjectID:APIKey)
             AUTH: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh",
+            
             AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
+            
             TRIGGER_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
             POLL_BASE: "https://api-d7b62b.stack.tryrelevance.com/latest/jobs"
         };
 
         async function startChat() {
             const input = document.getElementById("userInput");
-            const btn = document.getElementById("sendBtn");
-            const text = input.value.trim();
-            if(!text) return;
-
-            addMsg(text, 'user');
-            input.value = '';
-            input.disabled = true; btn.disabled = true;
+            const text = input.value;
             
-            const loadingId = addMsg("Thinking...", 'bot');
+            addMsg("Sending Request...", 'bot');
 
             try {
-                // 1. Trigger
-                const resp = await fetch(CONFIG.TRIGGER_URL, {
+                const response = await fetch(CONFIG.TRIGGER_URL, {
                     method: "POST",
-                    headers: { "Authorization": CONFIG.AUTH, "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: { role: "user", content: text }, agent_id: CONFIG.AGENT_ID })
+                    headers: { 
+                        "Authorization": CONFIG.AUTH, 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({ 
+                        message: { role: "user", content: text }, 
+                        agent_id: CONFIG.AGENT_ID 
+                    })
                 });
-                const data = await resp.json();
 
-                if (data.job_info) pollResult(data.job_info.job_id, loadingId);
-                else { updateMsg(loadingId, "❌ Error: No Job ID"); resetUI(); }
+                const data = await response.json();
+                console.log("Server Response:", data); // F12 Console ke liye
 
-            } catch (e) { updateMsg(loadingId, "❌ Network Error"); resetUI(); }
-        }
-
-        async function pollResult(jobId, msgId) {
-            const interval = setInterval(async () => {
-                try {
-                    const res = await fetch(`${CONFIG.POLL_BASE}/${jobId}`, { headers: { "Authorization": CONFIG.AUTH } });
-                    const job = await res.json();
+                // --- ERROR CATCHING LOGIC ---
+                if (data.job_info && data.job_info.job_id) {
+                    addMsg("✅ Success! Job ID received: " + data.job_info.job_id, 'bot');
+                    addMsg("Polling function will start now...", 'bot');
+                    // Polling code hataya hai taaki hum sirf Connection test karein
+                } else {
+                    // YAHAN DIKHEGA ASLI ERROR
+                    let errorText = "❌ <b>SERVER ERROR:</b><br>";
                     
-                    if (job.status === 'done' || job.status === 'complete') {
-                        clearInterval(interval);
-                        
-                        // Extract Text
-                        let output = job.output?.answer || job.output?.output || job.output?.text || JSON.stringify(job.output);
-                        
-                        // Beautify Text (Convert Markdown to HTML)
-                        updateMsg(msgId, formatText(output));
-                        resetUI();
-                    }
-                    if (job.status === 'failed') { clearInterval(interval); updateMsg(msgId, "❌ Failed"); resetUI(); }
-                } catch (e) { }
-            }, 2000);
-        }
+                    if (data.detail) errorText += JSON.stringify(data.detail);
+                    else if (data.message) errorText += data.message;
+                    else errorText += JSON.stringify(data);
 
-        // --- 🎨 BEAUTIFIER FUNCTION (Ye Text ko Sundar Banayega) ---
-        function formatText(text) {
-            if (!text) return "";
-            if (typeof text !== 'string') return JSON.stringify(text);
+                    addMsg(errorText, 'error');
+                }
 
-            return text
-                // 1. Replace Bold (**text**) with <strong>text</strong>
-                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                
-                // 2. Replace Bullet Points (- text) with List
-                .replace(/^- (.*$)/gim, "<li>$1</li>")
-                
-                // 3. Replace New Lines with <br>
-                .replace(/\n/g, "<br>");
+            } catch (e) {
+                addMsg("❌ NETWORK ERROR: " + e.message, 'error');
+            }
         }
 
         function addMsg(text, type) {
             const box = document.getElementById("chatBox");
             const div = document.createElement("div");
             div.className = `msg ${type}`;
-            div.innerHTML = text; // InnerHTML zaroori hai formatting ke liye
-            div.id = "msg_" + Date.now();
+            div.innerHTML = text;
             box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-            return div.id;
         }
-
-        function updateMsg(id, text) { const el = document.getElementById(id); if(el) el.innerHTML = text; }
-        function resetUI() { document.getElementById("userInput").disabled = false; document.getElementById("sendBtn").disabled = false; document.getElementById("userInput").focus(); }
-        function handleEnter(e) { if(e.key === 'Enter') startChat(); }
     </script>
-
 </body>
 </html>
