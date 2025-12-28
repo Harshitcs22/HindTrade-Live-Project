@@ -3,841 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTradeAI | The Global Trade OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>HindTradeAI - Smart Trading Assistant</title>
     <style>
-        /* --- GLOBAL RESET & VARIABLES --- */
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --primary: #38bdf8; /* Sky Blue */
-            --secondary: #22c55e; /* Green */
-            --text-main: #f8fafc;
-            --text-muted: #9ca3af;
-            --gradient-main: linear-gradient(135deg, #38bdf8, #22c55e);
-        }
-
-        * {
+        /* --- 1. BASIC STYLING (Platform Design) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* --- UTILITY CLASSES --- */
-        .gradient-text {
-            background: var(--gradient-main);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .btn-primary {
-            background: var(--gradient-main);
-            color: #0f172a;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 60px;
-        }
-
-        .section {
-            padding: 80px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* --- NAVBAR --- */
-        .navbar {
+            background-color: #0f172a; /* Dark Blue Theme */
+            color: white;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-left: 24px;
-            font-size: 14px;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        /* --- HERO SECTION --- */
+        /* Hero Section (Content) */
         .hero {
-            padding-top: 140px;
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            gap: 40px;
+            padding: 20px;
         }
 
-        .hero h1 {
-            font-size: 48px;
-            line-height: 1.2;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
+        p { font-size: 1.2rem; color: #94a3b8; max-width: 600px; }
 
-        /* --- TRADE CARD STYLE --- */
-        .trade-card {
-            width: 100%;
-            max-width: 380px;
-            border-radius: 20px;
-            padding: 1px; /* Border simulated by padding */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
+        /* --- 2. CHAT WIDGET STYLING --- */
         
-        .trade-card-content {
-            background: rgba(13, 13, 18, 0.95);
-            border-radius: 19px;
-            padding: 24px;
-            text-align: left;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* --- FEATURES GRID --- */
-        .demo-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-top: 60px;
-            width: 100%;
-        }
-
-        .demo-feature {
-            background: rgba(30, 41, 59, 0.5);
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: 0.3s;
-        }
-
-        .demo-feature:hover {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-
-        .demo-feature-icon {
-            font-size: 32px;
-            margin-bottom: 16px;
-        }
-
-        /* --- TIMELINE --- */
-        .timeline {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px;
-            position: relative;
-        }
-
-        .timeline-step {
-            background: rgba(30, 41, 59, 0.3);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-        }
-
-        .step-number {
-            background: var(--bg-dark);
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        /* --- PRICING --- */
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .pricing-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .pricing-card.featured {
-            border: 1px solid var(--primary);
-            background: linear-gradient(180deg, rgba(56, 189, 248, 0.05) 0%, rgba(15, 23, 42, 0) 100%);
-        }
-
-        .price {
-            font-size: 42px;
-            font-weight: 700;
-            margin: 20px 0 5px;
-            color: var(--text-main);
-        }
-
-        .price-duration {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .pricing-card ul {
-            list-style: none;
-            margin-bottom: 30px;
-            flex-grow: 1;
-        }
-
-        .pricing-card li {
-            margin-bottom: 12px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pricing-card li::before {
-            content: "✓";
-            color: var(--secondary);
-            font-weight: bold;
-        }
-
-        /* --- PROFILE SHOWCASE --- */
-        .profile-showcase {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .profile-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: center;
-        }
-
-        .profile-header {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-
-        .profile-name {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: var(--text-main);
-        }
-
-        .profile-designation {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .shipment-badge {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--secondary);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .view-profile-btn {
-            background: transparent;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--primary);
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        .view-profile-btn:hover {
-            background: rgba(56, 189, 248, 0.1);
-            border-color: var(--primary);
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 60px 20px;
-            text-align: center;
-            background: #0b1120;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        footer p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* --- EKAYAN CHAT WIDGET --- */
-        #ekayan-widget {
+        /* Chat Button (Floating) */
+        .chat-widget-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .chat-widget-btn:hover { transform: scale(1.1); }
+
+        /* Chat Container (The Box) */
+        .chat-container {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
             width: 350px;
             height: 500px;
-            background: var(--bg-card);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            background-color: #1e293b;
             border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            display: none; /* Hidden by default */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             flex-direction: column;
-            z-index: 9999;
+            z-index: 1000;
+            border: 1px solid #334155;
             overflow: hidden;
         }
 
+        /* Header */
         .chat-header {
-            background: var(--gradient-main);
+            background: #0f172a;
             padding: 15px;
+            border-bottom: 1px solid #334155;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #0f172a;
+            color: #38bdf8;
+            font-weight: bold;
         }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
 
-        .chat-header h3 { font-size: 16px; font-weight: 700; }
-
-        .close-chat {
-            background: none; border: none; font-size: 24px; cursor: pointer; color: #0f172a;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
+        /* Messages Area */
+        .chat-body {
+            flex: 1;
             padding: 15px;
             overflow-y: auto;
-            background: #0f172a;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        .msg {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .msg.bot {
-            background: rgba(30, 41, 59, 1);
-            color: #e2e8f0;
-            border-top-left-radius: 2px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .msg.user {
-            background: var(--primary);
-            color: #0f172a;
-            align-self: flex-end;
-            border-top-right-radius: 2px;
-            font-weight: 500;
-        }
-
-        .msg.loading { color: #9ca3af; font-style: italic; font-size: 12px; background: transparent; }
-        
-        .msg.error { color: #f87171; font-size: 12px; border: 1px solid #7f1d1d; background: #450a0a; }
-
+        /* Input Area */
         .chat-input-area {
             padding: 15px;
-            background: #1e293b;
+            background: #0f172a;
+            border-top: 1px solid #334155;
             display: flex;
             gap: 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
-
-        .chat-input {
-            flex-grow: 1;
-            background: #0f172a;
-            border: 1px solid rgba(255,255,255,0.1);
+        .chat-input-area input {
+            flex: 1;
+            background: #334155;
+            border: none;
             padding: 10px;
             border-radius: 8px;
             color: white;
             outline: none;
         }
-        
-        .chat-input:focus { border-color: var(--primary); }
-
-        .send-btn {
-            background: var(--primary);
+        .chat-input-area button {
+            background: #38bdf8;
             border: none;
-            width: 40px;
-            height: 40px;
+            padding: 10px 15px;
             border-radius: 8px;
-            cursor: pointer;
             color: #0f172a;
             font-weight: bold;
-        }
-
-        /* Chat Trigger Button */
-        .chat-trigger {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--gradient-main);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
             cursor: pointer;
-            z-index: 9998;
-            font-size: 30px;
-            transition: transform 0.2s;
         }
-        
-        .chat-trigger:hover { transform: scale(1.1); }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
-            .section { padding: 60px 20px; }
-            #ekayan-widget { width: 90%; right: 5%; bottom: 90px; height: 60vh; }
-            .navbar { padding: 15px 20px; }
-        }
+        /* Message Bubbles */
+        .message { padding: 10px 14px; border-radius: 10px; max-width: 80%; line-height: 1.4; font-size: 0.95rem; }
+        .bot-message { background: #334155; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 0; }
+        .user-message { background: #38bdf8; color: #0f172a; align-self: flex-end; border-bottom-right-radius: 0; }
+        
+        /* Loading Animation */
+        .typing { font-style: italic; color: #94a3b8; font-size: 0.8rem; margin-left: 5px; }
+
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo">HindTrade<span style="color:var(--primary)">AI</span></div>
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <button class="btn-primary" style="margin-left: 20px; padding: 8px 16px;" onclick="window.scrollTo(0,document.body.scrollHeight)">Join Waitlist</button>
-        </div>
-    </nav>
+    <div class="hero">
+        <h1>HindTrade AI</h1>
+        <p>Your intelligent trading companion. Ask me anything about the markets.</p>
+    </div>
 
-    <section class="section hero">
-        <div>
-            <h1>The Global Trade OS for <br><span class="gradient-text">Indian Exporters</span></h1>
-            <p style="color: var(--text-muted); max-width: 600px; margin: 20px auto;">
-                Verify trust instantly. Connect with CAs & CHAs. Close international deals with confidence.
-            </p>
-        </div>
+    <button class="chat-widget-btn" onclick="toggleChat()">💬</button>
 
-        <div class="trade-card" style="background: linear-gradient(135deg, rgba(10, 10, 20, 0.98), rgba(5, 5, 15, 0.98)); border: 1px solid rgba(56, 189, 248, 0.15);">
-            <div class="trade-card-content">
-                <div style="font-size: 11px; color: #38bdf8; margin-bottom: 12px; letter-spacing: 2px; font-weight: 700;">HINDTRADEAI VERIFIED EXPORTER</div>
-                <div class="company-info">
-                    <div class="company-name" style="font-size: 26px; background: linear-gradient(135deg, #38bdf8, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Himrock Exports</div>
-                    <div class="company-location" style="font-size: 12px; color: #9ca3af;">Ludhiana, Punjab | EST 2015</div>
-                </div>
-                
-                <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(34, 197, 94, 0.08)); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px; padding: 22px; margin: 18px 0;">
-                    <div style="font-size: 11px; color: #6b7280; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">QR VERIFICATION</div>
-                    <div class="qr-placeholder" style="width: 100px; height: 100px; margin: 0 auto 10px; display: flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                        <span style="font-size: 40px;">🔲</span>
-                    </div>
-                    <div style="font-size: 12px; color: #38bdf8; text-align: center; font-weight: 600;">ID: HT-LDH-2024-001</div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;">
-                    <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 10px; padding: 12px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 11px; margin-bottom: 6px;">TRUST SCORE</div>
-                        <div style="color: #22c55e; font-weight: 700; font-size: 20px;">98/100</div>
-                    </div>
-                    <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 10px; padding: 12px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 11px; margin-bottom: 6px;">NET WORTH</div>
-                        <div style="color: #38bdf8; font-weight: 700; font-size: 18px;">₹15Cr+</div>
-                    </div>
-                </div>
-
-                <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; border-radius: 8px; padding: 14px; margin: 16px 0;">
-                    <div style="font-size: 12px; color: #22c55e; font-weight: 700;">✓ CA-VERIFIED</div>
-                    <div style="font-size: 11px; color: #9ca3af;">CA Ramesh Gupta | UDIN: 240599ABC</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="demo-features" id="features">
-            <div class="demo-feature">
-                <div class="demo-feature-icon">🔲</div>
-                <h4>QR-Verified Instantly</h4>
-                <p style="color: var(--text-muted); font-size: 14px; margin-top: 10px;">Buyers scan. See Trust Score, Audit, CA details. Trade in minutes.</p>
-            </div>
-            <div class="demo-feature">
-                <div class="demo-feature-icon">👨‍⚖️</div>
-                <h4>CA Marketplace + UDIN</h4>
-                <p style="color: var(--text-muted); font-size: 14px; margin-top: 10px;">CAs sign with UDIN (IT Act 2000). QR-verified documents. Legally binding.</p>
-            </div>
-            <div class="demo-feature">
-                <div class="demo-feature-icon">🚢</div>
-                <h4>CHA Leads Network</h4>
-                <p style="color: var(--text-muted); font-size: 14px; margin-top: 10px;">Verified CHAs by port. Customs clearance guaranteed.</p>
-            </div>
-            <div class="demo-feature">
-                <div class="demo-feature-icon">📱</div>
-                <h4>MiniLinkedIn Profiles</h4>
-                <p style="color: var(--text-muted); font-size: 14px; margin-top: 10px;">Share shipments publicly. Build reputation. Buyers see track record.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <h2 class="section-title">The <span class="gradient-text">Trade Closure Journey</span></h2>
-        <div class="timeline">
-            <div class="timeline-step">
-                <div class="step-number">1</div>
-                <h3>Register & Connect CA</h3>
-                <p style="color: var(--text-muted); margin-top: 10px;">Upload GST/IEC. Nominate CA. Audit within 48 hrs.</p>
-            </div>
-            <div class="timeline-step">
-                <div class="step-number">2</div>
-                <h3>Get Trade Card + Profile</h3>
-                <p style="color: var(--text-muted); margin-top: 10px;">Premium card arrives. Create MiniLinkedIn. Share shipments publicly.</p>
-            </div>
-            <div class="timeline-step">
-                <div class="step-number">3</div>
-                <h3>Access Marketplaces</h3>
-                <p style="color: var(--text-muted); margin-top: 10px;">Browse verified CAs & CHAs. Get direct leads. Hire instantly.</p>
-            </div>
-            <div class="timeline-step">
-                <div class="step-number">4</div>
-                <h3>Close Trade + Earn</h3>
-                <p style="color: var(--text-muted); margin-top: 10px;">CA signs UDIN. CHA clears customs. Build reputation publicly.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section pricing-section" id="pricing">
-        <h2 class="section-title"><span class="gradient-text">Simple. Transparent.</span> No Hidden Fees.</h2>
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <h3>Free Tier</h3>
-                <div class="price">₹0</div>
-                <div class="price-duration">Forever</div>
-                <ul>
-                    <li>Profile + Registration</li>
-                    <li>3 Ekayan queries/month</li>
-                    <li>Basic Trust Score</li>
-                    <li>Mentor Agent access</li>
-                </ul>
-                <button class="btn-primary" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Start Free</button>
-            </div>
-            <div class="pricing-card featured">
-                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--secondary); color: black; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">MOST POPULAR</div>
-                <h3>Pro (Black Trade Card)</h3>
-                <div class="price">₹5,000</div>
-                <div class="price-duration">per month</div>
-                <ul>
-                    <li>Black luxury Trade Card + QR</li>
-                    <li>CA-verified net worth audit</li>
-                    <li>Access CA Marketplace</li>
-                    <li>50+ verified buyer leads/month</li>
-                    <li>Bank financing pre-approval</li>
-                </ul>
-                <button class="btn-primary">Get Early Access</button>
-            </div>
-            <div class="pricing-card">
-                <h3>Enterprise</h3>
-                <div class="price">Custom</div>
-                <div class="price-duration">per month</div>
-                <ul>
-                    <li>Everything in Pro</li>
-                    <li>Dedicated Personal CA (Hired)</li>
-                    <li>Unlimited CA consultations</li>
-                    <li>API + White-label</li>
-                    <li>Account Manager + 24/7</li>
-                </ul>
-                <button class="btn-primary" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Schedule Call</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" style="background: rgba(15, 23, 42, 0.4); border-radius: 20px; margin-top: 40px;">
-        <h2 class="section-title">Build <span class="gradient-text">Trust Publicly</span></h2>
-        <p style="text-align: center; color: #9ca3af; margin-bottom: 50px; margin-top: -40px;">MiniLinkedIn: Share shipments. Build reputation. Buyers see track record.</p>
-        <div class="profile-showcase">
-            <div class="profile-card">
-                <div class="profile-header">🌐 Exporter Profile</div>
-                <div class="profile-name">Himrock Exports</div>
-                <div class="profile-designation">Bulk Textiles | Ludhiana</div>
-                <div style="background: rgba(56, 189, 248, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 15px;">
-                    <div style="font-size: 13px; color: #9ca3af; margin-bottom: 5px;">Trade Score</div>
-                    <div style="font-size: 20px; color: #38bdf8; font-weight: 700;">98/100</div>
-                </div>
-                <div class="shipment-badge"><strong>✓ 47 Shipments</strong><br><span>Last: UAE (5 days ago)</span></div>
-                <button class="view-profile-btn">View Profile →</button>
-            </div>
-            <div class="profile-card">
-                <div class="profile-header">👨‍⚖️ CA Profile</div>
-                <div class="profile-name">CA Ramesh Gupta</div>
-                <div class="profile-designation">UDIN: 240599ABC</div>
-                <div style="background: rgba(34, 197, 94, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 15px;">
-                    <div style="font-size: 13px; color: #9ca3af; margin-bottom: 5px;">Rating</div>
-                    <div style="font-size: 20px; color: #22c55e; font-weight: 700;">4.9/5</div>
-                </div>
-                <div class="shipment-badge"><strong>✓ 230+ Verified</strong><br><span>Success rate: 95%</span></div>
-                <button class="view-profile-btn">Hire This CA →</button>
-            </div>
-            <div class="profile-card">
-                <div class="profile-header">🚢 CHA Profile</div>
-                <div class="profile-name">Express Customs</div>
-                <div class="profile-designation">Nhava Sheva Specialist</div>
-                <div style="background: rgba(56, 189, 248, 0.1); border-radius: 8px; padding: 12px; margin-bottom: 15px;">
-                    <div style="font-size: 13px; color: #9ca3af; margin-bottom: 5px;">Rating</div>
-                    <div style="font-size: 20px; color: #38bdf8; font-weight: 700;">4.8/5</div>
-                </div>
-                <div class="shipment-badge"><strong>✓ 1,200+ Clearances</strong><br><span>2 hour avg</span></div>
-                <button class="view-profile-btn">Get CHA Leads →</button>
-            </div>
-        </div>
-    </section>
-
-    <section style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(34, 197, 94, 0.15)); padding: 80px 40px; text-align: center; border-radius: 20px; max-width: 1200px; margin: 80px auto; border: 1px solid rgba(56, 189, 248, 0.3);">
-        <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 20px; color: #f9fafb;">Register Now. Get Early Access.</h2>
-        <p style="font-size: 16px; margin-bottom: 40px; color: #9ca3af; max-width: 700px; margin-left: auto; margin-right: auto;">Be among the first 500. Trade Card + CA & CHA marketplace + MiniLinkedIn profile. Build trust. Close deals faster.</p>
-        <button class="btn-primary" id="register" style="font-size: 18px; padding: 20px 50px;">Register & Get Early Access →</button>
-    </section>
-
-    <footer>
-        <div class="footer-links">
-            <a href="#agents">Agents</a>
-            <a href="#demo">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#">Terms</a>
-            <a href="#">Privacy</a>
-            <a href="#">Contact</a>
-        </div>
-        <p>&copy; 2025 HindTradeAI. The Global Trade OS. | Code is Law. Trust is Currency.</p>
-    </footer>
-
-    <div class="chat-trigger" onclick="toggleEkayanChat()">🤖</div>
-
-    <div id="ekayan-widget">
+    <div class="chat-container" id="ekayan-widget">
         <div class="chat-header">
-            <h3>Ekayan AI (Live)</h3>
-            <button class="close-chat" onclick="toggleEkayanChat()">×</button>
+            <span>AI Assistant</span>
+            <button class="close-btn" onclick="toggleChat()">×</button>
         </div>
-        <div class="chat-messages" id="chat-box">
-            <div class="msg bot">
-                Namaste! I am Ekayan. Connected to Relevance AI. <br><br>
-                Ask me about Trade compliance, HS Codes, or Buyers.
-            </div>
+        
+        <div class="chat-body" id="chatBody">
+            <div class="message bot-message">Hello! I am your Trading AI. How can I help you?</div>
         </div>
+
         <div class="chat-input-area">
-            <input type="text" id="user-input" class="chat-input" placeholder="Ask Ekayan..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button class="send-btn" onclick="sendMessage()">➤</button>
+            <input type="text" id="userInput" placeholder="Ask about stocks..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        // --- RELEVANCE AI CREDENTIALS EXTRACTED FROM YOUR URL ---
-        const REGION = "d7b62b";
-        const PROJECT_ID = "3fdb8425-c0a5-4909-9513-21d07c9f8f99";
-        const AGENT_ID = "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd";
-        const API_KEY = "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NTZmMGUyMTAtM2E0YS00Njk0LTgzYzYtYmVjY2Q4NzQxOGE4"; // Your Auth Token
-
-        /* GLOBAL FUNCTION FOR HTML ONCLICK */
-        window.toggleEkayanChat = function() {
-            const widget = document.getElementById('ekayan-widget');
-            if (!widget) return;
+        // --- CONFIGURATION: NEW API KEY INTEGRATED ---
+        const CONFIG = {
+            // Updated URL from your screenshot
+            API_URL: "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger",
             
+            // Your Agent ID
+            AGENT_ID: "a3f0bb17-9cbf-4d17-88cc-c1a981deabdd",
+            
+            // YOUR NEW API KEY (Integrated)
+            AUTH_TOKEN: "3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-NmQwOGI3YmMtMzljYy00NTAwLTgwYTUtYzE0NzRiYzA0N2Rh"
+        };
+
+        // Toggle Chat Window
+        function toggleChat() {
+            const widget = document.getElementById('ekayan-widget');
             if (widget.style.display === 'flex') {
                 widget.style.display = 'none';
             } else {
                 widget.style.display = 'flex';
-                // Focus input after small delay to allow transition
-                setTimeout(() => {
-                    const input = document.getElementById('user-input');
-                    if(input) input.focus();
-                }, 100);
+                // Focus on input when opened
+                setTimeout(() => document.getElementById("userInput").focus(), 100);
             }
-        };
+        }
 
-        // BUTTON HANDLER SETUP
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('button').forEach(btn => {
-                const text = btn.textContent.trim();
-                const hasOnclick = btn.hasAttribute('onclick');
-                
-                if (hasOnclick) return;
-
-                btn.addEventListener('click', function(e) {
-                    if (text.includes('Register') || text.includes('Early Access')) {
-                        alert('✓ Register page coming soon!\n\n✓ Premium Trade Card\n✓ CA Verification\n✓ QR Code');
-                    } else if (text.includes('Demo')) {
-                        alert('Demo: https://hindtradeai.vercel.app/demo');
-                    }
-                });
-            });
-        });
-
-        // --- REAL AI INTEGRATION ---
+        // Send Message Logic
         async function sendMessage() {
-            const inputField = document.getElementById('user-input');
-            const chatBox = document.getElementById('chat-box');
+            const inputField = document.getElementById("userInput");
+            const chatBody = document.getElementById("chatBody");
             const message = inputField.value.trim();
 
             if (!message) return;
 
-            // 1. Add User Message to UI
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'msg user';
-            userMsgDiv.textContent = message;
-            chatBox.appendChild(userMsgDiv);
-            
-            inputField.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // 1. Show User Message
+            addMessage(message, "user");
+            inputField.value = "";
 
-            // 2. Add Loading Indicator
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'msg loading';
-            loadingDiv.textContent = '⏳ Ekayan connecting...';
-            loadingDiv.id = 'loading-' + Date.now();
-            chatBox.appendChild(loadingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // 2. Show Loading Indicator
+            const loadingId = addMessage("Thinking...", "bot", true);
 
             try {
                 // 3. Call Relevance AI API
-                const response = await fetch(`https://api-${REGION}.relevanceai.com/latest/agents/trigger`, {
+                const response = await fetch(CONFIG.API_URL, {
                     method: "POST",
                     headers: {
-                        "Authorization": API_KEY,
+                        "Authorization": CONFIG.AUTH_TOKEN,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: {
-                            role: "user",
-                            content: message
+                        message: { 
+                            role: "user", 
+                            content: message 
                         },
-                        agent_id: AGENT_ID
+                        agent_id: CONFIG.AGENT_ID
                     })
                 });
 
                 const data = await response.json();
-                console.log("AI Response Data:", data); // Debugging
+                console.log("API Response:", data);
 
-                // 4. Remove Loading
-                const loadingElem = document.getElementById(loadingDiv.id);
-                if (loadingElem) loadingElem.remove();
-
-                // 5. Extract Answer
-                let botAnswer = "Sorry, I couldn't understand that.";
+                // 4. Extract Answer safely
+                let botReply = "Sorry, I couldn't understand that.";
                 
-                // Check different response structures used by Relevance AI
                 if (data.output && data.output.answer) {
-                    botAnswer = data.output.answer;
+                    botReply = data.output.answer;
                 } else if (data.output && typeof data.output === 'string') {
-                    botAnswer = data.output;
+                    botReply = data.output;
                 } else if (data.message) {
-                    botAnswer = data.message;
-                } else {
-                    botAnswer = "Agent triggered, but no direct text reply found. Check console.";
+                    botReply = data.message;
                 }
 
-                // 6. Add Bot Message to UI
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.className = 'msg bot';
-                botMsgDiv.innerText = botAnswer;
-                chatBox.appendChild(botMsgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
+                // 5. Update Loading Message with Real Answer
+                updateMessage(loadingId, botReply);
 
             } catch (error) {
-                console.error("Connection Error:", error);
-                const loadingElem = document.getElementById(loadingDiv.id);
-                if (loadingElem) loadingElem.remove();
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'msg error';
-                errorDiv.innerText = "Error: Could not connect to Ekayan Agent. Check Console.";
-                chatBox.appendChild(errorDiv);
+                console.error("Error:", error);
+                updateMessage(loadingId, "Connection error. Please check your internet or API key.");
             }
         }
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
+        // Helper: Add Message to UI
+        function addMessage(text, sender, isLoading = false) {
+            const chatBody = document.getElementById("chatBody");
+            const div = document.createElement("div");
+            div.className = `message ${sender === "user" ? "user-message" : "bot-message"}`;
+            
+            if (isLoading) {
+                div.innerHTML = `Thinking<span class="typing">...</span>`;
+                div.id = "loading-" + Date.now();
+            } else {
+                div.innerText = text;
+            }
 
-        console.log("🚀 HindTradeAI Initialized with Relevance AI Agent: " + AGENT_ID);
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            return isLoading ? div.id : null;
+        }
+
+        // Helper: Update Loading Message
+        function updateMessage(elementId, newText) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.innerText = newText;
+                el.removeAttribute("id"); // Remove ID after update
+            }
+        }
+
+        // Handle Enter Key
+        function handleKeyPress(e) {
+            if (e.key === "Enter") sendMessage();
+        }
     </script>
+
 </body>
 </html>
-
