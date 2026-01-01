@@ -1148,8 +1148,8 @@
                     ? RELEVANCE_CONFIG.logisticsAgentId 
                     : RELEVANCE_CONFIG.complianceAgentId;
 
-                // Correct API URL with /studios/{project_id} path
-                const apiUrl = "https://api-d7b62b.stack.tryrelevance.com/latest/studios/3fdb8425-c0a5-4909-9513-21d07c9f8f99/agents/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/trigger";
+                // Correct API URL with /studios/{project_id} path - now dynamic
+                const apiUrl = `https://api-${RELEVANCE_CONFIG.region}.stack.tryrelevance.com/latest/studios/${RELEVANCE_CONFIG.projectId}/agents/${agentId}/trigger`;
 
                 // Debug logging - verify URL and config values
                 console.log('🔍 Debug Info:');
