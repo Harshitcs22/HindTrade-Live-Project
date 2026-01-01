@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HindTrade | Global Enterprise OS</title>
-    <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+    <title>HindTrade | Enterprise AI OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-config.js"></script>
 
@@ -16,26 +14,21 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Manrope', 'sans-serif'] },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        void: '#050505',
-                        surface: '#0A0A0A',
-                        border: '#1F1F1F',
-                        gold: {
-                            100: '#F5E6C8',
-                            400: '#C5A059',
-                            500: '#B08D55',
-                            900: '#423318'
+                        ht: {
+                            dark: '#0A0E27',
+                            darker: '#050810',
+                            surface: '#0F1428',
+                            border: '#1A2847',
+                            accent: '#00D9FF',
+                            gold: '#FFB800',
+                            success: '#10B981'
                         }
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.4s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
@@ -43,282 +36,893 @@
     </script>
 
     <style>
-        body { background-color: #050505; color: #E5E5E5; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #1F1F1F; border-radius: 2px; }
-        
-        .glass {
-            background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #050810 0%, #0F1428 100%);
+            color: #E5E7EB;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
         }
         
-        .glow-gold { box-shadow: 0 0 50px -15px rgba(197, 160, 89, 0.15); }
-        .nav-item.active { background: rgba(197, 160, 89, 0.05); border-left: 2px solid #C5A059; color: #F5E6C8; }
-        .blur-secret { color: transparent; text-shadow: 0 0 10px rgba(255,255,255,0.4); user-select: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1A2847; border-radius: 3px; }
+
+        .glass {
+            background: rgba(15, 20, 40, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 217, 255, 0.08);
+        }
+
+        .glass-hover {
+            transition: all 0.3s ease;
+        }
+
+        .glass-hover:hover {
+            background: rgba(15, 20, 40, 0.9);
+            border-color: rgba(0, 217, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00D9FF 0%, #FFB800 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%);
+            color: #0A0E27;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #00D9FF;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: #00D9FF;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00D9FF, transparent);
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: #00D9FF;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: #00D9FF;
+            border-radius: 2px;
+        }
 
         .edit-input {
             background: rgba(255, 255, 255, 0.05);
-            border: none;
-            border-bottom: 2px solid #C5A059;
+            border: 1px solid #1A2847;
             color: white;
-            padding: 2px 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             outline: none;
-            width: 100%;
             font-family: inherit;
+            font-size: 14px;
+        }
+
+        .edit-input:focus {
+            border-color: #00D9FF;
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .blur-secret {
+            color: transparent;
+            text-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
+            user-select: none;
         }
 
         .agent-frame {
             border: none;
             width: 100%;
-            height: 600px; /* Fixed height for chat */
-            border-radius: 12px;
+            height: 600px;
+            border-radius: 8px;
             background: #fff;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #00D9FF;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9CA3AF;
+            margin-bottom: 8px;
         }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-gold-400 selection:text-black font-sans">
+<body class="flex h-screen overflow-hidden">
 
-   <aside class="w-72 bg-surface border-r border-border flex flex-col z-50">
-    <div class="p-8 pb-4">
-    <a href="index.html" class="block w-fit hover:opacity-80 transition">
-        <img src="assets/images/logo.svg" class="h-12 w-auto object-contain mb-2" alt="Logo">
-    </a>
-    <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] pl-1">System v2.1</p>
-</div>
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-ht-darker border-r border-ht-border flex flex-col z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="w-8 h-8 bg-gradient-to-br from-ht-accent to-ht-gold rounded flex items-center justify-center text-ht-dark font-bold text-sm">H</div>
+                <span class="text-lg font-700 text-white">HindTrade</span>
+            </div>
+            <p class="text-[11px] text-gray-500 uppercase tracking-wider">AI Enterprise OS</p>
+        </div>
 
-        <nav class="flex-1 mt-6 px-4 space-y-1">
-            <button onclick="navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-4 px-4 py-3 text-gray-400 text-sm font-medium hover:text-white transition-all rounded-r-lg group active">
-                <i class="ri-dashboard-line group-hover:text-gold-400"></i> Dashboard
+        <nav class="flex-1 px-3 py-4 space-y-1">
+            <button onclick="navigate('dashboard')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:text-ht-accent transition-colors rounded-lg active">
+                <i class="ri-dashboard-3-line text-base"></i><span>Dashboard</span>
             </button>
-            <div class="mt-6 mb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Markets</div>
-            <button onclick="navigate('global')" id="nav-global" class="nav-item w-full flex items-center gap-4 px-4 py-3 text-gray-400 text-sm font-medium hover:text-white transition-all rounded-r-lg group">
-                <i class="ri-earth-line group-hover:text-gold-400"></i> Global Trade <span class="w-1.5 h-1.5 rounded-full bg-gold-400 ml-auto animate-pulse"></span>
+            <button onclick="navigate('opportunities')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:text-ht-accent transition-colors rounded-lg">
+                <i class="ri-global-line text-base"></i><span>Global Trades</span>
             </button>
-            <button onclick="navigate('bharat')" id="nav-bharat" class="nav-item w-full flex items-center gap-4 px-4 py-3 text-gray-400 text-sm font-medium hover:text-white transition-all rounded-r-lg group">
-                <i class="ri-store-3-line group-hover:text-gold-400"></i> BharatBazar
+            <button onclick="navigate('inventory')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:text-ht-accent transition-colors rounded-lg">
+                <i class="ri-store-2-line text-base"></i><span>Inventory</span>
             </button>
-            <div class="mt-6 mb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Intelligence</div>
-            <button onclick="navigate('agents')" id="nav-agents" class="nav-item w-full flex items-center gap-4 px-4 py-3 text-gray-400 text-sm font-medium hover:text-white transition-all rounded-r-lg group">
-                <i class="ri-robot-2-line group-hover:text-gold-400"></i> AI Agents
+            <button onclick="navigate('agents')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:text-ht-accent transition-colors rounded-lg">
+                <i class="ri-robot-2-line text-base"></i><span>AI Agents</span>
+            </button>
+            <div class="mt-6 mb-2 px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Network</div>
+            <button onclick="navigate('experts')" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:text-ht-accent transition-colors rounded-lg">
+                <i class="ri-team-line text-base"></i><span>Experts</span>
             </button>
         </nav>
 
-        <div class="p-4 border-t border-border">
-            <div class="flex items-center gap-3 hover:bg-white/5 p-2 rounded-lg transition cursor-pointer">
-                <div class="w-10 h-10 rounded-full bg-void border border-border flex items-center justify-center text-gray-400 overflow-hidden">
-                    <img id="sidebar-dp" src="https://api.dicebear.com/7.x/initials/svg?seed=VE&backgroundColor=1a1a1a" class="w-full h-full opacity-80">
-                </div>
-                <div class="flex-1 overflow-hidden">
-                    <div id="sidebar-name" class="text-xs font-semibold text-white truncate">Velox Exports</div>
-                    <button onclick="handleLogout()" class="text-[10px] text-red-400 hover:text-red-300">Log Out</button>
+        <div class="p-4 border-t border-ht-border">
+            <div class="glass glass-hover p-3 rounded-lg flex items-center gap-3 cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-ht-accent to-ht-gold flex items-center justify-center text-ht-dark font-bold text-xs">VE</div>
+                <div class="flex-1 min-w-0">
+                    <div id="sidebar-name" class="text-sm font-600 text-white truncate">Velox Exports</div>
+                    <button onclick="handleLogout()" class="text-[11px] text-red-400 hover:text-red-300 transition">Log Out</button>
                 </div>
             </div>
         </div>
     </aside>
 
-    <main class="flex-1 h-screen overflow-y-auto bg-void relative flex flex-col">
-        <header class="sticky top-0 z-40 bg-void/80 backdrop-blur-md border-b border-border px-8 py-5 flex justify-between items-center shrink-0">
-            <h2 id="page-title" class="text-lg font-light tracking-wide text-white">Dashboard</h2>
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 h-screen overflow-y-auto flex flex-col">
+        <!-- HEADER -->
+        <header class="sticky top-0 z-40 bg-ht-dark/80 backdrop-blur-md border-b border-ht-border px-8 py-4 flex justify-between items-center">
+            <h2 id="page-title" class="text-xl font-600 text-white">Dashboard</h2>
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
-                    <span class="text-[10px] text-gray-400 uppercase tracking-wider">Credits</span>
-                    <span class="text-sm font-bold text-gold-400">2,450</span>
-                    <button class="w-4 h-4 rounded-full bg-gold-400 text-black flex items-center justify-center text-xs hover:bg-white transition">+</button>
+                <div class="flex items-center gap-2 glass px-4 py-2 rounded-full text-sm">
+                    <i class="ri-zap-fill text-ht-gold"></i>
+                    <span class="text-gray-400">Credits:</span>
+                    <span id="credits-display" class="font-600 text-ht-accent">2,450</span>
                 </div>
-                <button class="text-gray-400 hover:text-white relative"><i class="ri-notification-3-line text-xl"></i><span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span></button>
+                <button class="text-gray-400 hover:text-ht-accent transition relative">
+                    <i class="ri-notification-3-line text-lg"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
             </div>
         </header>
 
-        <div id="content-area" class="p-8 max-w-7xl mx-auto w-full flex-1 flex flex-col animate-fade-in">
-            </div>
+        <!-- CONTENT AREA -->
+        <div id="content-area" class="p-8 flex-1 overflow-y-auto animate-fade-in">
+        </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/umd/uuidv4.min.js"></script>
+    
     <script>
-        // --- 1. STATE & AUTH MANAGEMENT ---
-        let userProfile = {
-            name: "Velox Global Exports",
-            location: "Mumbai Port, IN",
-            trustScore: 98,
-            credits: 2450,
-            dp: "https://api.dicebear.com/7.x/initials/svg?seed=VE&backgroundColor=1a1a1a"
-        };
+        // ============ GLOBAL STATE ============
+        let currentUser = null;
+        let userProfile = null;
         let isEditing = false;
 
-        // 🟢 Check Login on Load
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await window.sb.auth.getSession();
-            if (!session) {
-                window.location.href = 'index.html'; // Kick out if not logged in
-            } else {
-                console.log("Logged in:", session.user.email);
-                // Load default dashboard
+        // ============ INITIALIZATION ============
+        async function initApp() {
+            console.log('🚀 Initializing HindTrade Dashboard...');
+            
+            try {
+                // Check authentication
+                const session = await htAPI.getCurrentSession();
+                console.log('📋 Session:', session);
+                
+                if (!session) {
+                    console.log('❌ No session, redirecting to login...');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                currentUser = session.user;
+                console.log('✅ User authenticated:', currentUser.email);
+
+                // Fetch user profile
+                const profileResult = await htAPI.getUserProfile(currentUser.id);
+                if (!profileResult.success) {
+                    throw new Error('Failed to load profile');
+                }
+
+                userProfile = profileResult.profile;
+                console.log('✅ Profile loaded:', userProfile);
+
+                // Update UI
+                updateSidebarUser();
+                updateHeaderCredits();
                 navigate('dashboard');
+
+                // Setup real-time listener for profile updates
+                setupProfileListener();
+
+            } catch (error) {
+                console.error('❌ Init error:', error);
+                showToast('Failed to load dashboard: ' + error.message, 'error');
             }
-        });
+        }
+
+        function updateSidebarUser() {
+            document.getElementById('sidebar-name').innerText = userProfile.company_name || 'User';
+            const initials = (userProfile.company_name || 'HT').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            document.getElementById('sidebar-avatar').innerText = initials;
+        }
+
+        function updateHeaderCredits() {
+            document.getElementById('credits-display').innerText = userProfile.credits.toLocaleString();
+        }
+
+        // Real-time profile listener
+        function setupProfileListener() {
+            const subscription = htAPI.supabase
+                .channel(`user_profile_${currentUser.id}`)
+                .on('postgres_changes', { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: 'user_profiles',
+                    filter: `user_id=eq.${currentUser.id}`
+                }, (payload) => {
+                    console.log('📡 Profile update received:', payload);
+                    userProfile = payload.new;
+                    updateHeaderCredits();
+                    if (document.getElementById('page-title').innerText === 'Dashboard') {
+                        navigate('dashboard');
+                    }
+                })
+                .subscribe();
+
+            console.log('✅ Real-time listener setup complete');
+        }
+
+        // AUTH CHECK
+        document.addEventListener('DOMContentLoaded', initApp);
 
         async function handleLogout() {
             const { error } = await window.sb.auth.signOut();
             if (!error) window.location.href = 'index.html';
         }
 
-        // --- 2. EDIT PROFILE LOGIC ---
+        // EDIT PROFILE
         function toggleEdit() {
             isEditing = !isEditing;
             const editBtn = document.getElementById('edit-btn');
             
-            if(isEditing) {
-                editBtn.innerHTML = '<i class="ri-save-line mr-1"></i> Save Changes';
-                editBtn.className = "text-xs px-3 py-1 bg-gold-400 text-black font-bold rounded hover:bg-gold-500 transition";
-                document.getElementById('display-name').innerHTML = `<input type="text" id="input-name" value="${userProfile.name}" class="edit-input text-3xl font-light">`;
-                document.getElementById('display-loc').innerHTML = `<input type="text" id="input-loc" value="${userProfile.location}" class="edit-input text-sm font-light w-48">`;
+            if (isEditing) {
+                editBtn.innerHTML = '<i class="ri-save-3-line mr-1"></i> Save';
+                editBtn.className = "btn-primary text-xs";
+                document.getElementById('display-name').innerHTML = `<input type="text" id="input-name" value="${userProfile.name}" class="edit-input text-2xl font-600">`;
+                document.getElementById('display-loc').innerHTML = `<input type="text" id="input-loc" value="${userProfile.location}" class="edit-input text-sm">`;
             } else {
-                const newName = document.getElementById('input-name').value;
-                const newLoc = document.getElementById('input-loc').value;
-                if(newName) userProfile.name = newName;
-                if(newLoc) userProfile.location = newLoc;
-                
-                // Update UI Sidebar
+                const newName = document.getElementById('input-name')?.value || userProfile.name;
+                const newLoc = document.getElementById('input-loc')?.value || userProfile.location;
+                userProfile.name = newName;
+                userProfile.location = newLoc;
                 document.getElementById('sidebar-name').innerText = userProfile.name;
-                const newDp = `https://api.dicebear.com/7.x/initials/svg?seed=${userProfile.name.charAt(0)}&backgroundColor=1a1a1a`;
-                userProfile.dp = newDp;
-                document.getElementById('sidebar-dp').src = newDp;
-                
-                navigate('dashboard'); 
+                navigate('dashboard');
             }
         }
 
-        // --- 3. HTML GENERATORS ---
-        function renderTradeCard() {
-            return `
-            <div class="w-full h-72 rounded-xl overflow-hidden relative group border border-border glow-gold">
-                <div class="absolute inset-0 group-hover:bg-black/40 transition z-10"></div>
-                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-50">
-                <div class="absolute inset-0 bg-gradient-to-t from-void via-void/80 to-transparent"></div>
-                <div class="absolute top-4 right-4 z-20">
-                    <button id="edit-btn" onclick="toggleEdit()" class="text-xs text-gold-400 hover:text-white border border-gold-400/30 hover:border-gold-400 bg-black/50 backdrop-blur px-3 py-1 rounded transition flex items-center gap-1"><i class="ri-edit-2-line"></i> Edit Profile</button>
-                </div>
-                <div class="absolute bottom-0 left-0 w-full p-8 flex items-end justify-between z-20">
-                    <div class="flex items-center gap-6">
-                        <div class="w-24 h-24 rounded bg-black border border-gold-400/30 flex items-center justify-center overflow-hidden shadow-2xl relative group/dp">
-                            <img src="${userProfile.dp}" class="w-full h-full object-cover">
-                        </div>
-                        <div id="trade-card-details">
-                            <div class="flex items-center gap-2 mb-1">
-                                <div id="display-name" class="text-3xl font-light text-white tracking-tight">${userProfile.name}</div>
-                                <i class="ri-verified-badge-fill text-gold-400 text-xl"></i>
-                            </div>
-                            <div id="display-loc" class="text-gray-400 text-sm font-light tracking-wide">${userProfile.location} • Member</div>
-                        </div>
-                    </div>
-                    <div class="text-right hidden md:block">
-                        <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Trust Score</div>
-                        <div class="text-3xl font-medium text-white">${userProfile.trustScore}<span class="text-base text-gray-600">/100</span></div>
-                    </div>
-                </div>
-            </div>`;
-        }
-
+        // DASHBOARD HTML - MVP CORE WITH 3-COLUMN LAYOUT
         function getDashboardHTML() {
-            return `${renderTradeCard()}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div class="glass p-6 rounded-xl border-l-2 border-l-gold-400"><div class="text-2xl font-medium text-white">Premium</div><div class="text-xs text-gray-500">Plan Status</div></div>
-                    <div class="glass p-6 rounded-xl"><div class="text-2xl font-medium text-white">1,240</div><div class="text-xs text-gray-500">Profile Views</div></div>
-                    <div class="glass p-6 rounded-xl"><div class="text-2xl font-medium text-white">8</div><div class="text-xs text-gray-500">Active Bids</div></div>
-                </div>`;
-        }
-
-        function getGlobalMarketHTML() {
             return `
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-gray-400 text-sm">Opportunities matched for: <span class="text-white font-bold">${userProfile.name}</span></div>
-                <button class="px-3 py-1.5 text-xs text-gold-100 bg-gold-900/30 border border-gold-900 rounded">High Value Only</button>
-            </div>
-            <div class="space-y-4">
-                <div class="glass p-6 rounded-xl relative group overflow-hidden">
-                    <div class="absolute top-0 right-0 p-3"><i class="ri-lock-2-fill text-gray-600 text-xl"></i></div>
-                    <div class="flex justify-between items-start">
-                        <div class="flex gap-4">
-                            <div class="text-3xl bg-white/5 w-12 h-12 flex items-center justify-center rounded-lg">🇦🇪</div>
-                            <div><h3 class="text-base font-semibold text-white">Basmati Rice (Grade A)</h3><div class="text-xs text-gray-500 mt-0.5">Verified Buyer • Dubai</div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- LEFT COLUMN: PROFILE + TRADE CARD PREVIEW (4 cols) -->
+                <div class="lg:col-span-4 space-y-4">
+                    <!-- Profile mini LinkedIn card -->
+                    <div class="glass glass-hover rounded-xl p-5 flex gap-3">
+                        <div class="w-11 h-11 rounded-full bg-gradient-to-br from-ht-accent to-ht-gold flex items-center justify-center text-ht-dark font-bold text-sm">
+                            ${userProfile.initials}
                         </div>
-                        <div class="text-gold-100 font-medium">$500k+</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1">
+                                <h3 id="display-name" class="text-base font-600 text-white truncate">${userProfile.name}</h3>
+                                <i class="ri-verified-badge-fill text-ht-gold text-sm"></i>
+                            </div>
+                            <div id="display-loc" class="text-[11px] text-gray-400">${userProfile.location}</div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-surface border border-ht-border text-gray-300">Exporter</span>
+                                <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-surface border border-ht-border text-gray-300">Premium</span>
+                            </div>
+                        </div>
+                        <button id="edit-btn" onclick="toggleEdit()" class="btn-secondary text-[11px] flex-shrink-0">
+                            <i class="ri-edit-2-line mr-1"></i>Edit
+                        </button>
                     </div>
-                    <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-surface border border-white/10 flex items-center justify-center"><i class="ri-building-2-line text-gray-500"></i></div>
-                        <div class="flex flex-col"><span class="text-sm text-gray-300 blur-secret">Royal Catering LLC</span><span class="text-[10px] text-gray-600 blur-secret">contact@royal.ae</span></div></div>
-                        <button class="px-6 py-2 bg-gold-400 hover:bg-gold-500 text-black text-xs font-bold rounded shadow-[0_0_15px_rgba(197,160,89,0.2)] transition flex items-center gap-2"><i class="ri-lock-unlock-line"></i> Unlock (1 Credit)</button>
+
+                    <!-- Trade Card Premium Preview -->
+                    <div class="glass rounded-xl p-4 relative overflow-hidden border-2 border-ht-gold/30">
+                        <div class="absolute inset-0 bg-gradient-to-br from-black/40 via-transparent to-ht-accent/10 pointer-events-none"></div>
+                        <div class="absolute top-2 right-2 text-[10px] text-ht-gold font-600">DIGITAL CARD</div>
+                        <div class="relative flex flex-col gap-3">
+                            <div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">HindTrade Verified</div>
+                                <div class="text-sm font-700 text-white">${userProfile.name}</div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="bg-white/5 rounded p-2">
+                                    <div class="text-gray-400">Net Worth</div>
+                                    <div class="text-ht-gold font-600 mt-1">₹5-10 Cr</div>
+                                </div>
+                                <div class="bg-white/5 rounded p-2">
+                                    <div class="text-gray-400">Shipments</div>
+                                    <div class="text-ht-accent font-600 mt-1">132+</div>
+                                </div>
+                                <div class="bg-white/5 rounded p-2">
+                                    <div class="text-gray-400">Trust Score</div>
+                                    <div class="text-white font-600 mt-1">${userProfile.trustScore}/100</div>
+                                </div>
+                                <div class="bg-white/5 rounded p-2">
+                                    <div class="text-gray-400">Status</div>
+                                    <div class="text-ht-success font-600 mt-1">✓ Verified</div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-ht-border flex items-center justify-between">
+                                <button class="btn-primary text-[11px] flex-1 mr-2">View Card</button>
+                                <div class="w-12 h-12 rounded bg-white/5 border border-ht-border flex items-center justify-center text-[9px] text-gray-400 font-500">QR</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MIDDLE COLUMN: STATS + GETTING STARTED (5 cols) -->
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- Quick metrics row -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="glass stat-card p-4 rounded-xl">
+                            <div class="metric-label">Platform Status</div>
+                            <div class="text-base font-600 text-white mb-1">Premium</div>
+                            <div class="text-[11px] text-gray-400">Active member</div>
+                        </div>
+                        <div class="glass stat-card p-4 rounded-xl">
+                            <div class="metric-label">Profile Views</div>
+                            <div class="metric-value">1,240</div>
+                            <div class="text-[11px] text-gray-400">Last 30 days</div>
+                        </div>
+                        <div class="glass stat-card p-4 rounded-xl">
+                            <div class="metric-label">Negotiations</div>
+                            <div class="metric-value">8</div>
+                            <div class="text-[11px] text-gray-400">In progress</div>
+                        </div>
+                    </div>
+
+                    <!-- Getting started steps -->
+                    <div class="glass rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-600 text-white">Getting Started</h4>
+                            <span class="text-[10px] text-ht-accent font-500">1/3</span>
+                        </div>
+                        <div class="space-y-3 text-[12px]">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-ht-accent/20 flex items-center justify-center text-[10px] text-ht-accent border border-ht-accent/40 flex-shrink-0">1</div>
+                                <div>
+                                    <div class="text-white font-500">Complete Profile</div>
+                                    <div class="text-gray-400 text-[11px]">Add company details & certifications</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-ht-accent/5 flex items-center justify-center text-[10px] text-gray-400 border border-ht-border flex-shrink-0">2</div>
+                                <div>
+                                    <div class="text-white font-500">Get CA Verified</div>
+                                    <div class="text-gray-400 text-[11px]">Certify your trade card</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-ht-accent/5 flex items-center justify-center text-[10px] text-gray-400 border border-ht-border flex-shrink-0">3</div>
+                                <div>
+                                    <div class="text-white font-500">Unlock Leads</div>
+                                    <div class="text-gray-400 text-[11px]">View buyers & CHA contacts</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: QUICK ACTIONS + SUMMARY (3 cols) -->
+                <div class="lg:col-span-3 space-y-4">
+                    <!-- Quick actions -->
+                    <div class="glass rounded-xl p-4 space-y-3">
+                        <h4 class="text-sm font-600 text-white mb-1">Quick Actions</h4>
+                        <button class="w-full btn-primary text-[12px] justify-center" onclick="navigate('agents')">
+                            <i class="ri-search-eye-line mr-1"></i> Ask HS Code Agent
+                        </button>
+                        <button class="w-full btn-secondary text-[12px] justify-center" onclick="navigate('opportunities')">
+                            <i class="ri-global-line mr-1"></i> Browse Trades
+                        </button>
+                        <button class="w-full btn-secondary text-[12px] justify-center">
+                            <i class="ri-user-voice-line mr-1"></i> Contact CA/CHA
+                        </button>
+                    </div>
+
+                    <!-- Account snapshot -->
+                    <div class="glass rounded-xl p-4 space-y-3">
+                        <h4 class="text-sm font-600 text-white mb-1">Account</h4>
+                        <div class="space-y-2 text-[11px]">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Profile</span>
+                                <span class="text-ht-accent font-500">72%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">KYC Status</span>
+                                <span class="text-yellow-300 font-500">Pending</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">CA Verify</span>
+                                <span class="text-gray-300 font-500">Not started</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Credits</span>
+                                <span class="text-ht-gold font-600">${userProfile.credits}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                <div class="flex-1">
+                                    <h3 id="display-name" class="text-2xl font-700 text-white mb-1">${userProfile.name}</h3>
+                                    <div id="display-loc" class="text-sm text-gray-400 mb-3">${userProfile.location}</div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 bg-ht-success/20 border border-ht-success/50 rounded text-xs text-ht-success font-500">Verified ✓</span>
+                                        <span class="px-2 py-1 bg-ht-gold/20 border border-ht-gold/50 rounded text-xs text-ht-gold font-500">Premium Tier</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="edit-btn" onclick="toggleEdit()" class="btn-secondary text-xs">
+                                <i class="ri-edit-2-line mr-1"></i> Edit
+                            </button>
+                        </div>
+
+                        <!-- Key Metrics Grid -->
+                        <div class="grid grid-cols-3 gap-4 border-t border-ht-border pt-6 mt-6">
+                            <div class="text-center">
+                                <div class="metric-label">Trust Score</div>
+                                <div class="text-3xl font-700 text-ht-accent">${userProfile.trustScore}</div>
+                                <div class="text-xs text-gray-500">/100</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="metric-label">Successful Trades</div>
+                                <div class="text-3xl font-700 text-ht-gold">24</div>
+                                <div class="text-xs text-gray-500">All Time</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="metric-label">Member Since</div>
+                                <div class="text-3xl font-700 text-white">2024</div>
+                                <div class="text-xs text-gray-500">Jan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTION CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- HS Code & Compliance Agent -->
+                    <div class="glass glass-hover rounded-xl p-6 border border-blue-500/20 hover:border-blue-500/40 cursor-pointer transition" onclick="openAgent('legal')">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
+                                    <i class="ri-scales-3-line text-lg"></i>
+                                </div>
+                                <h4 class="text-white font-600">HS Codes & Compliance</h4>
+                                <p class="text-xs text-gray-400 mt-2">Get export docs, tariff codes & regulations</p>
+                            </div>
+                            <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                        </div>
+                        <button class="text-blue-400 text-xs font-500 flex items-center gap-1">
+                            <i class="ri-arrow-right-line"></i> Ask Agent
+                        </button>
+                    </div>
+
+                    <!-- Account Overview -->
+                    <div class="glass glass-hover rounded-xl p-6 border border-ht-gold/20">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h4 class="text-white font-600">Account Overview</h4>
+                                <p class="text-xs text-gray-400 mt-2">Membership • Credits • Verification</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Status:</span>
+                                <span class="text-ht-gold font-500">Premium Active</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Credits Left:</span>
+                                <span id="credits-badge" class="text-ht-accent font-500">2,450</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Verification:</span>
+                                <span class="text-ht-success font-500">✓ Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GETTING STARTED SECTION -->
+                <div class="glass rounded-xl p-6 border border-ht-border">
+                    <h4 class="text-white font-600 mb-4">🚀 Next Steps for Your MVP</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                            <span class="w-6 h-6 rounded-full bg-ht-accent/20 flex items-center justify-center text-xs text-ht-accent font-700">1</span>
+                            <span class="text-sm text-gray-300"><strong>Complete Profile:</strong> Add company details, certifications & documents</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                            <span class="w-6 h-6 rounded-full bg-ht-accent/20 flex items-center justify-center text-xs text-ht-accent font-700">2</span>
+                            <span class="text-sm text-gray-300"><strong>Explore Opportunities:</strong> Browse global & local trade matches</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                            <span class="w-6 h-6 rounded-full bg-ht-accent/20 flex items-center justify-center text-xs text-ht-accent font-700">3</span>
+                            <span class="text-sm text-gray-300"><strong>Use AI Agents:</strong> Get HS codes, compliance docs & logistics help</span>
+                        </div>
                     </div>
                 </div>
             </div>`;
         }
 
-        function getBharatBazarHTML() {
+        // OPPORTUNITIES HTML - MARKETPLACE STYLE
+        function getOpportunitiesHTML() {
             return `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                 <div class="border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center p-8 hover:bg-white/5 transition cursor-pointer group h-full min-h-[200px]">
-                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3 group-hover:scale-110 transition"><i class="ri-add-line text-2xl text-gold-400"></i></div>
-                    <span class="text-sm text-gray-400">Add Product for ${userProfile.name}</span>
+            <div class="space-y-6">
+                <!-- SEARCH & FILTERS (Amazon style) -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 bg-ht-surface border border-ht-border rounded-lg px-4 py-3 focus-within:border-ht-accent transition">
+                        <i class="ri-search-line text-gray-500"></i>
+                        <input type="text" placeholder="Search trades: Rice, Textiles, Spices, Machinery..." class="bg-transparent flex-1 text-white outline-none placeholder:text-gray-600">
+                    </div>
+
+                    <!-- Filter Pills -->
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="px-4 py-2 rounded-full text-xs font-500 bg-ht-accent/20 border border-ht-accent/50 text-ht-accent hover:bg-ht-accent/30 transition">All Trades</button>
+                        <button class="px-4 py-2 rounded-full text-xs font-500 border border-ht-border text-gray-400 hover:border-ht-accent hover:text-ht-accent transition">Agriculture</button>
+                        <button class="px-4 py-2 rounded-full text-xs font-500 border border-ht-border text-gray-400 hover:border-ht-accent hover:text-ht-accent transition">Textiles</button>
+                        <button class="px-4 py-2 rounded-full text-xs font-500 border border-ht-border text-gray-400 hover:border-ht-accent hover:text-ht-accent transition">Electronics</button>
+                        <button class="px-4 py-2 rounded-full text-xs font-500 border border-ht-border text-gray-400 hover:border-ht-accent hover:text-ht-accent transition">More +</button>
+                    </div>
                 </div>
-                <div class="glass p-0 rounded-xl overflow-hidden group hover:border-gold-400/30 transition">
-                    <div class="h-32 bg-gray-800 relative"><img src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60"><div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[10px] text-white">Live</div></div>
-                    <div class="p-4"><h3 class="text-white font-medium">Nashik Red Onion</h3><div class="flex justify-between items-end mt-4"><div><div class="text-[10px] text-gray-600 uppercase">Price</div><div class="text-gold-100 font-medium">₹2,400</div></div><div class="text-right"><div class="text-[10px] text-gray-600 uppercase">Qty</div><div class="text-white">50T</div></div></div></div>
+
+                <!-- GLOBAL OPPORTUNITIES -->
+                <div>
+                    <h3 class="text-lg font-600 text-white mb-4 flex items-center gap-2">
+                        <i class="ri-global-line text-ht-accent"></i> Global Opportunities
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- Opportunity 1 -->
+                        <div class="glass glass-hover rounded-xl p-6 border-l-4 border-l-ht-gold">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="text-white font-600 text-lg">Premium Basmati Rice - Grade A</h4>
+                                    <p class="text-sm text-gray-400 mt-1">🇦🇪 Dubai • Verified Buyer • Min Order: 1000 MT</p>
+                                </div>
+                                <span class="text-ht-gold font-700 text-lg">$500K+</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">Looking for consistent supply. Bulk orders preferred. Direct payment via LC.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">RC</div>
+                                    <div class="text-sm">
+                                        <div class="text-white font-500 blur-secret">Royal Catering LLC</div>
+                                        <div class="text-gray-500 text-xs blur-secret">Dubai, UAE</div>
+                                    </div>
+                                </div>
+                                <button class="btn-primary text-xs">Unlock (1 Credit)</button>
+                            </div>
+                        </div>
+
+                        <!-- Opportunity 2 -->
+                        <div class="glass glass-hover rounded-xl p-6 border-l-4 border-l-ht-accent">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="text-white font-600 text-lg">Cotton Yarn & Fabric Supply</h4>
+                                    <p class="text-sm text-gray-400 mt-1">🇬🇧 Manchester • Verified Buyer • Min Order: 500 MT</p>
+                                </div>
+                                <span class="text-ht-accent font-700 text-lg">₹2.5Cr+</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">Looking for Indian cotton yarn suppliers. Quality certified. Long-term partnership.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">TM</div>
+                                    <div class="text-sm">
+                                        <div class="text-white font-500 blur-secret">Texcraft Manufacturing</div>
+                                        <div class="text-gray-500 text-xs blur-secret">Manchester, UK</div>
+                                    </div>
+                                </div>
+                                <button class="btn-primary text-xs">Unlock (1 Credit)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INDIAN SMEs SECTION -->
+                <div>
+                    <h3 class="text-lg font-600 text-white mb-4 flex items-center gap-2">
+                        <i class="ri-india-line text-orange-500"></i> Indian SME Marketplace
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- SME Opportunity -->
+                        <div class="glass glass-hover rounded-xl p-6 border border-orange-500/30 bg-orange-500/5">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="text-white font-600 text-lg">Nashik Red Onion Bulk Supply</h4>
+                                    <p class="text-sm text-gray-400 mt-1">🇮🇳 Maharashtra • Local B2B • Min Order: 50 MT</p>
+                                </div>
+                                <span class="text-orange-400 font-700 text-lg">₹24,00,000</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-4">Seasonal supply available. Quality guaranteed. Fast local delivery.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm">MF</div>
+                                    <div class="text-sm">
+                                        <div class="text-white font-500">Maharaj Farms</div>
+                                        <div class="text-gray-500 text-xs">Nashik, Maharashtra</div>
+                                    </div>
+                                </div>
+                                <button class="btn-primary text-xs">View Details</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>`;
         }
 
-        // --- 4. AGENTS ---
-        const agentIframe1 = "https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/1733a3cb-bd12-45c6-9cbc-71e1286652fe/embed-chat?hide_tool_steps=true&bubble_style=agent&primary_color=%23000000&input_placeholder_text=Ask+legal+questions...";
-        const agentIframe2 = "https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat?bubble_style=agent&primary_color=%23685FFF&input_placeholder_text=Ask+about+logistics...";
+        // INVENTORY HTML
+        function getInventoryHTML() {
+            return `
+            <div class="space-y-6">
+                <button class="w-full glass rounded-xl p-8 border-2 border-dashed border-ht-border hover:border-ht-accent transition flex flex-col items-center justify-center group">
+                    <div class="w-12 h-12 rounded-full bg-ht-accent/10 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                        <i class="ri-add-line text-2xl text-ht-accent"></i>
+                    </div>
+                    <span class="text-sm text-gray-400 group-hover:text-ht-accent transition">Add New Product</span>
+                </button>
+                <div class="glass rounded-xl overflow-hidden">
+                    <div class="h-40 bg-gradient-to-br from-ht-accent/20 to-ht-gold/20 relative">
+                        <img src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-40">
+                        <div class="absolute top-3 right-3 bg-ht-success/20 border border-ht-success/50 px-2 py-1 rounded text-xs text-ht-success font-500">Live</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-white font-600 mb-4">Nashik Red Onion</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="metric-label">Price</div>
+                                <div class="text-xl font-700 text-ht-gold">₹2,400/Qt</div>
+                            </div>
+                            <div>
+                                <div class="metric-label">Available</div>
+                                <div class="text-xl font-700 text-white">50 MT</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
 
-        function getAgentsGridHTML() {
+        // AGENTS HTML - ENHANCED WITH 3 AGENTS
+        function getAgentsHTML() {
             return `
             <div class="space-y-6">
                 <div class="text-center mb-8">
-                    <h3 class="text-xl text-white font-light">Select Your AI Agent</h3>
-                    <p class="text-gray-500 text-sm">Deploy specialized autonomous agents.</p>
+                    <h3 class="text-2xl font-700 text-white mb-2">⚡ AI Command Center</h3>
+                    <p class="text-gray-400 text-sm">Three autonomous agents for compliance, logistics & documentation</p>
                 </div>
+
+                <!-- MAIN AGENTS GRID (3 AGENTS) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="openAgent('legal')" class="glass p-6 rounded-xl hover:bg-white/5 hover:border-gold-400/50 cursor-pointer transition group text-center relative overflow-hidden">
-                        <div class="absolute top-2 right-2 flex gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span></div>
-                        <div class="w-16 h-16 rounded-full bg-blue-900/20 text-blue-400 flex items-center justify-center mx-auto mb-4 border border-blue-500/20 group-hover:scale-110 transition"><i class="ri-scales-3-line text-2xl"></i></div>
-                        <h4 class="text-white font-medium mb-1">Legal & HS Code</h4>
-                        <p class="text-gray-500 text-xs px-2">Export compliance checks.</p>
-                        <button class="mt-4 text-xs text-blue-400 border border-blue-400/30 px-4 py-1.5 rounded hover:bg-blue-400 hover:text-black transition">Launch Agent</button>
+                    <!-- AGENT 1: HS CODE & COMPLIANCE (PRIMARY) -->
+                    <div onclick="openAgent('legal')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-blue-500/40 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl -z-0"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
+                                    <i class="ri-scales-3-line text-xl"></i>
+                                </div>
+                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                            </div>
+                            <h4 class="text-white font-700 text-lg mb-2">HS Code & Compliance</h4>
+                            <p class="text-sm text-gray-400 mb-4">Export compliance & tariff codes</p>
+                            <div class="space-y-2 mb-4 text-xs text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Find correct HS code
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Know exact docs per shipment
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Check DGFT & policy notes
+                                </div>
+                            </div>
+                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
+                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
+                            </button>
+                        </div>
                     </div>
-                    <div onclick="openAgent('govtech')" class="glass p-6 rounded-xl hover:bg-white/5 hover:border-gold-400/50 cursor-pointer transition group text-center relative overflow-hidden">
-                         <div class="absolute top-2 right-2 flex gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span></div>
-                        <div class="w-16 h-16 rounded-full bg-purple-900/20 text-purple-400 flex items-center justify-center mx-auto mb-4 border border-purple-500/20 group-hover:scale-110 transition"><i class="ri-government-line text-2xl"></i></div>
-                        <h4 class="text-white font-medium mb-1">GovTech & Maritime</h4>
-                        <p class="text-gray-500 text-xs px-2">Port logistics & DGFT.</p>
-                        <button class="mt-4 text-xs text-purple-400 border border-purple-400/30 px-4 py-1.5 rounded hover:bg-purple-400 hover:text-black transition">Launch Agent</button>
+
+                    <!-- AGENT 2: LOGISTICS & ROUTING + QR -->
+                    <div onclick="openAgent('logistics')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-purple-500/40 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl -z-0"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition">
+                                    <i class="ri-ship-2-line text-xl"></i>
+                                </div>
+                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                            </div>
+                            <h4 class="text-white font-700 text-lg mb-2">Logistics & Routing</h4>
+                            <p class="text-sm text-gray-400 mb-4">Port routing, shipping routes & QR labels</p>
+                            <div class="space-y-2 mb-4 text-xs text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Find optimal port routing
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Compare routes & transit times
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Generate sample labels & QR
+                                </div>
+                            </div>
+                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
+                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AGENT 3: EXPORT DOCS COPILOT -->
+                    <div onclick="openAgent('docs')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-green-500/40 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full blur-2xl -z-0"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition">
+                                    <i class="ri-file-text-line text-xl"></i>
+                                </div>
+                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                            </div>
+                            <h4 class="text-white font-700 text-lg mb-2">Export Docs Copilot</h4>
+                            <p class="text-sm text-gray-400 mb-4">Auto-fill export documents</p>
+                            <div class="space-y-2 mb-4 text-xs text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-green-400"></i> Validate shipment details
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-green-400"></i> Auto-fill export documents
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-checkbox-circle-line text-green-400"></i> Download-ready formats (soon)
+                                </div>
+                            </div>
+                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
+                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK STATS -->
+                <div class="glass rounded-xl p-6 border border-ht-border/50">
+                    <h4 class="text-white font-600 mb-4">📊 Agent Usage This Month</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center justify-between p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">HS Code Lookups</div>
+                                <div class="text-lg font-700 text-blue-400">24</div>
+                            </div>
+                            <i class="ri-scales-3-line text-3xl text-blue-500/40"></i>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">Route Queries</div>
+                                <div class="text-lg font-700 text-purple-400">12</div>
+                            </div>
+                            <i class="ri-ship-2-line text-3xl text-purple-500/40"></i>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-500/5 rounded-lg border border-green-500/20">
+                            <div>
+                                <div class="text-xs text-gray-400 mb-1">Docs Generated</div>
+                                <div class="text-lg font-700 text-green-400">8</div>
+                            </div>
+                            <i class="ri-file-text-line text-3xl text-green-500/40"></i>
+                        </div>
                     </div>
                 </div>
             </div>`;
         }
 
         function openAgent(type) {
-            let url = (type === 'legal') ? agentIframe1 : agentIframe2;
-            let title = (type === 'legal') ? "Legal & HS Code Advisor" : "GovTech & Maritime Assistant";
-
+            let url, title, description;
+            
+            if (type === 'legal') {
+                url = "https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/1733a3cb-bd12-45c6-9cbc-71e1286652fe/embed-chat?hide_tool_steps=true&bubble_style=agent&primary_color=%23000000&input_placeholder_text=Ask+about+HS+codes+or+export+docs...";
+                title = "HS Code & Compliance Agent";
+                description = "Get product HS codes, tariff rates, export documentation & DGFT policy requirements";
+            } else if (type === 'logistics') {
+                url = "https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat?bubble_style=agent&primary_color=%23685FFF&input_placeholder_text=Ask+about+port+routing+or+shipping...";
+                title = "Logistics & Routing Agent";
+                description = "Find optimal port routing, compare shipping routes, generate sample QR codes for shipments";
+            } else if (type === 'docs') {
+                url = "https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat?bubble_style=agent&primary_color=%2310B981&input_placeholder_text=Validate+and+generate+export+documents...";
+                title = "Export Docs Copilot";
+                description = "Validate shipment details, auto-fill Proforma Invoice, Commercial Invoice & Packing List";
+            }
+            
             document.getElementById('page-title').innerText = title;
             document.getElementById('content-area').innerHTML = `
-                <div class="flex flex-col h-full animate-fade-in">
-                    <div class="flex items-center justify-between mb-4">
-                        <button onclick="navigate('agents')" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"><i class="ri-arrow-left-line"></i> Back to Agents</button>
-                        <div class="flex gap-2"><span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span><span class="text-xs text-green-400">Agent Active</span></div>
+                <div class="flex flex-col h-full space-y-4 animate-fade-in">
+                    <div class="flex items-center justify-between">
+                        <button onclick="navigate('agents')" class="flex items-center gap-2 text-sm text-gray-400 hover:text-ht-accent transition">
+                            <i class="ri-arrow-left-line"></i> Back to Agents
+                        </button>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                            <span class="text-ht-success">Agent Active</span>
+                        </div>
                     </div>
-                    <div class="flex-1 rounded-xl overflow-hidden border border-border bg-white">
+                    <div class="glass rounded-xl p-4 border border-ht-border">
+                        <p class="text-sm text-gray-300">${description}</p>
+                    </div>
+                    <div class="flex-1 rounded-xl overflow-hidden border border-ht-border bg-white">
                         <iframe src="${url}" class="agent-frame" frameborder="0" allow="microphone"></iframe>
                     </div>
                 </div>`;
         }
 
-        // --- 5. NAVIGATION CONTROLLER ---
+        // NAVIGATION
         function navigate(pageId) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${pageId}`).classList.add('active');
+            document.getElementById(`nav-${pageId}`) && document.getElementById(`nav-${pageId}`).classList.add('active');
             
             const contentArea = document.getElementById('content-area');
             const pageTitle = document.getElementById('page-title');
@@ -327,28 +931,229 @@
             setTimeout(() => {
                 switch(pageId) {
                     case 'dashboard': 
-                        pageTitle.innerText = "Command Center";
-                        contentArea.innerHTML = getDashboardHTML(); 
+                        pageTitle.innerText = "Dashboard";
+                        contentArea.innerHTML = getDashboardHTML();
                         break;
-                    case 'global': 
+                    case 'opportunities': 
                         pageTitle.innerText = "Global Opportunities";
-                        contentArea.innerHTML = getGlobalMarketHTML(); 
+                        contentArea.innerHTML = getOpportunitiesHTML();
                         break;
-                    case 'bharat': 
-                        pageTitle.innerText = "BharatBazar Inventory";
-                        contentArea.innerHTML = getBharatBazarHTML(); 
+                    case 'inventory': 
+                        pageTitle.innerText = "Inventory";
+                        contentArea.innerHTML = getInventoryHTML();
                         break;
                     case 'agents': 
-                        pageTitle.innerText = "AI Agent Grid";
-                        contentArea.innerHTML = getAgentsGridHTML(); 
+                        pageTitle.innerText = "AI Agents";
+                        contentArea.innerHTML = getAgentsHTML();
+                        break;
+                    case 'experts': 
+                        pageTitle.innerText = "Experts Network";
+                        contentArea.innerHTML = getExpertsHTML();
                         break;
                 }
                 contentArea.classList.remove('animate-fade-in');
                 void contentArea.offsetWidth;
                 contentArea.classList.add('animate-fade-in');
                 contentArea.style.opacity = '1';
-            }, 200);
+            }, 150);
         }
+
+        // EXPERTS HTML - CA & CHA NETWORK
+        function getExpertsHTML() {
+            return `
+            <div class="space-y-8">
+                <!-- CA SECTION -->
+                <div>
+                    <h3 class="text-lg font-600 text-white mb-4 flex items-center gap-2">
+                        <i class="ri-user-search-line text-ht-gold"></i> Chartered Accountants (CA)
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4">Verified export-focused CAs to certify your trade card</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- CA Card 1 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-gold/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start gap-3 mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-ht-gold to-yellow-600 flex items-center justify-center text-ht-dark font-bold text-sm flex-shrink-0">RM</div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">CA Rahul Mehta</h4>
+                                        <p class="text-[11px] text-gray-400">Mehta & Associates</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>10+ years</strong> • Export-Focused</div>
+                                    <div class="text-gray-500">ICAI Reg. No. A45782</div>
+                                    <div class="text-ht-gold">₹150 Cr+ exports certified</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-gold/20 text-ht-gold border border-ht-gold/40">Export Specialist</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">FMCG</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-green-500/20 text-green-300 border border-green-500/40">Agri</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Hire for 1 Year</button>
+                                    <button class="w-full btn-secondary text-[11px]">Get Trade Card</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CA Card 2 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-gold/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start gap-3 mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-ht-gold to-yellow-600 flex items-center justify-center text-ht-dark font-bold text-sm flex-shrink-0">PS</div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">CA Priya Sharma</h4>
+                                        <p class="text-[11px] text-gray-400">Sharma & Co.</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>8+ years</strong> • Trade Focused</div>
+                                    <div class="text-gray-500">ICAI Reg. No. B67234</div>
+                                    <div class="text-ht-gold">₹200 Cr+ exports certified</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-gold/20 text-ht-gold border border-ht-gold/40">Export Specialist</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40">Textiles</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Hire for 1 Year</button>
+                                    <button class="w-full btn-secondary text-[11px]">Get Trade Card</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CA Card 3 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-gold/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start gap-3 mb-3">
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-ht-gold to-yellow-600 flex items-center justify-center text-ht-dark font-bold text-sm flex-shrink-0">AK</div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">CA Amit Khurana</h4>
+                                        <p class="text-[11px] text-gray-400">Khurana Group</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>12+ years</strong> • Supply Chain</div>
+                                    <div class="text-gray-500">ICAI Reg. No. C89012</div>
+                                    <div class="text-ht-gold">₹300 Cr+ exports certified</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-gold/20 text-ht-gold border border-ht-gold/40">Export Specialist</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-red-500/20 text-red-300 border border-red-500/40">Electronics</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/40">Machinery</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Hire for 1 Year</button>
+                                    <button class="w-full btn-secondary text-[11px]">Get Trade Card</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHA SECTION -->
+                <div>
+                    <h3 class="text-lg font-600 text-white mb-4 flex items-center gap-2">
+                        <i class="ri-ship-line text-ht-accent"></i> Custom House Agents (CHA)
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4">Port-wise CHA network for customs clearance & logistics</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- CHA Card 1 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group border-l-4 border-l-ht-accent">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-accent/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">ABC Logistics (CHA)</h4>
+                                        <p class="text-[11px] text-gray-400">CHA Lic. No. CHG/2019/001</p>
+                                    </div>
+                                    <span class="text-[10px] text-ht-success font-600 ml-2 flex-shrink-0">VERIFIED</span>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>Ports:</strong> Nhava Sheva, Mundra, ICD TKD</div>
+                                    <div class="text-ht-accent font-600">2,300+ shipments cleared</div>
+                                    <div class="text-gray-400">Contact: Locked • Unlock (2 Credits)</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-accent/20 text-ht-accent border border-ht-accent/40">FCL/LCL</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">Reefer</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-green-500/20 text-green-300 border border-green-500/40">Agro</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Unlock Contact (2 Credits)</button>
+                                    <button class="w-full btn-secondary text-[11px]">Share Shipment Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CHA Card 2 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group border-l-4 border-l-ht-accent">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-accent/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">XYZ Port Services (CHA)</h4>
+                                        <p class="text-[11px] text-gray-400">CHA Lic. No. CHG/2018/045</p>
+                                    </div>
+                                    <span class="text-[10px] text-ht-success font-600 ml-2 flex-shrink-0">VERIFIED</span>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>Ports:</strong> Jawaharlal Nehru, Kolkata Port</div>
+                                    <div class="text-ht-accent font-600">1,850+ shipments cleared</div>
+                                    <div class="text-gray-400">Contact: Locked • Unlock (2 Credits)</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-accent/20 text-ht-accent border border-ht-accent/40">FCL</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/40">Air Cargo</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40">Textiles</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Unlock Contact (2 Credits)</button>
+                                    <button class="w-full btn-secondary text-[11px]">Share Shipment Details</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CHA Card 3 -->
+                        <div class="glass glass-hover rounded-xl p-5 relative overflow-hidden group border-l-4 border-l-ht-accent">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-ht-accent/10 rounded-full blur-2xl -z-0"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-white font-600 text-sm">Global Trade Solutions (CHA)</h4>
+                                        <p class="text-[11px] text-gray-400">CHA Lic. No. CHG/2020/089</p>
+                                    </div>
+                                    <span class="text-[10px] text-ht-success font-600 ml-2 flex-shrink-0">VERIFIED</span>
+                                </div>
+                                <div class="space-y-1 mb-3 text-[11px]">
+                                    <div class="text-gray-300"><strong>Ports:</strong> Pipavav, Kutch, ICD DLI</div>
+                                    <div class="text-ht-accent font-600">3,100+ shipments cleared</div>
+                                    <div class="text-gray-400">Contact: Locked • Unlock (2 Credits)</div>
+                                </div>
+                                <div class="flex items-center gap-1 mb-3 flex-wrap">
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-ht-accent/20 text-ht-accent border border-ht-accent/40">FCL/LCL</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">Machinery</span>
+                                    <span class="px-2 py-0.5 text-[10px] rounded-full bg-green-500/20 text-green-300 border border-green-500/40">Chemicals</span>
+                                </div>
+                                <div class="space-y-2 text-[11px]">
+                                    <button class="w-full btn-primary text-[11px]">Unlock Contact (2 Credits)</button>
+                                    <button class="w-full btn-secondary text-[11px]">Share Shipment Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // Nav item finder
+        document.querySelectorAll('.nav-item').forEach((btn, idx) => {
+            const pages = ['dashboard', 'opportunities', 'inventory', 'agents', 'experts'];
+            btn.id = `nav-${pages[idx]}`;
+        });
     </script>
 </body>
 </html>
