@@ -2,6 +2,8 @@
 // HindTrade AI - Supabase Configuration & API Wrapper
 
 // 1. SUPABASE CREDENTIALS
+// Note: Anon key is safe for frontend use. It's public and protected by RLS policies.
+// To change these values, update them here or consider using environment-specific configs.
 const SUPABASE_URL = 'https://fgzlekquexmtnzrhjswd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnemxla3F1ZXhtdG56cmhqc3dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5NDgxNTQsImV4cCI6MjA4MjUyNDE1NH0.hEDqZzidfJJTE5n0KF2Jd1XNMSbDyZcut4MP-PCi1NY';
 
@@ -12,7 +14,8 @@ if (typeof supabase !== 'undefined') {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log("✅ Supabase Client Initialized");
 } else {
-    console.error("❌ Supabase SDK not loaded. Include CDN script in HTML.");
+    console.error("❌ Supabase SDK not loaded. Add this script to your HTML <head>:");
+    console.error('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
 }
 
 // 3. EXPOSE GLOBAL SUPABASE CLIENT
@@ -369,12 +372,19 @@ window.htAPI = {
     // ============ UTILITY METHODS ============
     
     generateInitials(text) {
-        if (!text) return 'HT';
-        const words = text.trim().split(/\s+/);
+        if (!text || text.trim() === '') return 'HT';
+        
+        const cleaned = text.trim();
+        const words = cleaned.split(/\s+/);
+        
         if (words.length === 1) {
-            return words[0].substring(0, 2).toUpperCase();
+            const word = words[0];
+            if (word.length === 0) return 'HT';
+            if (word.length === 1) return word.toUpperCase() + 'T';
+            return word.substring(0, 2).toUpperCase();
         }
-        return words.slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        
+        return (words[0][0] + words[1][0]).toUpperCase();
     }
 };
 

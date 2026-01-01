@@ -171,17 +171,33 @@ RETURNS VARCHAR(2) AS $$
 DECLARE
   words TEXT[];
   initials TEXT := '';
+  cleaned_name TEXT;
 BEGIN
-  IF name IS NULL OR name = '' THEN
+  IF name IS NULL OR trim(name) = '' THEN
     RETURN 'HT';
   END IF;
   
-  words := string_to_array(trim(name), ' ');
+  cleaned_name := trim(name);
+  words := string_to_array(cleaned_name, ' ');
   
+  -- Handle single word
   IF array_length(words, 1) = 1 THEN
+    IF length(words[1]) = 0 THEN
+      RETURN 'HT';
+    ELSIF length(words[1]) = 1 THEN
+      RETURN UPPER(words[1] || 'T');
+    ELSE
+      RETURN UPPER(SUBSTRING(words[1], 1, 2));
+    END IF;
+  END IF;
+  
+  -- Handle multiple words
+  IF length(words[1]) > 0 AND length(words[2]) > 0 THEN
+    RETURN UPPER(SUBSTRING(words[1], 1, 1) || SUBSTRING(words[2], 1, 1));
+  ELSIF length(words[1]) > 1 THEN
     RETURN UPPER(SUBSTRING(words[1], 1, 2));
   ELSE
-    RETURN UPPER(SUBSTRING(words[1], 1, 1) || SUBSTRING(words[2], 1, 1));
+    RETURN 'HT';
   END IF;
 END;
 $$ LANGUAGE plpgsql;
