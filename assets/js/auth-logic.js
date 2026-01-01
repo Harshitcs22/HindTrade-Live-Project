@@ -40,7 +40,7 @@ function selectRole(role) {
     activeBtn.classList.add('border-blue-500', 'bg-blue-500/20', 'text-white');
 }
 
-// 3. Handle SIGN UP
+// 3. Handle SIGN UP (FIXED: Removed duplicate insert)
 async function handleSignup(e) {
     e.preventDefault();
     
@@ -61,45 +61,33 @@ async function handleSignup(e) {
     successMsg.classList.add('hidden');
 
     try {
-        // Step 1: Sign up with Supabase Auth
+        // Step 1: Sign up with Supabase Auth (Trigger will handle profile creation)
         const { data: authData, error: authError } = await window.sb.auth.signUp({
             email,
             password,
             options: {
+                // Hum sara data yahan bhej rahe hain taaki SQL Trigger isey use karle
                 data: {
                     full_name: fullName,
                     company_name: companyName,
-                    phone,
-                    role
+                    phone: phone,
+                    role: role,
+                    city: city,
+                    state: state,
+                    business_category: businessCategory
                 }
             }
         });
 
         if (authError) throw authError;
 
-        // Step 2: Insert into profiles table
-        const { data: profileData, error: profileError } = await window.sb
-            .from('profiles')
-            .insert({
-                id: authData.user.id,
-                email,
-                full_name: fullName,
-                company_name: companyName,
-                phone,
-                role,
-                city,
-                state,
-                business_category: businessCategory,
-                status: 'pending'
-            });
+        // Note: Humne yahan se Manual Insert hata diya hai kyunki Trigger automatic kaam karega.
 
-        if (profileError) throw profileError;
-
-        successMsg.innerText = '✅ Signup successful! Check your email to confirm.';
+        successMsg.innerText = '✅ Signup successful! Redirecting...';
         successMsg.classList.remove('hidden');
         
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'index.html'; // Ya dashboard.html
         }, 2000);
 
     } catch (error) {
@@ -125,7 +113,7 @@ async function handleLogin(e) {
         if (error) throw error;
 
         // Redirect on success
-        window.location.href = 'dashboard.html';
+        window.location.href = 'index.html'; // Ya dashboard.html
 
     } catch (err) {
         errorMsg.innerText = err.message;
