@@ -182,6 +182,46 @@
             color: #9CA3AF;
             margin-bottom: 8px;
         }
+
+        /* Chat Interface Styles */
+        .agent-card {
+            transition: all 0.3s ease;
+        }
+
+        #chat-messages {
+            scroll-behavior: smooth;
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #1A2847;
+            border-radius: 3px;
+        }
+
+        #chat-input {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        #chat-input::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #chat-input::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chat-input::-webkit-scrollbar-thumb {
+            background: #1A2847;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -785,171 +825,231 @@
             </div>`;
         }
 
-        // AGENTS HTML - ENHANCED WITH 3 AGENTS
+        // RELEVANCE AI CONFIGURATION
+        const RELEVANCE_CONFIG = {
+            region: 'd7b62b',
+            projectId: '3fdb8425-c0a5-4909-9513-21d07c9f8f99',
+            logisticsAgentId: 'a3f0bb17-9cbf-4d17-88cc-c1a981deabdd',
+            complianceAgentId: 'a3f0bb17-9cbf-4d17-88cc-c1a981deabdd', // Using same agent for now - update when compliance agent is available
+            authToken: '3fdb8425-c0a5-4909-9513-21d07c9f8f99:sk-MDkyNGE5OTAtOGQ3Ny00OGI4LTk1ZDgtNzE3OWFhMDNiYzkw'
+        };
+
+        // GLOBAL STATE FOR CHAT
+        let currentAgentId = 'logistics';
+        let chatMessages = [];
+        let isLoading = false;
+
+        // AGENTS HTML - CUSTOM CHAT INTERFACE
         function getAgentsHTML() {
             return `
             <div class="space-y-6">
-                <div class="text-center mb-8">
-                    <h3 class="text-2xl font-700 text-white mb-2">⚡ AI Command Center</h3>
-                    <p class="text-gray-400 text-sm">Three autonomous agents for compliance, logistics & documentation</p>
+                <!-- Page Header -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-700 text-white mb-2">AI Agents</h2>
+                        <p class="text-gray-400 text-sm">Intelligent assistants powered by Relevance AI</p>
+                    </div>
                 </div>
 
-                <!-- MAIN AGENTS GRID (3 AGENTS) -->
+                <!-- Agent Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- EKAYAN Agent (HS Code) -->
+                    <div class="glass rounded-xl p-6 border border-ht-border hover:border-ht-accent transition cursor-pointer" onclick="openAgentModal('ekayan', 'HS Code Lookup')">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i class="ri-search-line text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-white font-600 text-lg mb-1">EKAYAN</h3>
+                                <p class="text-xs text-ht-accent font-500 mb-2">The one who is all</p>
+                                <p class="text-sm text-gray-400 mb-3">HS Code classification & tariff lookup</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="flex items-center gap-1 text-xs text-ht-success">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-ht-success animate-pulse"></span>
+                                        Online
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="mt-4 w-full btn-primary text-sm py-2 rounded-lg">
+                            <i class="ri-chat-3-line mr-2"></i>Start Chat
+                        </button>
+                    </div>
+
+                    <!-- EKAYAN Agent (Logistics) -->
+                    <div class="glass rounded-xl p-6 border border-ht-border hover:border-ht-accent transition cursor-pointer" onclick="openAgentModal('ekayan', 'Logistics Support')">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                <i class="ri-ship-2-line text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-white font-600 text-lg mb-1">EKAYAN</h3>
+                                <p class="text-xs text-ht-accent font-500 mb-2">The one who is all</p>
+                                <p class="text-sm text-gray-400 mb-3">Port routing & shipping optimization</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="flex items-center gap-1 text-xs text-ht-success">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-ht-success animate-pulse"></span>
+                                        Online
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="mt-4 w-full btn-primary text-sm py-2 rounded-lg">
+                            <i class="ri-chat-3-line mr-2"></i>Start Chat
+                        </button>
+                    </div>
+
+                    <!-- Export Docs Copilot (Locked) -->
+                    <div class="glass rounded-xl p-6 border border-ht-border opacity-60 cursor-not-allowed">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-gray-500/20 flex items-center justify-center text-gray-500 flex-shrink-0">
+                                <i class="ri-file-text-line text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-gray-400 font-600 text-lg">Export Docs Copilot</h3>
+                                    <i class="ri-lock-fill text-gray-500 text-sm"></i>
+                                </div>
+                                <p class="text-xs text-gray-500 font-500 mb-2">Premium Feature</p>
+                                <p class="text-sm text-gray-500 mb-3">Automated document generation & validation</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-500">
+                                        Coming Soon
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="mt-4 w-full bg-gray-700/30 text-gray-500 text-sm py-2 rounded-lg cursor-not-allowed" disabled>
+                            <i class="ri-lock-fill mr-2"></i>Premium Access
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Usage Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- AGENT 1: HS CODE & COMPLIANCE (PRIMARY) -->
-                    <div onclick="openAgent('legal')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-blue-500/40 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl -z-0"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition">
-                                    <i class="ri-scales-3-line text-xl"></i>
-                                </div>
-                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                    <div class="glass rounded-xl p-6 border border-ht-border">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-ht-accent/20 flex items-center justify-center text-ht-accent">
+                                <i class="ri-question-answer-line text-lg"></i>
                             </div>
-                            <h4 class="text-white font-700 text-lg mb-2">HS Code & Compliance</h4>
-                            <p class="text-sm text-gray-400 mb-4">Export compliance & tariff codes</p>
-                            <div class="space-y-2 mb-4 text-xs text-gray-500">
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Find correct HS code
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Know exact docs per shipment
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-blue-400"></i> Check DGFT & policy notes
-                                </div>
+                            <div>
+                                <p class="text-2xl font-700 text-white">24</p>
+                                <p class="text-xs text-gray-400">Queries This Month</p>
                             </div>
-                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
-                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
-                            </button>
                         </div>
                     </div>
-
-                    <!-- AGENT 2: LOGISTICS & ROUTING + QR -->
-                    <div onclick="openAgent('logistics')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-purple-500/40 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl -z-0"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition">
-                                    <i class="ri-ship-2-line text-xl"></i>
-                                </div>
-                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                    <div class="glass rounded-xl p-6 border border-ht-border">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-ht-success/20 flex items-center justify-center text-ht-success">
+                                <i class="ri-time-line text-lg"></i>
                             </div>
-                            <h4 class="text-white font-700 text-lg mb-2">Logistics & Routing</h4>
-                            <p class="text-sm text-gray-400 mb-4">Port routing, shipping routes & QR labels</p>
-                            <div class="space-y-2 mb-4 text-xs text-gray-500">
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Find optimal port routing
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Compare routes & transit times
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-purple-400"></i> Generate sample labels & QR
-                                </div>
+                            <div>
+                                <p class="text-2xl font-700 text-white">2.3s</p>
+                                <p class="text-xs text-gray-400">Avg Response Time</p>
                             </div>
-                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
-                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
-                            </button>
                         </div>
                     </div>
-
-                    <!-- AGENT 3: EXPORT DOCS COPILOT -->
-                    <div onclick="openAgent('docs')" class="glass glass-hover rounded-xl p-6 cursor-pointer group border border-green-500/40 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full blur-2xl -z-0"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition">
-                                    <i class="ri-file-text-line text-xl"></i>
-                                </div>
-                                <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
+                    <div class="glass rounded-xl p-6 border border-ht-border">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                <i class="ri-robot-2-line text-lg"></i>
                             </div>
-                            <h4 class="text-white font-700 text-lg mb-2">Export Docs Copilot</h4>
-                            <p class="text-sm text-gray-400 mb-4">Auto-fill export documents</p>
-                            <div class="space-y-2 mb-4 text-xs text-gray-500">
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-green-400"></i> Validate shipment details
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-green-400"></i> Auto-fill export documents
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="ri-checkbox-circle-line text-green-400"></i> Download-ready formats (soon)
-                                </div>
+                            <div>
+                                <p class="text-2xl font-700 text-white">100%</p>
+                                <p class="text-xs text-gray-400">Uptime</p>
                             </div>
-                            <button class="btn-primary text-xs w-full group-hover:shadow-lg transition">
-                                <i class="ri-arrow-right-line mr-1"></i> Ask Agent
-                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- QUICK STATS -->
-                <div class="glass rounded-xl p-6 border border-ht-border/50">
-                    <h4 class="text-white font-600 mb-4">📊 Agent Usage This Month</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="flex items-center justify-between p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
-                            <div>
-                                <div class="text-xs text-gray-400 mb-1">HS Code Lookups</div>
-                                <div class="text-lg font-700 text-blue-400">24</div>
+            <!-- Agent Modal -->
+            <div id="agent-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="glass rounded-2xl border border-ht-border w-full max-w-6xl h-[85vh] flex flex-col">
+                    <!-- Modal Header -->
+                    <div class="border-b border-ht-border px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/30 to-blue-500/30 flex items-center justify-center text-purple-400">
+                                <i class="ri-robot-line text-lg"></i>
                             </div>
-                            <i class="ri-scales-3-line text-3xl text-blue-500/40"></i>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-purple-500/5 rounded-lg border border-purple-500/20">
                             <div>
-                                <div class="text-xs text-gray-400 mb-1">Route Queries</div>
-                                <div class="text-lg font-700 text-purple-400">12</div>
+                                <h3 id="modal-agent-name" class="text-white font-600 text-lg">EKAYAN</h3>
+                                <p id="modal-agent-subtitle" class="text-xs text-gray-400">The one who is all</p>
                             </div>
-                            <i class="ri-ship-2-line text-3xl text-purple-500/40"></i>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-green-500/5 rounded-lg border border-green-500/20">
-                            <div>
-                                <div class="text-xs text-gray-400 mb-1">Docs Generated</div>
-                                <div class="text-lg font-700 text-green-400">8</div>
-                            </div>
-                            <i class="ri-file-text-line text-3xl text-green-500/40"></i>
-                        </div>
+                        <button onclick="closeAgentModal()" class="text-gray-400 hover:text-white transition">
+                            <i class="ri-close-line text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Modal Body - iframe -->
+                    <div class="flex-1 overflow-hidden">
+                        <iframe 
+                            id="agent-iframe" 
+                            src="" 
+                            class="w-full h-full border-0"
+                            allow="microphone; camera"
+                        ></iframe>
                     </div>
                 </div>
             </div>`;
         }
 
-        function openAgent(type) {
-            let url, title, description;
+        // OPEN AGENT MODAL
+        function openAgentModal(agentType, subtitle) {
+            const modal = document.getElementById('agent-modal');
+            const iframe = document.getElementById('agent-iframe');
+            const modalName = document.getElementById('modal-agent-name');
+            const modalSubtitle = document.getElementById('modal-agent-subtitle');
             
-            if (type === 'legal') {
-                url = "https://app.relevanceai.com/agents/d7b62b/18dd64bb-7e6f-4d82-913c-42ffa5f552c1/1733a3cb-bd12-45c6-9cbc-71e1286652fe/embed-chat?hide_tool_steps=true&bubble_style=agent&primary_color=%23000000&input_placeholder_text=Ask+about+HS+codes+or+export+docs...";
-                title = "HS Code & Compliance Agent";
-                description = "Get product HS codes, tariff rates, export documentation & DGFT policy requirements";
-            } else if (type === 'logistics') {
-                url = "https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat?bubble_style=agent&primary_color=%23685FFF&input_placeholder_text=Ask+about+port+routing+or+shipping...";
-                title = "Logistics & Routing Agent";
-                description = "Find optimal port routing, compare shipping routes, generate sample QR codes for shipments";
-            } else if (type === 'docs') {
-                url = "https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat?bubble_style=agent&primary_color=%2310B981&input_placeholder_text=Validate+and+generate+export+documents...";
-                title = "Export Docs Copilot";
-                description = "Validate shipment details, auto-fill Proforma Invoice, Commercial Invoice & Packing List";
-            }
+            // Set agent details
+            modalName.textContent = 'EKAYAN';
+            modalSubtitle.textContent = subtitle || 'The one who is all';
             
-            document.getElementById('page-title').innerText = title;
-            document.getElementById('content-area').innerHTML = `
-                <div class="flex flex-col h-full space-y-4 animate-fade-in">
-                    <div class="flex items-center justify-between">
-                        <button onclick="navigate('agents')" class="flex items-center gap-2 text-sm text-gray-400 hover:text-ht-accent transition">
-                            <i class="ri-arrow-left-line"></i> Back to Agents
-                        </button>
-                        <div class="flex items-center gap-2 text-xs">
-                            <span class="w-2 h-2 rounded-full bg-ht-success animate-pulse"></span>
-                            <span class="text-ht-success">Agent Active</span>
-                        </div>
-                    </div>
-                    <div class="glass rounded-xl p-4 border border-ht-border">
-                        <p class="text-sm text-gray-300">${description}</p>
-                    </div>
-                    <div class="flex-1 rounded-xl overflow-hidden border border-ht-border bg-white">
-                        <iframe src="${url}" class="agent-frame" frameborder="0" allow="microphone"></iframe>
-                    </div>
-                </div>`;
+            // Set iframe URL (same URL for all EKAYAN instances)
+            const iframeUrl = 'https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/embed-chat';
+            iframe.src = iframeUrl;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        // CLOSE AGENT MODAL
+        function closeAgentModal() {
+            const modal = document.getElementById('agent-modal');
+            const iframe = document.getElementById('agent-iframe');
+            
+            // Hide modal
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            // Clear iframe
+            iframe.src = '';
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+
+        // SETUP AGENT CHAT - Initialize (now just a placeholder)
+        function setupAgentChat() {
+            // No longer needed with iframe implementation
+            console.log('Agent iframe interface ready');
+        }
+
+        // UTILITY FUNCTIONS (kept for compatibility)
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatMessage(text) {
+            // Convert line breaks to <br>
+            return escapeHtml(text).replace(/\n/g, '<br>');
         }
 
         // NAVIGATION
@@ -978,6 +1078,7 @@
                     case 'agents': 
                         pageTitle.innerText = "AI Agents";
                         contentArea.innerHTML = getAgentsHTML();
+                        setupAgentChat();
                         break;
                     case 'experts': 
                         pageTitle.innerText = "Experts Network";
