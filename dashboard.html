@@ -1204,8 +1204,9 @@
                 } else if (typeof data === 'string') {
                     agentReply = data;
                 } else {
-                    // If none of the above, try JSON stringify as last resort
-                    agentReply = JSON.stringify(data);
+                    // Log unexpected response structure for debugging
+                    console.warn('Unexpected response structure:', data);
+                    agentReply = 'I received your message but the response format was unexpected. Please try again.';
                 }
 
                 // Add agent's reply to chat
