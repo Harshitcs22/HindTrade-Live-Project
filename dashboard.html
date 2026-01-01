@@ -1149,7 +1149,7 @@
                     : RELEVANCE_CONFIG.complianceAgentId;
 
                 // Generic trigger endpoint (safest - doesn't require agent ID in path)
-                const apiUrl = "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger";
+                const apiUrl = `https://api-${RELEVANCE_CONFIG.region}.stack.tryrelevance.com/latest/agents/trigger`;
 
                 // Debug logging - verify URL and config values
                 console.log('🔍 Debug Info:');
@@ -1201,10 +1201,11 @@
                     agentReply = data.answer;
                 } else if (data.message) {
                     agentReply = data.message;
-                } else if (data.output && typeof data.output === 'string') {
-                    agentReply = data.output;
                 } else if (typeof data === 'string') {
                     agentReply = data;
+                } else {
+                    // If none of the above, try JSON stringify as last resort
+                    agentReply = JSON.stringify(data);
                 }
 
                 // Add agent's reply to chat
