@@ -3,364 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - HindTrade AI</title>
-    <meta name="description" content="HindTrade AI - Agent-Led Trade Network">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/supabase-config.js"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
-                }
+    <title>EKAYAN - The Global Trade OS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Landing Page Styles */
+        #landing-page {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-    </script>
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: linear-gradient(135deg, #050810 0%, #0F1428 50%, #050810 100%);
-            color: #E5E7EB;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
+
+        .hero-heading {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 8px;
         }
-        
-        .glass-card {
-            background: rgba(15, 20, 40, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 217, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+        .tagline {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 2px;
         }
-        
-        .glass-card:hover {
-            border-color: rgba(0, 217, 255, 0.3);
+
+        .description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%);
-            color: #0A0E27;
-            font-weight: 600;
+
+        .get-started-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 217, 255, 0.4);
+
+        .get-started-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #f8f9fa;
         }
-        
-        .input-field {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+
+        /* Login Section Styles */
+        #login-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-container h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: #666;
             transition: all 0.3s ease;
+            position: relative;
         }
-        
-        .input-field:focus {
+
+        .tab.active {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
             outline: none;
-            border-color: #00D9FF;
-            background: rgba(0, 217, 255, 0.05);
-            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+            border-color: #667eea;
         }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #00D9FF 0%, #FFB800 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
-        
-        .tab-active {
-            color: #00D9FF;
-            border-bottom: 2px solid #00D9FF;
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #FCA5A5;
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.95rem;
         }
-        
-        .success-message {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #6EE7B7;
+
+        .back-btn:hover {
+            text-decoration: underline;
         }
-        
-        .loading {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
+
+        @media (max-width: 768px) {
+            .hero-heading {
+                font-size: 3rem;
+                letter-spacing: 4px;
+            }
+
+            .tagline {
+                font-size: 1.5rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            #login-section {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-    
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+<body>
+    <!-- Landing Page Section -->
+    <div id="landing-page">
+        <h1 class="hero-heading">EKAYAN</h1>
+        <p class="tagline">The Global Trade OS</p>
+        <p class="description">
+            Welcome to HindTrade AI - Your intelligent companion for global trade operations. 
+            Streamline your international business with cutting-edge AI technology, 
+            real-time market insights, and seamless trade management. 
+            Experience the future of global commerce today.
+        </p>
+        <button class="get-started-btn" onclick="showLoginSection()">Get Started</button>
     </div>
 
-    <div class="glass-card rounded-2xl p-8 w-full max-w-md relative z-10">
-        <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg">
-                H
+    <!-- Login/Signup Section (Hidden by default) -->
+    <div id="login-section" class="hidden">
+        <div class="form-container">
+            <h2>Welcome to EKAYAN</h2>
+            
+            <div class="tab-container">
+                <button class="tab active" onclick="showLogin()">Login</button>
+                <button class="tab" onclick="showSignup()">Sign Up</button>
             </div>
-            <h1 class="text-3xl font-bold gradient-text mb-2">HindTrade AI</h1>
-            <p class="text-gray-400 text-sm">Global Trade Operating System</p>
-        </div>
 
-        <div class="flex border-b border-gray-700 mb-6">
-            <button onclick="switchTab('login')" id="tab-login" class="tab-active flex-1 pb-3 text-sm font-semibold transition-colors">
-                Login
-            </button>
-            <button onclick="switchTab('signup')" id="tab-signup" class="flex-1 pb-3 text-sm font-semibold text-gray-400 hover:text-gray-300 transition-colors">
-                Sign Up
-            </button>
-        </div>
+            <!-- Login Form -->
+            <div id="login-form" class="form-content active">
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Login</button>
+                </form>
+            </div>
 
-        <div id="message-container" class="mb-4"></div>
+            <!-- Signup Form -->
+            <div id="signup-form" class="form-content">
+                <form onsubmit="handleSignup(event)">
+                    <div class="input-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign Up</button>
+                </form>
+            </div>
 
-        <form id="login-form" class="space-y-4">
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Email</label>
-                <input type="email" id="login-email" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="your@email.com" required>
-            </div>
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Password</label>
-                <input type="password" id="login-password" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="••••••••" required>
-            </div>
-            
-            <div class="flex items-center justify-between text-xs">
-                <label class="flex items-center text-gray-400">
-                    <input type="checkbox" class="mr-2 rounded">
-                    Remember me
-                </label>
-                <button type="button" onclick="handleForgotPassword()" class="text-blue-400 hover:text-blue-300">
-                    Forgot password?
-                </button>
-            </div>
-            
-            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold flex items-center justify-center">
-                <span id="login-btn-text">Login to Dashboard</span>
-                <i id="login-spinner" class="ri-loader-4-line spinner ml-2 hidden"></i>
-            </button>
-        </form>
-
-        <form id="signup-form" class="space-y-4 hidden">
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Full Name</label>
-                <input type="text" id="signup-fullname" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="John Doe" required>
-            </div>
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Company Name</label>
-                <input type="text" id="signup-company" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="Acme Exports Ltd" required>
-            </div>
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Location</label>
-                <input type="text" id="signup-location" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="Mumbai, India" required>
-            </div>
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Email</label>
-                <input type="email" id="signup-email" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="your@email.com" required>
-            </div>
-            
-            <div>
-                <label class="block text-gray-400 text-xs font-semibold uppercase tracking-wide mb-2">Password</label>
-                <input type="password" id="signup-password" class="input-field w-full px-4 py-3 rounded-lg text-sm" placeholder="••••••••" required minlength="6">
-            </div>
-            
-            <div class="text-xs text-gray-400">
-                <label class="flex items-start">
-                    <input type="checkbox" class="mr-2 mt-0.5" required>
-                    <span>I agree to the <a href="#" class="text-blue-400 hover:text-blue-300">Terms of Service</a> and <a href="#" class="text-blue-400 hover:text-blue-300">Privacy Policy</a></span>
-                </label>
-            </div>
-            
-            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold flex items-center justify-center">
-                <span id="signup-btn-text">Create Account</span>
-                <i id="signup-spinner" class="ri-loader-4-line spinner ml-2 hidden"></i>
-            </button>
-        </form>
-
-        <div class="mt-6 text-center">
-            <a href="landing.html" class="text-xs text-gray-400 hover:text-gray-300 transition-colors">
-                <i class="ri-arrow-left-line mr-1"></i>Back to Home
-            </a>
+            <a class="back-btn" onclick="showLandingPage()">← Back to Home</a>
         </div>
     </div>
 
     <script>
-        // Check if user is already logged in
-        async function checkSession() {
-            const session = await htAPI.getCurrentSession();
-            if (session) {
-                console.log('✅ User already logged in, redirecting to dashboard');
-                window.location.href = 'dashboard.html';
-            }
-        }
-        
-        checkSession();
-
-        // Tab Switching
-        function switchTab(tab) {
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const loginTab = document.getElementById('tab-login');
-            const signupTab = document.getElementById('tab-signup');
-            
-            clearMessages();
-            
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
-                loginTab.classList.add('tab-active');
-                signupTab.classList.remove('tab-active');
-                signupTab.classList.add('text-gray-400');
-            } else {
-                loginForm.classList.add('hidden');
-                signupForm.classList.remove('hidden');
-                signupTab.classList.add('tab-active');
-                loginTab.classList.remove('tab-active');
-                loginTab.classList.add('text-gray-400');
-            }
+        // Toggle between landing page and login section
+        function showLoginSection() {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
         }
 
-        // Message Functions
-        function showMessage(message, type = 'error') {
-            const container = document.getElementById('message-container');
-            const className = type === 'error' ? 'error-message' : 'success-message';
-            const icon = type === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line';
-            
-            container.innerHTML = `
-                <div class="${className} px-4 py-3 rounded-lg text-sm flex items-start">
-                    <i class="${icon} mr-2 text-lg flex-shrink-0"></i>
-                    <span>${message}</span>
-                </div>
-            `;
+        function showLandingPage() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('landing-page').classList.remove('hidden');
         }
 
-        function clearMessages() {
-            document.getElementById('message-container').innerHTML = '';
+        // Toggle between login and signup forms
+        function showLogin() {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('login-form').classList.add('active');
+            document.getElementById('signup-form').classList.remove('active');
         }
 
-        // Login Handler
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
+        function showSignup() {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('signup-form').classList.add('active');
+            document.getElementById('login-form').classList.remove('active');
+        }
+
+        // Form handlers
+        function handleLogin(event) {
+            event.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const btnText = document.getElementById('login-btn-text');
-            const spinner = document.getElementById('login-spinner');
-            const form = document.getElementById('login-form');
             
-            clearMessages();
-            form.classList.add('loading');
-            btnText.textContent = 'Logging in...';
-            spinner.classList.remove('hidden');
-            
-            try {
-                const result = await htAPI.signIn(email, password);
-                
-                if (result.success) {
-                    showMessage('Login successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
-                } else {
-                    throw new Error(result.error || 'Login failed');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage(error.message || 'Login failed. Please check your credentials.', 'error');
-                form.classList.remove('loading');
-                btnText.textContent = 'Login to Dashboard';
-                spinner.classList.add('hidden');
-            }
-        });
+            // Add your login logic here
+            console.log('Login attempt:', { email, password });
+            alert('Login functionality to be implemented');
+        }
 
-        // Sign Up Handler
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const fullName = document.getElementById('signup-fullname').value;
-            const companyName = document.getElementById('signup-company').value;
-            const location = document.getElementById('signup-location').value;
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
-            const btnText = document.getElementById('signup-btn-text');
-            const spinner = document.getElementById('signup-spinner');
-            const form = document.getElementById('signup-form');
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
             
-            clearMessages();
-            form.classList.add('loading');
-            btnText.textContent = 'Creating account...';
-            spinner.classList.remove('hidden');
-            
-            try {
-                const result = await htAPI.signUp(email, password, {
-                    full_name: fullName,
-                    company_name: companyName,
-                    location: location
-                });
-                
-                if (result.success) {
-                    showMessage('Account created successfully! Redirecting to dashboard...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 2000);
-                } else {
-                    throw new Error(result.error || 'Sign up failed');
-                }
-            } catch (error) {
-                console.error('Sign up error:', error);
-                showMessage(error.message || 'Sign up failed. Please try again.', 'error');
-                form.classList.remove('loading');
-                btnText.textContent = 'Create Account';
-                spinner.classList.add('hidden');
-            }
-        });
-
-        // Forgot Password Handler
-        async function handleForgotPassword() {
-            const email = prompt('Enter your email address to reset password:');
-            
-            if (!email) return;
-            
-            if (!email.includes('@')) {
-                alert('Please enter a valid email address');
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
                 return;
             }
             
-            try {
-                const result = await htAPI.resetPassword(email);
-                
-                if (result.success) {
-                    showMessage('Password reset email sent! Check your inbox.', 'success');
-                } else {
-                    throw new Error(result.error || 'Failed to send reset email');
-                }
-            } catch (error) {
-                console.error('Password reset error:', error);
-                showMessage(error.message || 'Failed to send reset email', 'error');
-            }
+            // Add your signup logic here
+            console.log('Signup attempt:', { name, email, password });
+            alert('Signup functionality to be implemented');
         }
     </script>
 </body>
