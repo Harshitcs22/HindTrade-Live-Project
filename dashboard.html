@@ -1148,16 +1148,19 @@
                     ? RELEVANCE_CONFIG.logisticsAgentId 
                     : RELEVANCE_CONFIG.complianceAgentId;
 
-                // Correct API URL - full studio path with agent ID
-                const apiUrl = `https://api-${RELEVANCE_CONFIG.region}.stack.tryrelevance.com/latest/studios/${RELEVANCE_CONFIG.projectId}/agents/${agentId}/trigger`;
+                // Generic trigger endpoint (safest - doesn't require agent ID in path)
+                const apiUrl = "https://api-d7b62b.stack.tryrelevance.com/latest/agents/trigger";
 
                 // Debug logging - verify URL and config values
                 console.log('🔍 Debug Info:');
-                console.log('Region:', RELEVANCE_CONFIG.region);
-                console.log('Project ID:', RELEVANCE_CONFIG.projectId);
                 console.log('Agent ID:', agentId);
-                console.log('Constructed URL:', apiUrl);
-                console.log('Request Body:', JSON.stringify({ message: userMessage, agent_id: agentId }));
+                console.log('Studio ID:', RELEVANCE_CONFIG.projectId);
+                console.log('API URL:', apiUrl);
+                console.log('Request Body:', JSON.stringify({ 
+                    message: userMessage, 
+                    agent_id: agentId,
+                    studio_id: RELEVANCE_CONFIG.projectId 
+                }));
 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -1167,35 +1170,33 @@
                     },
                     body: JSON.stringify({
                         message: userMessage,
-                        agent_id: agentId
+                        agent_id: agentId,
+                        studio_id: RELEVANCE_CONFIG.projectId
                     })
                 });
 
                 removeTypingIndicator();
 
                 if (!response.ok) {
-                    // Enhanced error logging for 404 responses
-                    if (response.status === 404) {
-                        const errorText = await response.text();
-                        console.error('❌ 404 Error Details:');
-                        console.error('Status:', response.status);
-                        console.error('Status Text:', response.statusText);
-                        console.error('Response Body:', errorText);
-                        console.error('URL that failed:', apiUrl);
-                        throw new Error(`API Error: 404 Not Found - ${errorText}`);
-                    }
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    const errorText = await response.text();
+                    console.error('❌ API Error Details:');
+                    console.error('Status:', response.status);
+                    console.error('Status Text:', response.statusText);
+                    console.error('Response Body:', errorText);
+                    console.error('URL that failed:', apiUrl);
+                    throw new Error(`Server Error: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.log('Relevance AI Response:', data);
+                console.log('✅ Relevance AI Response:', data);
 
-                // Extract the agent's reply from the response
+                // Try to grab the text response safely (handle various response structures)
                 let agentReply = 'Sorry, I could not process your request at this time.';
                 
-                // Try different possible response structures
                 if (data.output && data.output.answer) {
                     agentReply = data.output.answer;
+                } else if (data.output && typeof data.output === 'string') {
+                    agentReply = data.output;
                 } else if (data.answer) {
                     agentReply = data.answer;
                 } else if (data.message) {
