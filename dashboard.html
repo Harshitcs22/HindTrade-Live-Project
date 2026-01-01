@@ -1090,10 +1090,11 @@
                     </div>
                 `;
             } else {
-                const agentColor = currentAgentId === 'logistics' ? 'purple' : 'blue';
+                // Use conditional classes based on agent type
+                const iconBgClass = currentAgentId === 'logistics' ? 'bg-purple-500/30 text-purple-400' : 'bg-blue-500/30 text-blue-400';
                 messageDiv.className = 'flex gap-3 items-start';
                 messageDiv.innerHTML = `
-                    <div class="w-8 h-8 rounded-lg bg-${agentColor}-500/30 flex items-center justify-center text-${agentColor}-400 flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg ${iconBgClass} flex items-center justify-center flex-shrink-0">
                         <i class="ri-robot-line text-sm"></i>
                     </div>
                     <div class="glass rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%] border border-ht-border">
@@ -1111,12 +1112,12 @@
             const messagesContainer = document.getElementById('chat-messages');
             if (!messagesContainer) return;
             
-            const agentColor = currentAgentId === 'logistics' ? 'purple' : 'blue';
+            const iconBgClass = currentAgentId === 'logistics' ? 'bg-purple-500/30 text-purple-400' : 'bg-blue-500/30 text-blue-400';
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing-indicator';
             typingDiv.className = 'flex gap-3 items-start';
             typingDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-lg bg-${agentColor}-500/30 flex items-center justify-center text-${agentColor}-400 flex-shrink-0">
+                <div class="w-8 h-8 rounded-lg ${iconBgClass} flex items-center justify-center flex-shrink-0">
                     <i class="ri-robot-line text-sm"></i>
                 </div>
                 <div class="glass rounded-2xl rounded-tl-sm px-4 py-3 border border-ht-border">
