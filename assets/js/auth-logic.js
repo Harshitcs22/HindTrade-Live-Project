@@ -53,6 +53,8 @@ async function handleSignup(e) {
     const city = document.getElementById('city').value;
     const state = document.getElementById('state').value;
     const businessCategory = document.getElementById('businessCategory').value;
+    const gstNumber = document.getElementById('gstNumber')?.value || '';
+    const iecNumber = document.getElementById('iecNumber')?.value || '';
 
     const errorMsg = document.getElementById('error-msg');
     const successMsg = document.getElementById('success-msg');
@@ -87,6 +89,8 @@ async function handleSignup(e) {
                 city: city,
                 state: state,
                 business_category: businessCategory,
+                gst_number: gstNumber,
+                iec_number: iecNumber,
                 role: role,
                 status: 'active',
                 trust_score: 0,
