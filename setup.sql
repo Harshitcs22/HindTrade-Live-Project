@@ -22,8 +22,8 @@ ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
 -- 2. CREATE INDEXES FOR BETTER PERFORMANCE
 -- ============================================
 
--- Index on user_id for faster profile lookups
-CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
+-- Index on id for faster profile lookups
+CREATE INDEX IF NOT EXISTS idx_user_profiles_id ON user_profiles(id);
 
 -- Index on email for faster email lookups
 CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);
@@ -54,12 +54,17 @@ ALTER TABLE experts ENABLE ROW LEVEL SECURITY;
 -- Policy: Users can read their own profile
 CREATE POLICY IF NOT EXISTS "Users can read own profile" 
 ON user_profiles FOR SELECT 
-USING (auth.uid() = user_id);
+USING (auth.uid() = id);
+
+-- Policy: Users can insert their own profile
+CREATE POLICY IF NOT EXISTS "Users can insert own profile" 
+ON user_profiles FOR INSERT 
+WITH CHECK (auth.uid() = id);
 
 -- Policy: Users can update their own profile
 CREATE POLICY IF NOT EXISTS "Users can update own profile" 
 ON user_profiles FOR UPDATE 
-USING (auth.uid() = user_id);
+USING (auth.uid() = id);
 
 -- Policy: Authenticated users can read all opportunities
 CREATE POLICY IF NOT EXISTS "Authenticated users can read opportunities" 
@@ -103,15 +108,16 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.user_profiles (
-    user_id,
+    id,
     email,
     full_name,
     company_name,
-    location,
     city,
     state,
     phone,
     business_category,
+    gst_number,
+    iec_number,
     role,
     initials,
     credits,
@@ -125,15 +131,16 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
     COALESCE(NEW.raw_user_meta_data->>'company_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'location', ''),
     COALESCE(NEW.raw_user_meta_data->>'city', ''),
     COALESCE(NEW.raw_user_meta_data->>'state', ''),
     COALESCE(NEW.raw_user_meta_data->>'phone', ''),
     COALESCE(NEW.raw_user_meta_data->>'business_category', 'other'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'trader'),
+    COALESCE(NEW.raw_user_meta_data->>'gst_number', ''),
+    COALESCE(NEW.raw_user_meta_data->>'iec_number', ''),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'exporter'),
     SUBSTRING(COALESCE(NEW.raw_user_meta_data->>'full_name', 'HT'), 1, 2),
     100,
-    50,
+    0,
     'active',
     NOW(),
     NOW()
