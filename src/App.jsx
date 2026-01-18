@@ -5,6 +5,8 @@ import Index from './pages/Index'
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
+import CADashboard from './pages/CADashboard'
+import TradeCard from './pages/TradeCard'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -27,8 +29,11 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#0b1220_0%,_#020617_40%,_#000000_100%)] flex items-center justify-center">
-        <div className="text-ht-accent text-xl">Loading...</div>
+      <div className="min-h-screen bg-[#0a0f1a] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+          <p className="text-slate-400 text-sm">Loading...</p>
+        </div>
       </div>
     )
   }
@@ -39,8 +44,13 @@ function App() {
       <Route path="/landing" element={<Landing />} />
       <Route path="/auth" element={session ? <Navigate to="/dashboard" replace /> : <Auth />} />
       <Route path="/dashboard" element={session ? <Dashboard session={session} /> : <Navigate to="/" replace />} />
+      <Route path="/admin" element={session ? <CADashboard session={session} /> : <Navigate to="/auth" replace />} />
+      <Route path="/ca" element={session ? <CADashboard session={session} /> : <Navigate to="/auth" replace />} />
+      <Route path="/trade-card/:id" element={<TradeCard />} />
     </Routes>
   )
 }
 
 export default App
+
+

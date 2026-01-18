@@ -1,28 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { supabase } from '../config/supabase'
 
 function Index({ session }) {
     const [nexusModalOpen, setNexusModalOpen] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
-        // Redirect logged-in users to dashboard
         if (session) {
             navigate('/dashboard')
         }
     }, [session, navigate])
 
-    // Smooth scroll handler
-    const handleSmoothScroll = (e, targetId) => {
-        e.preventDefault()
-        const target = document.querySelector(targetId)
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth' })
-        }
-    }
-
-    // Nexus Chat handlers
     const openNexusChat = () => {
         setNexusModalOpen(true)
         document.body.style.overflow = 'hidden'
@@ -33,466 +21,485 @@ function Index({ session }) {
         document.body.style.overflow = 'auto'
     }
 
-    // Handle escape key
-    useEffect(() => {
-        const handleEscape = (e) => {
-            if (e.key === 'Escape') {
-                closeNexusChat()
-            }
-        }
-        document.addEventListener('keydown', handleEscape)
-        return () => document.removeEventListener('keydown', handleEscape)
-    }, [])
-
-    // Button click handlers
-    const handleButtonClick = (text) => {
-        if (text.includes('Hire This CA')) {
-            alert('CA Marketplace: Coming to your dashboard\nYou can directly message CAs, see rates, hire immediately.')
-        } else if (text.includes('CHA Leads')) {
-            alert('CHA Network: Direct access to verified CHAs by port\nNhava Sheva • Mumbai • JNPT • Kandla • Cochin')
-        } else if (text.includes('Start Free')) {
-            alert('Free tier activated!\n✓ Profile created\n✓ 3 Nexus queries/month\n✓ Mentor access\n\nUpgrade to Pro for Trade Card & CA marketplace')
-        } else if (text.includes('Schedule Call')) {
-            alert('Enterprise support:\nSchedule a call with our team\nWhite-label API • Personal CA • 24/7 support\nContact: enterprise@hindtradeai.io')
-        }
-    }
-
-    const handleViewProfile = (text) => {
-        if (text.includes('View Full Profile')) {
-            alert('📊 Profile Details:\n\nHimrock Exports\nLudhiana, Punjab\nTrade Score: 98/100\nShipments: 47\nReputation: Excellent\n\nBuyers can view:\n✓ Trust score\n✓ Shipment history\n✓ CA verification\n✓ Net worth\n✓ Payment record')
-        } else if (text.includes('Hire This CA')) {
-            alert('💼 CA Ramesh Gupta\n\nSpecialization: Export Financing\nRating: 4.9/5\nVerified: 230+ exports\nSuccess Rate: 95%\n\nServices:\n✓ Document signing (UDIN)\n✓ Financing coordination\n✓ Compliance\n✓ Direct rate: ₹500-1000/doc')
-        } else if (text.includes('Get CHA Leads')) {
-            alert('🛂 Express Customs Solutions\n\nPort: Nhava Sheva (Primary)\nRating: 4.8/5\nClearances: 1,200+\nAvg Time: 2 hours\n\nServices:\n✓ Customs clearance\n✓ Documentation\n✓ Port coordination\n✓ Duty optimization')
-        }
+    const scrollToSection = (id) => {
+        const el = document.getElementById(id)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
     }
 
     return (
-        <>
-            {/* Nexus Modal */}
-            <div
-                className={`nexus-modal ${nexusModalOpen ? 'active' : ''}`}
-                onClick={(e) => e.target === e.currentTarget && closeNexusChat()}
-            >
-                <div className="nexus-modal-content">
-                    <div className="nexus-close" onClick={closeNexusChat}>×</div>
-                    <iframe
-                        className="nexus-iframe"
-                        src="https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/share?hide_tool_steps=false&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%23685FFF&bubble_icon=pd%2Fchat&input_placeholder_text=Type+your+message...&hide_logo=false&hide_description=false"
-                        allow="microphone"
-                    ></iframe>
-                </div>
+        <div className="min-h-screen bg-black text-slate-300 font-sans selection:bg-blue-600/30 overflow-x-hidden">
+
+            {/* AMBIENT LIGHTING (Deep Royal Blue) */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[1000px] h-[700px] bg-blue-900/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-0 left-0 w-[800px] h-[600px] bg-indigo-900/5 rounded-full blur-[150px]"></div>
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04] mix-blend-overlay"></div>
             </div>
 
-            {/* Header */}
-            <header>
-                <div className="header-content">
-                    <div className="logo">🌐 HindTradeAI</div>
-                    <nav>
-                        <a href="#agents" onClick={(e) => handleSmoothScroll(e, '#agents')}>Agents</a>
-                        <a href="#demo" onClick={(e) => handleSmoothScroll(e, '#demo')}>Features</a>
-                        <a href="#pricing" onClick={(e) => handleSmoothScroll(e, '#pricing')}>Pricing</a>
-                        <Link to="/auth" className="nav-btn">Register Now</Link>
-                    </nav>
+            {/* Nexus Chat Modal */}
+            {nexusModalOpen && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4" onClick={(e) => e.target === e.currentTarget && closeNexusChat()}>
+                    <div className="w-full max-w-4xl h-[80vh] bg-[#050505] border border-blue-900/30 rounded-sm overflow-hidden relative shadow-2xl ring-1 ring-blue-500/10">
+                        <button
+                            onClick={closeNexusChat}
+                            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-black border border-blue-900/50 text-blue-500 hover:text-white transition z-10"
+                        >
+                            ×
+                        </button>
+                        <iframe
+                            className="w-full h-full border-0 bg-[#050505]"
+                            src="https://app.relevanceai.com/agents/d7b62b/3fdb8425-c0a5-4909-9513-21d07c9f8f99/a3f0bb17-9cbf-4d17-88cc-c1a981deabdd/share?hide_tool_steps=false&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%232563EB&bubble_icon=pd%2Fchat&input_placeholder_text=Ask+Trade+AI...&hide_logo=false&hide_description=false"
+                            allow="microphone"
+                        ></iframe>
+                    </div>
                 </div>
-            </header>
+            )}
 
-            {/* Hero Section */}
-            <section className="hero">
-                <h1>The <span className="gradient-text">Agent-Led Trade Network</span></h1>
-                <h1>Code is Law. Trust is Currency.</h1>
-                <p>7 AI Agents automate your entire export journey. From CA verification to global buyer discovery—everything verified, nothing manual. Your Trade Card with QR backed by CA audits. <span style={{ color: '#22c55e', fontWeight: 700 }}>🟢 Ekayan is LIVE</span></p>
-                <div className="hero-buttons">
-                    <button className="btn-primary" onClick={openNexusChat}>🤖 Chat with Nexus Agent Now</button>
-                    <button className="btn-secondary" onClick={() => alert('Demo video: https://hindtradeai.vercel.app/demo')} style={{ background: 'rgba(56, 189, 248, 0.1)' }}>📺 Watch Demo</button>
-                </div>
-            </section>
+            {/* NAVBAR - Floating Glass */}
+            <nav className="sticky top-4 z-50 px-4">
+                <div className="max-w-7xl mx-auto h-20 flex items-center justify-between bg-black/70 backdrop-blur-xl border border-white/5 rounded-2xl px-6 shadow-2xl">
+                    <div className="flex items-center gap-4">
+                        <div className="w-9 h-9 bg-gradient-to-b from-blue-600 to-indigo-800 rounded-lg flex items-center justify-center text-white font-serif font-bold text-lg shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                            H
+                        </div>
+                        <span className="text-lg tracking-[0.2em] font-light text-white uppercase">HindTrade</span>
+                    </div>
 
-            {/* Stats */}
-            <section className="stats">
-                <div className="stat-card">
-                    <div className="stat-number">5M+</div>
-                    <div className="stat-label">Indian SMEs (TAM)</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-number">$430B</div>
-                    <div className="stat-label">Annual Export Value</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-number">40%</div>
-                    <div className="stat-label">Profit Lost to Delays</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-number">60sec</div>
-                    <div className="stat-label">Avg Agent Response</div>
-                </div>
-            </section>
+                    <div className="hidden md:flex items-center gap-8">
+                        {['Mission', 'Infrastructure', 'Blueprint', 'Membership'].map((item) => (
+                            <button
+                                key={item}
+                                onClick={() => scrollToSection(item.toLowerCase())}
+                                className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-[0.2em] transition"
+                            >
+                                {item}
+                            </button>
+                        ))}
+                    </div>
 
-            {/* Problems Section */}
-            <section className="section" id="about">
-                <h2 className="section-title">The <span className="gradient-text">7 Problems We Solve</span></h2>
-                <div className="cards-grid">
-                    <div className="card">
-                        <div className="card-icon">⚖️</div>
-                        <h3>Legal Fear</h3>
-                        <p>HS codes, sanctions, DGFT policy. One wrong move = lost shipment. CAs charge ₹2L/year for manual advice.</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">👻</div>
-                        <h3>Buyer Blindness</h3>
-                        <p>500M importers globally. No database. No lead system. Cold calls fail. How do buyers even find you?</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">🚢</div>
-                        <h3>Shipping Chaos</h3>
-                        <p>Port delays. Hidden demurrage charges. No real-time tracking. Each shipment feels like a gamble.</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">📝</div>
-                        <h3>Document Prison</h3>
-                        <p>Invoices. BoL. Certificates. GST returns. Each needs CA signatures. Weeks of delays, ₹500/doc fee.</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">🔐</div>
-                        <h3>Zero Trust Network</h3>
-                        <p>No verification system. Scams happen daily. Buyers wonder: "Are these people real?" Banks won't finance.</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">💸</div>
-                        <h3>Hidden Tax Drain</h3>
-                        <p>CA: ₹2L/year. Certs: ₹5L. Freight: 10%. Only ₹500Cr+ companies afford global trade profitably.</p>
-                    </div>
-                    <div className="card">
-                        <div className="card-icon">👨‍💼</div>
-                        <h3>CA Shortage Crisis</h3>
-                        <p>Finding trusted CAs for financing, verification, compliance is impossible. No CA marketplace. Payment delays.</p>
+                    <div className="flex items-center gap-4">
+                        <Link to="/auth" className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-[0.2em] transition">Login</Link>
+                        <Link to="/auth" className="px-6 py-2.5 bg-white text-black text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-blue-50 transition rounded-lg">
+                            Get Access
+                        </Link>
                     </div>
                 </div>
-            </section>
+            </nav>
 
-            {/* Agents Section */}
-            <section className="section agents-section" id="agents">
-                <h2 className="section-title">Your <span className="gradient-text">AI Workforce</span></h2>
-                <p style={{ textAlign: 'center', color: '#9ca3af', marginBottom: '50px', fontSize: '16px' }}>24/7 operation. Zero errors. Costs ₹5K/month vs ₹50L/year in human overhead. Every document needs CA signature—we handle coordination. Plus: Access our curated CA marketplace, Custom House Agent network + hire personal CAs for enterprises. ⚡ <span style={{ color: '#22c55e', fontWeight: 700 }}>Nexus Trade Agent is LIVE NOW</span></p>
-                <div className="cards-grid">
-                    <div className="agent-card">
-                        <div className="agent-icon">🔐</div>
-                        <h3>The Gatekeeper</h3>
-                        <p>Triple-layer verification + Trust Score from CA audits.</p>
-                        <ul className="features-list">
-                            <li>IEC + GST + Sanctions check</li>
-                            <li>Credit risk analysis</li>
-                            <li>CA-verified Trust Score</li>
-                            <li>Buyer vetting (UDIN)</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card" style={{ borderLeft: '4px solid #22c55e' }}>
-                        <div style={{ display: 'inline-block', background: 'rgba(34, 197, 94, 0.3)', color: '#22c55e', padding: '6px 12px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🟢 Live Now</div>
-                        <div className="agent-icon">⚖️</div>
-                        <h3>Ekayan</h3>
-                        <p>GovTech-grade AI. Real-time DGFT/Customs compliance. Ask anything trade-related. Responds in 60 seconds.</p>
-                        <ul className="features-list">
-                            <li>HS code lookups (instant)</li>
-                            <li>DGFT policy verification</li>
-                            <li>Customs duty calculation</li>
-                            <li>Trade scenario analysis</li>
-                            <li>Find trusted CAs for verification</li>
-                        </ul>
-                        <button onClick={openNexusChat} style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.4)', color: '#22c55e', padding: '10px 16px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', marginTop: '15px', width: '100%' }}>Chat with Nexus Now →</button>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">📄</div>
-                        <h3>CA Marketplace</h3>
-                        <p>Verified CAs for verification, financing, compliance. Direct leads. Zero commission markup. UDIN-backed document signing.</p>
-                        <ul className="features-list">
-                            <li>Certified CA profiles (searchable)</li>
-                            <li>Financing specialists</li>
-                            <li>Compliance experts</li>
-                            <li>UDIN document signing (IT Act 2000)</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">🛂</div>
-                        <h3>Custom House Agent Network</h3>
-                        <p>Verified CHAs for customs clearance. Direct leads. Real-time clearance status.</p>
-                        <ul className="features-list">
-                            <li>CHA marketplace (verified CHAs)</li>
-                            <li>Port-wise CHA specialization</li>
-                            <li>Customs clearance tracking</li>
-                            <li>Duty optimization advice</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">🔍</div>
-                        <h3>Buyer & Financing Agent</h3>
-                        <p>Find verified buyers + connect to finance-ready CAs. End-to-end trade closure.</p>
-                        <ul className="features-list">
-                            <li>AI-matched verified buyers</li>
-                            <li>CA-backed financing leads</li>
-                            <li>Global + local options</li>
-                            <li>Payment guarantee network</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">📍</div>
-                        <h3>Shipment Tracker</h3>
-                        <p>Real-time tracking with QR codes on Trade Card. Share shipments for trust building.</p>
-                        <ul className="features-list">
-                            <li>Live port updates</li>
-                            <li>Ocean tracking</li>
-                            <li>Customs alerts</li>
-                            <li>Shipment sharing on MiniLinkedIn</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">🚢</div>
-                        <h3>Logistics Optimizer</h3>
-                        <p>Best shipping routes in real-time.</p>
-                        <ul className="features-list">
-                            <li>Port recommendations</li>
-                            <li>Rate comparisons</li>
-                            <li>Transit time calc</li>
-                            <li>Cost optimization</li>
-                        </ul>
-                    </div>
-                    <div className="agent-card">
-                        <div className="agent-icon">🎓</div>
-                        <h3>Mentor Agent</h3>
-                        <p>Educates new exporters step-by-step.</p>
-                        <ul className="features-list">
-                            <li>Export 101 guides</li>
-                            <li>Regulatory explainers</li>
-                            <li>Farmer-to-exporter path</li>
-                            <li>Q&A on basics</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+            {/* HERO SECTION */}
+            <section className="relative pt-32 pb-32 overflow-hidden z-10">
+                <div className="max-w-7xl mx-auto px-6 text-center">
 
-            {/* Trade Card Demo */}
-            <section className="section demo-section" id="demo">
-                <h2 className="section-title">Your <span className="gradient-text">Premium Trade Card</span></h2>
-                <p style={{ textAlign: 'center', color: '#9ca3af', marginBottom: '30px' }}>Black luxury card. QR-verified. CA-backed. Share globally. Buyers trust instantly.</p>
-                <div className="demo-container">
-                    <div className="trade-card" style={{ background: 'linear-gradient(135deg, rgba(10, 10, 20, 0.98), rgba(5, 5, 15, 0.98))', border: '1px solid rgba(56, 189, 248, 0.15)' }}>
-                        <div className="trade-card-content">
-                            <div style={{ fontSize: '11px', color: '#38bdf8', marginBottom: '12px', letterSpacing: '2px', fontWeight: 700 }}>HINDTRADEAI VERIFIED EXPORTER</div>
-                            <div className="company-info">
-                                <div className="company-name" style={{ fontSize: '26px', background: 'linear-gradient(135deg, #38bdf8, #22c55e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Himrock Exports</div>
-                                <div className="company-location" style={{ fontSize: '12px', color: '#9ca3af' }}>Ludhiana, Punjab | Established 2015</div>
-                            </div>
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-3 px-4 py-2 border border-blue-900/30 rounded-full bg-blue-950/10 mb-10 backdrop-blur-md mx-auto">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span className="text-blue-400 text-[10px] font-bold uppercase tracking-[0.25em]">Verified Trade Infrastructure</span>
+                    </div>
 
-                            <div style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(34, 197, 94, 0.08))', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '14px', padding: '22px', margin: '18px 0' }}>
-                                <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '10px', textAlign: 'center', letterSpacing: '1px' }}>QR VERIFICATION</div>
-                                <div className="qr-placeholder" style={{ width: '160px', height: '160px', margin: '0 auto 15px' }}>
-                                    🔲 <br /><span style={{ fontSize: '11px' }}>Scan to Verify</span>
+                    {/* Headline */}
+                    <h1 className="text-5xl md:text-8xl font-light text-white mb-8 tracking-tight leading-[1.1]">
+                        The <span className="font-serif italic text-blue-500">Operating System</span> <br />
+                        for Indian Trade.
+                    </h1>
+
+                    <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-20 leading-relaxed font-light">
+                        A unified identity layer for SMEs. <br />
+                        <span className="text-white">Public Visibility. Locked Contacts. Verified Trust.</span>
+                    </p>
+
+                    {/* THE ULTRA-LUXURY CARD */}
+                    <div className="relative w-full max-w-[520px] aspect-[1.586/1] mx-auto perspective-1000 mb-20 group">
+                        {/* Champagne/Gold Glow specific to Card */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-amber-200/10 rounded-full blur-[80px] opacity-100 transition duration-1000"></div>
+
+                        <div className="relative h-full w-full bg-[#030303] rounded-2xl border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,1)] overflow-hidden flex flex-col backdrop-blur-2xl transform transition-transform duration-1000 group-hover:rotate-x-2 group-hover:scale-[1.02]">
+                            {/* Texture */}
+                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-overlay"></div>
+
+                            {/* Card Content */}
+                            <div className="relative z-10 p-8 flex flex-col h-full justify-between">
+
+                                {/* Header */}
+                                <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded border border-white/20 flex items-center justify-center bg-white/5 backdrop-blur-md">
+                                            <span className="text-white font-serif text-lg">H</span>
+                                        </div>
+                                        <div>
+                                            <div className="text-[9px] text-amber-200/80 uppercase tracking-[0.2em] mb-0.5">Verified Exporter</div>
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></div>
+                                                <div className="text-[9px] text-white/60 font-mono">LIVE STATUS</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-2xl grayscale opacity-60">🇮🇳</div>
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#38bdf8', textAlign: 'center', fontWeight: 600 }}>ID: HT-LDH-2024-001</div>
-                                <div style={{ fontSize: '11px', color: '#6b7280', textAlign: 'center', marginTop: '8px' }}>Verified | HSN Approved | Financeable</div>
-                            </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', margin: '16px 0', fontSize: '13px' }}>
-                                <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.15)', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-                                    <div style={{ color: '#9ca3af', fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Trust Score</div>
-                                    <div style={{ color: '#22c55e', fontWeight: 700, fontSize: '20px' }}>98/100</div>
-                                    <div style={{ color: '#6b7280', fontSize: '10px', marginTop: '4px' }}>CA Verified</div>
+                                {/* Main Data */}
+                                <div>
+                                    <h2 className="text-2xl text-white tracking-widest uppercase font-light mb-6">Himrock Exports</h2>
+
+                                    {/* Stats Grid */}
+                                    <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-4 mb-4">
+                                        <div>
+                                            <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Shipments</div>
+                                            <div className="text-sm text-white font-mono">120+</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Experience</div>
+                                            <div className="text-sm text-white font-mono">12 Yrs</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Net Worth</div>
+                                            <div className="text-sm text-amber-200 font-mono">₹12 Cr</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 mb-2">
+                                        <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] text-slate-400">GST REGISTERED</span>
+                                        <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] text-slate-400">IEC HOLDER</span>
+                                        <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] text-slate-400">CA AUDITED</span>
+                                    </div>
                                 </div>
-                                <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-                                    <div style={{ color: '#9ca3af', fontSize: '11px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Net Worth</div>
-                                    <div style={{ color: '#38bdf8', fontWeight: 700, fontSize: '18px' }}>₹15Cr+</div>
-                                    <div style={{ color: '#6b7280', fontSize: '10px', marginTop: '4px' }}>Audited</div>
+
+                                {/* Footer Strip */}
+                                <div className="flex justify-between items-end">
+                                    <div className="font-mono text-[9px] text-amber-500/60 tracking-widest">
+                                        UDIN: 24059182AABCV1928 • VERIFIED
+                                    </div>
+                                    <button className="px-3 py-1 bg-white text-black text-[9px] font-bold uppercase tracking-widest hover:bg-slate-200 transition rounded-sm">
+                                        Portfolio ↗
+                                    </button>
                                 </div>
                             </div>
 
-                            <div style={{ background: 'rgba(34, 197, 94, 0.1)', borderLeft: '3px solid #22c55e', borderRadius: '8px', padding: '14px', margin: '16px 0' }}>
-                                <div style={{ fontSize: '12px', color: '#22c55e', fontWeight: 700, marginBottom: '8px' }}>✓ CA-VERIFIED PROFILE</div>
-                                <div style={{ fontSize: '11px', color: '#9ca3af', lineHeight: 1.5 }}>
-                                    Verified by CA Ramesh Gupta (UDIN: 240599ABC)<br />
-                                    <strong style={{ color: '#38bdf8' }}>View Full Audit →</strong>
+                            {/* Holographic Sheen */}
+                            <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-5 animate-shine" />
+                        </div>
+                    </div>
+
+                    {/* CTAs */}
+                    <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                        <Link to="/auth" className="px-12 py-4 bg-blue-700 text-white font-bold text-[10px] uppercase tracking-[0.25em] hover:bg-blue-600 transition shadow-[0_0_40px_rgba(37,99,235,0.4)] rounded-lg">
+                            Get Trade Card
+                        </Link>
+                        <button onClick={() => scrollToSection('mission')} className="px-12 py-4 bg-transparent border border-white/10 text-slate-400 font-bold text-[10px] uppercase tracking-[0.25em] hover:text-white hover:border-white transition rounded-lg">
+                            See The Problem
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* PROBLEM SECTION: "THE TRUST GAP" */}
+            <section id="mission" className="py-32 border-t border-white/5 bg-[#030303]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-20">
+                        <span className="text-red-500 font-bold text-[10px] uppercase tracking-[0.25em] mb-4 block">The Problem</span>
+                        <h2 className="text-4xl font-serif text-white mb-6">Why Indian SMEs Struggle Globally</h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-sm leading-relaxed">
+                            International buyers don't trust WhatsApp screenshots. Domestic trade is cluttered with unverified leads.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            { title: "Identity Crisis", desc: "No verifiable digital proof of business existence beyond PDFs." },
+                            { title: "Manual Chaos", desc: "Invoices, GST docs, and compliance handled manually on paper." },
+                            { title: "Hidden Visibility", desc: "Great products remain invisible to high-value buyers due to poor presentation." }
+                        ].map((item, i) => (
+                            <div key={i} className="group p-10 bg-[#050505] border border-white/5 rounded-xl hover:-translate-y-2 hover:shadow-[0_20px_60px_-15px_rgba(220,38,38,0.1)] transition-all duration-500">
+                                <h3 className="text-xl text-white mb-4 font-serif">{item.title}</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* INFRASTRUCTURE GRID: "SHOPIFY EFFECTS" */}
+            <section id="infrastructure" className="py-32 border-t border-white/5 bg-black">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-20">
+                        <div>
+                            <span className="text-blue-500 font-bold text-[10px] uppercase tracking-[0.25em] mb-4 block">The Solution</span>
+                            <h2 className="text-4xl font-serif text-white">Core Infrastructure</h2>
+                        </div>
+                        <p className="text-slate-500 text-right text-xs max-w-xs leading-relaxed">
+                            A complete operating system to manage identity, compliance, and growth.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            { icon: "🪪", title: "Trade Card", desc: "Your cryptographic business passport. Verified by CAs." },
+                            { icon: "🤖", title: "AI Trade Guidance", desc: "24/7 AI Copilot for HSN codes & compliance queries." },
+                            { icon: "📄", title: "Auto Doc Gen", desc: "Generate GST Invoices & Packing Lists instantly." },
+                            { icon: "👨‍⚖️", title: "Expert Network", desc: "Direct access to CAs & CHAs for audits." },
+                            { icon: "🎨", title: "Student Designers", desc: "Hire talent to build your digital portfolio." },
+                            { icon: "🌍", title: "Connectivity", desc: "Logistics linking for seamless exports." }
+                        ].map((item, i) => (
+                            <div key={i} className="group bg-[#080808] border border-white/10 p-8 rounded-2xl hover:-translate-y-2 hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.1)] hover:border-white/30 transition-all duration-500 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition duration-500 text-white">↗</div>
+                                <div className="relative z-10">
+                                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white/10 transition">
+                                        <span className="text-2xl">{item.icon}</span>
+                                    </div>
+                                    <h3 className="text-lg text-white mb-2 font-serif">{item.title}</h3>
+                                    <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
-                            <div style={{ background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', padding: '12px', marginTop: '12px' }}>
-                                <div style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 700, marginBottom: '6px' }}>CONTACT YOUR CA</div>
-                                <div style={{ fontSize: '12px', color: '#9ca3af' }}>CA Ramesh Gupta | +91-98765-43210<br /><span style={{ color: '#6b7280', fontSize: '11px' }}>Financing • Verification • Compliance</span></div>
+            {/* THE BLUEPRINT: "WORKFLOW" */}
+            <section id="blueprint" className="py-32 border-t border-white/5 bg-[#030303]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-24">
+                        <span className="text-blue-500 font-bold text-[10px] uppercase tracking-[0.25em] mb-4 block">Workflow</span>
+                        <h2 className="text-4xl font-serif text-white">The Blueprint</h2>
+                    </div>
+
+                    <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
+                        {/* Connecting Line */}
+                        <div className="hidden md:block absolute top-12 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-900/50 to-transparent z-0"></div>
+
+                        {[
+                            { step: "01", title: "Initialize", highlight: "Free", desc: "Register. Get your Mini-Profile and Basic Trade Card instantly." },
+                            { step: "02", title: "Validate", highlight: "Verify", desc: "Hire a CA from the network. Get your Verified Badge and Net Worth Certificate." },
+                            { step: "03", title: "Showcase", highlight: "Build", desc: "Open Student Access. Build a professional product webpage linked to your card." },
+                            { step: "04", title: "Execute", highlight: "Scale", desc: "Connect with CHAs. Share your verified identity. Start global trade." }
+                        ].map((item, i) => (
+                            <div key={i} className="relative z-10 bg-[#050505] border border-white/10 p-8 pt-12 rounded-xl group hover:-translate-y-2 hover:shadow-2xl transition duration-500">
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-black border border-blue-900 rounded-full flex items-center justify-center text-[10px] text-blue-500 font-bold group-hover:bg-blue-600 group-hover:text-white transition">
+                                    {i + 1}
+                                </div>
+                                <div className="text-blue-500 text-[9px] font-bold uppercase tracking-widest mb-2">{item.highlight}</div>
+                                <h3 className="text-xl text-white mb-4">{item.title}</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* SERVICE MARKETPLACE (CA + CHA) */}
+            <section id="marketplace" className="py-32 border-t border-white/5 bg-black">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-20">
+                        <h2 className="text-3xl font-light text-white uppercase tracking-widest mb-4">Service Marketplace</h2>
+                        <p className="text-slate-500 text-xs tracking-[0.1em]">Connect with verified professionals.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* CA CARD - Enhanced */}
+                        <div className="group bg-[#080808] border border-white/10 p-8 hover:border-white/30 hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.1)] hover:-translate-y-2 transition-all duration-500 rounded-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition duration-500 text-white">↗</div>
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white/10 transition">
+                                    <span className="text-2xl">👨‍⚖️</span>
+                                </div>
+                                <h3 className="text-lg text-white font-serif mb-3">Chartered Accountants</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed mb-6">
+                                    Hire CAs for specific tasks without high retainers.
+                                </p>
+                                <ul className="space-y-3 text-xs text-slate-400 mb-6 border-t border-white/5 pt-5">
+                                    <li className="flex justify-between"><span>• Trade Doc Signing</span> <span className="text-white/70">On-Demand</span></li>
+                                    <li className="flex justify-between"><span>• Net Worth Certificates</span> <span className="text-white/70">Fixed Fee</span></li>
+                                    <li className="flex justify-between"><span>• Verification Audits</span> <span className="text-white/70">Priority</span></li>
+                                </ul>
+                                <button className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-white transition group-hover:text-white">Access Network →</button>
+                            </div>
+                        </div>
+
+                        {/* CHA CARD */}
+                        <div className="group bg-[#080808] border border-white/10 p-8 hover:border-white/30 hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.1)] hover:-translate-y-2 transition-all duration-500 rounded-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition duration-500 text-white">↗</div>
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white/10 transition">
+                                    <span className="text-2xl">🚢</span>
+                                </div>
+                                <h3 className="text-lg text-white font-serif mb-3">CHA Network</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed mb-6">
+                                    Connect with verified Customs House Agents.
+                                </p>
+                                <ul className="space-y-3 text-xs text-slate-400 mb-6 border-t border-white/5 pt-5">
+                                    <li className="flex justify-between"><span>• Verified CHA Leads</span> <span className="text-white/70">Direct Contact</span></li>
+                                    <li className="flex justify-between"><span>• Export Clearance</span> <span className="text-white/70">Expert Support</span></li>
+                                    <li className="flex justify-between"><span>• Port Documentation</span> <span className="text-white/70">Assistance</span></li>
+                                </ul>
+                                <button className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-white transition group-hover:text-white">Contact CHA →</button>
+                            </div>
+                        </div>
+
+                        {/* STUDENT DESIGNERS CARD */}
+                        <div className="group bg-[#080808] border border-white/10 p-8 hover:border-white/30 hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.1)] hover:-translate-y-2 transition-all duration-500 rounded-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition duration-500 text-white">↗</div>
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white/10 transition">
+                                    <span className="text-2xl">🎨</span>
+                                </div>
+                                <h3 className="text-lg text-white font-serif mb-3">Student Designers</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed mb-6">
+                                    NIT/IIT students build your portfolio & webpage.
+                                </p>
+                                <ul className="space-y-3 text-xs text-slate-400 mb-6 border-t border-white/5 pt-5">
+                                    <li className="flex justify-between"><span>• Company Webpage</span> <span className="text-white/70">₹500</span></li>
+                                    <li className="flex justify-between"><span>• Product Portfolio</span> <span className="text-white/70">Custom</span></li>
+                                    <li className="flex justify-between"><span>• Trade Card Linking</span> <span className="text-white/70">Included</span></li>
+                                </ul>
+                                <button className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-white transition group-hover:text-white">Hire Designer →</button>
+                            </div>
+                        </div>
+
+                        {/* AI MENTOR CARD */}
+                        <div className="group bg-[#080808] border border-white/10 p-8 hover:border-white/30 hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.1)] hover:-translate-y-2 transition-all duration-500 rounded-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition duration-500 text-white">↗</div>
+                            <div className="relative z-10">
+                                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-white/10 transition">
+                                    <span className="text-2xl">🤖</span>
+                                </div>
+                                <h3 className="text-lg text-white font-serif mb-3">AI Trade Mentor</h3>
+                                <p className="text-slate-500 text-xs leading-relaxed mb-6">
+                                    24/7 AI guidance for global trade compliance.
+                                </p>
+                                <ul className="space-y-3 text-xs text-slate-400 mb-6 border-t border-white/5 pt-5">
+                                    <li className="flex justify-between"><span>• HSN Code Lookup</span> <span className="text-white/70">Instant</span></li>
+                                    <li className="flex justify-between"><span>• Shipping Ports & Routes</span> <span className="text-white/70">Global</span></li>
+                                    <li className="flex justify-between"><span>• Required Documents</span> <span className="text-white/70">Checklist</span></li>
+                                </ul>
+                                <button className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-white transition group-hover:text-white">Ask AI Mentor →</button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                {/* Demo Features */}
-                <div className="demo-features">
-                    <div className="demo-feature">
-                        <div className="demo-feature-icon">🔲</div>
-                        <h4>QR-Verified Instantly</h4>
-                        <p>Buyers scan black luxury card. See Net Worth, Trust Score, CA audit link. Trade happens in minutes, not weeks.</p>
+            {/* DETAILED PRICING (10+ POINTS) */}
+            <section id="membership" className="py-32 border-t border-white/5 bg-[#030303]">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-24">
+                        <span className="text-blue-500 font-bold text-[10px] uppercase tracking-[0.25em] mb-4 block">Membership</span>
+                        <h2 className="text-4xl font-serif text-white">Select Your Tier</h2>
                     </div>
-                    <div className="demo-feature">
-                        <div className="demo-feature-icon">👨‍⚖️</div>
-                        <h4>CA Marketplace + UDIN Signing</h4>
-                        <p>Verified CA profiles. Direct rates. CAs sign documents with UDIN (IT Act 2000 compliant). QR-generated, legally verified.</p>
+
+                    {/* Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 max-w-6xl mx-auto">
+
+                        {/* Starter */}
+                        <div className="border border-white/10 p-8 bg-[#050505] rounded-xl hover:border-white/20 transition">
+                            <div className="text-lg text-white font-serif mb-2">Basic</div>
+                            <div className="text-4xl font-light text-white mb-6">₹0</div>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-8 pb-8 border-b border-white/5">
+                                Trade Card Creation is Free.
+                            </p>
+                            <Link to="/auth" className="block w-full py-4 border border-white/20 text-white text-center text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition rounded-lg">
+                                Start
+                            </Link>
+                        </div>
+
+                        {/* Verified */}
+                        <div className="border border-blue-500/40 p-8 bg-[#0a0a0a] rounded-xl relative shadow-[0_0_30px_rgba(37,99,235,0.1)] hover:-translate-y-1 transition duration-500">
+                            <div className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold uppercase px-3 py-1 tracking-widest rounded-bl-lg rounded-tr-lg">Required for Badge</div>
+                            <div className="text-lg text-white font-serif mb-2">Verified</div>
+                            <div className="text-4xl font-light text-blue-400 mb-6">₹5,000<span className="text-sm text-slate-600">/yr</span></div>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-8 pb-8 border-b border-white/5">
+                                For Active Trading.
+                            </p>
+                            <Link to="/auth" className="block w-full py-4 bg-blue-600 text-white text-center text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-blue-500 transition rounded-lg">
+                                Get Verified
+                            </Link>
+                        </div>
+
+                        {/* Scale */}
+                        <div className="border border-white/10 p-8 bg-[#050505] rounded-xl hover:border-white/20 transition">
+                            <div className="text-lg text-white font-serif mb-2">Scale</div>
+                            <div className="text-4xl font-light text-white mb-6">₹10,000<span className="text-sm text-slate-600">/yr</span></div>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-8 pb-8 border-b border-white/5">
+                                For Market Leaders.
+                            </p>
+                            <Link to="/auth" className="block w-full py-4 border border-white/20 text-white text-center text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white hover:text-black transition rounded-lg">
+                                Upgrade
+                            </Link>
+                        </div>
                     </div>
-                    <div className="demo-feature">
-                        <div className="demo-feature-icon">🛂</div>
-                        <h4>CHA Leads Network</h4>
-                        <p>Verified Custom House Agents by port. Direct CHA leads. Port-wise specialization. Customs clearance guaranteed.</p>
+
+                    {/* DETAILED COMPARISON TABLE (10 POINTS) */}
+                    <div className="max-w-5xl mx-auto overflow-x-auto bg-[#050505] border border-white/5 rounded-2xl p-8">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-white/10">
+                                    <th className="py-6 pl-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] w-1/3">Feature Breakdown</th>
+                                    <th className="py-6 text-center text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Basic (Free)</th>
+                                    <th className="py-6 text-center text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em]">Verified</th>
+                                    <th className="py-6 text-center text-[10px] font-bold text-white uppercase tracking-[0.2em]">Scale</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-xs text-slate-400">
+                                {[
+                                    { name: "Basic Trade Card", basic: true, ver: true, scale: true },
+                                    { name: "Public Inventory Listing", basic: true, ver: true, scale: true },
+                                    { name: "Receive Trade Requests", basic: true, ver: true, scale: true },
+                                    { name: "Access Student Designers (₹500)", basic: true, ver: true, scale: true },
+                                    { name: "Verified Badge (CA Audited)", basic: false, ver: true, scale: true },
+                                    { name: "Unlock Buyer Contacts", basic: false, ver: true, scale: true },
+                                    { name: "Access CA Marketplace", basic: false, ver: true, scale: true },
+                                    { name: "Document Vault Storage", basic: false, ver: true, scale: true },
+                                    { name: "Net Worth Certificate", basic: false, ver: false, scale: true },
+                                    { name: "Access CHA Leads", basic: false, ver: false, scale: true },
+                                ].map((row, i) => (
+                                    <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition group">
+                                        <td className="py-5 pl-4 text-white font-light tracking-wide group-hover:text-blue-400 transition">{row.name}</td>
+                                        <td className="text-center text-slate-600">{row.basic ? "●" : "—"}</td>
+                                        <td className="text-center text-blue-500">{row.ver ? "●" : "—"}</td>
+                                        <td className="text-center text-white">{row.scale ? "●" : "—"}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                    <div className="demo-feature">
-                        <div className="demo-feature-icon">📱</div>
-                        <h4>MiniLinkedIn: Shipment Sharing</h4>
-                        <p>Share successful shipments on your profile. Build trust publicly. Buyers see your track record. Transparency = more deals.</p>
+
+                    {/* CONCIERGE ADD-ON BOX */}
+                    <div className="max-w-4xl mx-auto mt-20 bg-blue-900/5 border border-dashed border-blue-500/30 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div>
+                            <h3 className="text-white text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                Concierge Web Design
+                            </h3>
+                            <p className="text-slate-500 text-xs max-w-md leading-relaxed">
+                                Optional add-on for all members. Hire a vetted engineering student to build a professional product showcase page linked to your Trade Card.
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-2xl text-white font-light mb-1">₹500</div>
+                            <div className="text-[10px] text-blue-400 uppercase tracking-widest">One-time Fee</div>
+                        </div>
                     </div>
+
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section className="section">
-                <h2 className="section-title">The <span className="gradient-text">Trade Closure Journey</span></h2>
-                <div className="timeline">
-                    <div className="timeline-step">
-                        <div className="step-number">1</div>
-                        <h3>Register & Connect CA</h3>
-                        <p>Upload GST/IEC. Nominate your CA (or get assigned). We coordinate audit + net worth verification within 48 hrs.</p>
-                    </div>
-                    <div className="timeline-step">
-                        <div className="step-number">2</div>
-                        <h3>Get Black Trade Card + Profile</h3>
-                        <p>Premium card with QR arrives. Create MiniLinkedIn profile. Share shipments to build trust publicly. Show track record to buyers.</p>
-                    </div>
-                    <div className="timeline-step">
-                        <div className="step-number">3</div>
-                        <h3>Access CA & CHA Marketplaces</h3>
-                        <p>Browse verified CAs (financing, compliance), CHAs (customs). Get direct leads. CA signs documents with UDIN. CHA clears customs instantly.</p>
-                    </div>
-                    <div className="timeline-step">
-                        <div className="step-number">4</div>
-                        <h3>Close Trade + Build Reputation</h3>
-                        <p>Trade, get financed, documents UDIN-signed & QR-verified. Share shipment on MiniLinkedIn. Every deal = higher score = premium opportunities.</p>
+            {/* FOOTER */}
+            <footer className="py-20 border-t border-white/5 bg-black text-[10px] text-slate-600 uppercase tracking-widest">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>© 2026 HindTradeAI. Built for Indian Trade.</div>
+                    <div className="flex items-center gap-8">
+                        <a href="#" className="hover:text-white transition">Privacy</a>
+                        <a href="#" className="hover:text-white transition">Terms</a>
+                        <button onClick={openNexusChat} className="text-blue-500 hover:text-white transition">
+                            Concierge
+                        </button>
                     </div>
                 </div>
-            </section>
-
-            {/* Pricing */}
-            <section className="section pricing-section" id="pricing">
-                <h2 className="section-title"><span className="gradient-text">Simple. Transparent.</span> No Hidden Fees.</h2>
-                <div className="pricing-grid">
-                    <div className="pricing-card">
-                        <h3>Free Tier</h3>
-                        <div className="price">₹0</div>
-                        <div className="price-duration">Forever</div>
-                        <ul>
-                            <li>Profile + Registration</li>
-                            <li>3 Nexus queries/month</li>
-                            <li>Basic Trust Score</li>
-                            <li>Mentor Agent access</li>
-                            <li>No Trade Card</li>
-                            <li>No CA Verification</li>
-                            <li>No CA Marketplace access</li>
-                        </ul>
-                        <button className="btn-primary" onClick={() => handleButtonClick('Start Free')}>Start Free</button>
-                    </div>
-                    <div className="pricing-card featured">
-                        <h3>Pro (Black Trade Card)</h3>
-                        <div className="price">₹5,000</div>
-                        <div className="price-duration">per month</div>
-                        <ul>
-                            <li>Black luxury Trade Card + QR</li>
-                            <li>CA-verified net worth audit</li>
-                            <li>Access CA Marketplace</li>
-                            <li>50+ verified buyer leads/month</li>
-                            <li>Bank financing pre-approval</li>
-                            <li>Unlimited document coordination</li>
-                        </ul>
-                        <button className="btn-primary" onClick={() => navigate('/auth')}>Get Early Access</button>
-                    </div>
-                    <div className="pricing-card">
-                        <h3>Enterprise</h3>
-                        <div className="price">Custom</div>
-                        <div className="price-duration">per month</div>
-                        <ul>
-                            <li>Everything in Pro</li>
-                            <li>Dedicated Personal CA (Hired)</li>
-                            <li>Unlimited CA consultations</li>
-                            <li>API + White-label</li>
-                            <li>Bulk Trade Card Printing</li>
-                            <li>Account Manager + 24/7</li>
-                        </ul>
-                        <button className="btn-primary" onClick={() => handleButtonClick('Schedule Call')}>Schedule Call</button>
-                    </div>
-                </div>
-                <p style={{ textAlign: 'center', marginTop: '40px', color: '#6b7280', fontSize: '14px' }}><strong>Pay-as-you-grow:</strong> CA marketplace (direct rates, no markup). CHA leads (₹1K-2K per clearance). UDIN document signing (₹500/doc, CA fee). Bank financing (bank charges). CHA + CA profiles searchable. Pro: 2 free consultations/month. Enterprise: Unlimited + dedicated personal CA hired.</p>
-            </section>
-
-            {/* MiniLinkedIn Profiles Demo */}
-            <section className="section" style={{ background: 'rgba(15, 23, 42, 0.4)', borderRadius: '20px', padding: '80px 40px' }}>
-                <h2 className="section-title">Build <span className="gradient-text">Trust Publicly</span></h2>
-                <p style={{ textAlign: 'center', color: '#9ca3af', marginBottom: '50px' }}>Your MiniLinkedIn profile. Share shipments. Build reputation. Buyers trust verified track records.</p>
-                <div className="profile-showcase">
-                    <div className="profile-card">
-                        <div className="profile-header">🌐 Exporter Profile</div>
-                        <div className="profile-name">Himrock Exports</div>
-                        <div className="profile-designation">Bulk Textiles | Ludhiana, Punjab</div>
-                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', padding: '12px', marginBottom: '15px' }}>
-                            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '5px' }}>Trade Score</div>
-                            <div style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 700 }}>98/100</div>
-                        </div>
-                        <div className="shipment-badge">
-                            <strong>✓ 47 Shipments Completed</strong><br />
-                            <span>Last shipment: UAE (5 days ago)</span>
-                        </div>
-                        <button className="view-profile-btn" onClick={() => handleViewProfile('View Full Profile')}>View Full Profile →</button>
-                    </div>
-                    <div className="profile-card">
-                        <div className="profile-header">👨‍⚖️ CA Profile</div>
-                        <div className="profile-name">CA Ramesh Gupta</div>
-                        <div className="profile-designation">UDIN: 240599ABC | Financing Specialist</div>
-                        <div style={{ background: 'rgba(34, 197, 94, 0.1)', borderRadius: '8px', padding: '12px', marginBottom: '15px' }}>
-                            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '5px' }}>Rating</div>
-                            <div style={{ fontSize: '20px', color: '#22c55e', fontWeight: 700 }}>4.9/5</div>
-                        </div>
-                        <div className="shipment-badge">
-                            <strong>✓ 230+ Exports Verified</strong><br />
-                            <span>Financing success rate: 95%</span>
-                        </div>
-                        <button className="view-profile-btn" onClick={() => handleViewProfile('Hire This CA')}>Hire This CA →</button>
-                    </div>
-                    <div className="profile-card">
-                        <div className="profile-header">🛂 CHA Profile</div>
-                        <div className="profile-name">Express Customs Solutions</div>
-                        <div className="profile-designation">Nhava Sheva Port Specialist | CHA</div>
-                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', padding: '12px', marginBottom: '15px' }}>
-                            <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '5px' }}>Rating</div>
-                            <div style={{ fontSize: '20px', color: '#38bdf8', fontWeight: 700 }}>4.8/5</div>
-                        </div>
-                        <div className="shipment-badge">
-                            <strong>✓ 1,200+ Clearances</strong><br />
-                            <span>Avg clearance time: 2 hours</span>
-                        </div>
-                        <button className="view-profile-btn" onClick={() => handleViewProfile('Get CHA Leads')}>Get CHA Leads →</button>
-                    </div>
-                </div>
-            </section>
-
-            {/* Register CTA */}
-            <section style={{ background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(34, 197, 94, 0.15))', padding: '80px 40px', textAlign: 'center', borderRadius: '20px', margin: '80px 40px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                <h2 style={{ fontSize: '48px', fontWeight: 700, marginBottom: '20px', color: '#f9fafb' }}>Register Now. Get Early Access.</h2>
-                <p style={{ fontSize: '18px', marginBottom: '40px', color: '#9ca3af', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>Be among the first 500 verified exporters. Your Trade Card + MiniLinkedIn profile + CA & CHA marketplace access. Build trust. Close deals faster.</p>
-                <button className="btn-primary" id="register" style={{ fontSize: '18px', padding: '20px 50px' }} onClick={() => navigate('/auth')}>Register & Get Early Access →</button>
-            </section>
-
-            {/* Footer */}
-            <footer>
-                <div className="footer-links">
-                    <a href="#agents" onClick={(e) => handleSmoothScroll(e, '#agents')}>Agents</a>
-                    <a href="#demo" onClick={(e) => handleSmoothScroll(e, '#demo')}>Features</a>
-                    <a href="#pricing" onClick={(e) => handleSmoothScroll(e, '#pricing')}>Pricing</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Contact</a>
-                </div>
-                <p>© 2025 HindTradeAI. The Global Trade OS. | Simplifying Indian Export. | Code is Law. Trust is Currency.</p>
             </footer>
-        </>
+        </div>
     )
 }
 
